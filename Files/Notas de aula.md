@@ -789,3 +789,58 @@ Scalability Challenges in Web Search Engines, Ch. 2Cambazoglu and Baeza-Yates, 2
 
 ### Próxima aula: Document Understanding
 
+## Aula 04 - 24/03/2025 - Document Understanding
+
+## Aula 05 - 26/03/2025 - Document Indexing
+
+## Aula 06 - 31/03/2025 - Query Understanding
+
+## Aula 07 - 02/04/2025 - Document Matching
+
+## Aula 08 - 07/04/2025 - Efficient Matching
+
+## Aula 09 - 09/04/2025 - Vector Space Models
+
+## Aula 10 - 14/04/2025 - Language Models
+
+## Aula 11 - 16/04/2025 - Experimental Methods
+
+## Aula 12 - 21/04/2025 - Offline Evaluation
+
+## Aula 13 - 23/04/2025 - Exam #1
+
+## Aula 14 - 28/04/2025 - Quality Models
+
+## Aula 15 - 30/04/2025 - Feedback Models
+
+## Aula 16 - 05/05/2025 - Diversification Models
+
+## Aula 17 - 07/05/2025 - Learning to Rank: Fundamentals
+
+## Aula 18 - 12/05/2025 - Learning to Rank: Algorithms
+
+## Aula 19 - 14/05/2025 - Neural Models: Reranking
+
+## Aula 20 - 19/05/2025 - Neural Models: Retrieval
+
+## Aula 21 - 21/05/2025 - Online Evaluation
+
+## Aula 22 - 26/05/2025 - Online Learning to Rank
+
+## Aula 23 - 28/05/2025 - Seminars
+
+## Aula 24 - 02/06/2025 - Seminars
+
+## Aula 25 - 04/06/2025 - Exam #2
+
+## --- - 09/06/2025 - Recess: Corpus Christi
+
+## Aula 26 - 11/06/2025 - RC Development (off-class)
+
+## Aula 27 - 16/06/2025 - RC Presentations
+
+## Aula 28 - 18/06/2025 - RC Presentations
+
+## Aula 29 - 23/06/2025 - Replacement Exam
+
+## Aula 30 - 25/06/2025 - Resit Exam
