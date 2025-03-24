@@ -1,9 +1,10 @@
 # Recuperação de Informação
 
-- Professor: Rodrygo L. T. Santos
+- Professor: Rodrygo Luis Teodoro Santos
 - Email: <rodrygo@dcc.ufmg.br>
+- [Pre-Course Survey](https://docs.google.com/forms/d/e/1FAIpQLSfJK_YDa9bH8wzg-xKOWxyShF7MLR8DkvcCRyzEM1R5ofNmsQ/formResponse)
 
-## Aula 1 - 12/03/2025
+## Aula 01 - 12/03/2025
 
 Essa é a área principal de pesquisa dele. Ele também tem foco nos sistemas de recomendação.
 
@@ -261,7 +262,7 @@ Semana que vem ele envia o material no Moodle.
 
 Próxima aula: Search Architecture
 
-## Aula 2 - 17/03/2025
+## Aula 02 - 17/03/2025
 
 ### Slide: Search Architecture
 
@@ -282,7 +283,7 @@ to huge clusters spread across availability zones
 
 #### Search Architecture
 
-A software achitectuer conssits of software components, the interfaces 
+A software achitectuer conssits of software components, the interfaces
 
 - Effectuveness: ...
 - Efficiency: ...
@@ -353,7 +354,7 @@ Professor: uma forma seriam pelos logs do chrome por exemplo. Se não tá indexa
   - Off-document evidente
     - Anchor text, link analysis
       - Texto de âncora é o texto presente...
-        - <a href="https://www.google.com">ESSE TEXTO AQUI</a>
+        - `<a href="https://www.google.com">ESSE TEXTO AQUI</a>`
         - Esse tipo de informação é útil caso, por exemplo, se o site da UOL não citasse "notícias", mesmo que seja sobre notícias, porém, se nos anchor texts essa informação estivesse presente, seria possível inferir que o site é sobre notícias.
     - Social Network Signals
 
