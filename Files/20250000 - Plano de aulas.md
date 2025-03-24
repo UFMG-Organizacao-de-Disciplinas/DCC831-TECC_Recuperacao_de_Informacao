@@ -58,12 +58,27 @@ Projeto, implementação e avaliação de sistemas de recuperação de informaç
 ## Bibliografia
 
 1. [Link][Bib_1] Introduction to Information Retrieval, by C. Manning, P. Raghavan, and H. Schütze. Cambridge University Press, 2008.
+    - ISBN-10: 0521865719
+    - ISBN-13: 978-0521865715
 2. [Link][Bib_2] Search Engines: Information Retrieval in Practice, by B. Croft, D. Metzler, and T. Strohman. Pearson, 2009.
+    - ISBN-10: 0136072240
+    - ISBN-13: 978-0136072249
 3. [Link][Bib_3] Modern Information Retrieval, by R. Baeza-Yates and B. Ribeiro-Neto. Addison-Wesley Professional, 2011.
+    - ISBN-10: 0321416910
+    - ISBN-13: 978-0321416919
 4. [Link][Bib_4] Information Retrieval: Implementing and Evaluating Search Engines, by S. Büttcher, C. Clarke, and G. Cormack. MIT Press, 2016.
+    - ISBN-10: 0262528878
+    - ISBN-13: 978-0262528870
 5. [Link][Bib_5] Text Data Management: A Practical Introduction to Information Retrieval and Text Mining, by C. Zhai and S. Massung. Morgan & Claypool, 2016.
+    - ASIN: B09CLTNC7X
+    - ISBN:978-1-970001-17-4
+    - DOI: <https://doi.org/10.1145/2915031>
 6. [Link][Bib_6] Foundations and Trends in Information Retrieval, by several authors
 7. [Link][Bib_7] Synthesis Lectures on Information Concepts, Retrieval, and Services, by several authors
+    - Print ISSN: 1554-0669
+    - Online ISSN: 1554-0677
+    - Electronic ISSN: 1947-9468
+    - Print ISSN: 1947-945X
 
 [Bib_1]: <https://www.amazon.com/Introduction-Information-Retrieval-Christopher-Manning/dp/0521865719>
 [Bib_2]: <https://www.amazon.com/Search-Engines-Information-Retrieval-Practice/dp/0136072240>
