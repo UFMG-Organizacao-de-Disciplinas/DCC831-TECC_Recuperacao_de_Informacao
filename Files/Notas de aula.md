@@ -1417,12 +1417,12 @@ Parece um pouco com o conceito de RAIDS de armazenamento.
 
 ```mermaid
 flowchart LR
-WWW --> Crawler
-Crawler --> Corpus[(Corpus)]
-Corpus[(Corpus)] --> Indexer
-Indexer --> Index[(Index)]
-Index[(Index)] <--> Query_Processor
-Query_Processor <--> Actor
+  WWW --> Crawler
+  Crawler --> Corpus[(Corpus)]
+  Corpus[(Corpus)] --> Indexer
+  Indexer --> Index[(Index)]
+  Index[(Index)] <--> Query_Processor
+  Query_Processor <--> Actor
 ```
 
 ---
@@ -1904,6 +1904,16 @@ Uma possibilidade é pegar os top documentos ranqueados, minerar as palavras mai
 
 ### Search Components (Aula 07)
 
+```mermaid
+flowchart LR
+  WWW --> Crawler
+  Crawler --> Corpus[(Corpus)]
+  Corpus[(Corpus)] --> Indexer
+  Indexer --> Index[(Index)]
+  Index[(Index)] <--> Query_Processor
+  Query_Processor <--> Actor
+```
+
 ---
 
 ```mermaid
@@ -1940,26 +1950,28 @@ Aqui busca-se ser "exato", para que encontremos tudo que possa vir a ser útil n
 
 - Scan postings lists for all query terms
   - [aquarium fish]
-    - and: 1:1
-    - aquarium: 3:1
-    - are: 3:1, 4:1
-    - ...
-    - environment: 1:1
-    - fish: 1:2, 2:3, 3:2, 4:2
+
+| Terms       | Postings           |
+| ----------- | ------------------ |
+| and         | 1:1                |
+| aquarium    | 3:1                |
+| are         | 3:1, 4:1           |
+| ...         | ...                |
+| environment | 1:1                |
+| fish        | 1:2, 2:3, 3:2, 4:2 |
 
 ---
 
 - Score matching documents
-
-Formula: $f(q, d) = \sum_{t \in q} f(t, d)$
+  - $f(q, d) = \sum_{t \in q} f(t, d)$
 
 ### Key Challenge
 
-- **Matching must operate under strict time constraints**
-  - A slight delay (0.2s-0.4s) can lead to a dramatic drop in perceived quality.
-- **Why is it costly?**
-  - Must score billions (or trillions) of documents.
-  - Must answer thousands of concurrent queries.
+- Matching must operate under strict time constraints
+  - Even a slightly slower search (0.2s-0.4s) can lead to a dramatic drop in the perceived quality of the results
+- What makes it so costly?
+  - Must score billions (or trillions?) of documents
+  - Must answer thousands of concurrent queries
 
 Essa tende a ser a parte mais custosa, visto que é a parte mais computacionalmente custoso
 
@@ -1967,9 +1979,12 @@ Deve-se considerar que enquanto um usuário tá acessando certa informação, di
 
 #### Solution #1: Bypass Scoring
 
-- Query distributions follow Zipf's law.
-- Caching improves efficiency.
-- **Problem**: Cache misses will happen (new queries, index updates).
+- Query distributions similar to Zipf
+◦ Popular queries account for majority of traffic
+- Caching can significantly improve efficiency
+◦ Cache search results, or at least inverted lists
+- Problem: cache misses will happen eventually
+◦ New queries, index updates
 
 As consultas mais repetidas podem ser armazenadas em um cache, e assim, quando um usuário fizer uma consulta que já foi feita antes, o resultado pode ser retornado mais rapidamente.
 
@@ -1979,27 +1994,44 @@ Em algum momento precisamos expirar a cache por ela já não ser mais tão relev
 
 #### Solution #2: Distribute the Burden
 
-- Indexes distributed in a cluster.
-- Replication helps load balancing.
-- **Problem**: Cannot scale indefinitely (costly hardware, energy efficiency).
+- Indexes are often distributed in a cluster
+◦ Too large to fit in a single machine
+◦ Replication helps load balancing
 
 Índices grandes já não são comportados em um único computador, logo já estarão distribuídos. Assim, cada máquina também acaba precisando acessar outras máquinas.
 
 ---
 
+```mermaid
+flowchart LR
+  Actor -->|query| Broker
+  Broker --> Matching_1[Matching]
+  Broker --> Matching_2[Matching]
+  Index_1[(Index)] --> Matching_1
+  Index_2[(Index)] --> Matching_2
+```
+
 Pode haver então um **broker** que agrupa os resultados dos índices para retornar ao usuário.
 
 ---
+
+- Indexes are often distributed in a cluster
+◦ Too large to fit in one machine
+◦ Replication helps load balancing
+- Problem: cannot scale indefinitely
+◦ Costly resources (hardware, energy)
+◦ Intra-node efficiency still crucial
 
 Ainda precisa se preocupar quanto ao nível de eficiência em cada um dos computadores individualmente.
 
 #### Solution #3: Score Parsimoniously
 
-- Ranking models can be expensive.
-- **Multi-stage ranking cascade:**
-  - **Stage #1**: Boolean matching (billions)
-  - **Stage #2**: Unsupervised scoring (millions)
-  - **Stage #3**: Supervised scoring (thousands)
+- Some ranking models can be expensive
+◦ Infeasible to score billions of documents
+- Ranking as a multi-stage cascade
+◦ Stage #1: Boolean matching (billions)
+◦ Stage #2: Unsupervised scoring (millions)
+◦ Stage #3: Supervised scoring (thousands)
 
 Podemos trabalhar com apenas parte do índice.
 
@@ -2007,7 +2039,18 @@ Podemos usar técnicas computacionalmente caras, desde que usemos em volumes peq
 
 ### Why is it still so costly?
 
-...
+- Inherent cost of matching documents to queries
+◦ Query length (number of posting lists)
+◦ Posting lists length (number of postings per list)
+
+| Term     | Postings           |
+| -------- | ------------------ |
+| aquarium | 3:1                |
+| fish     | 1:2, 2:3, 3:2, 4:2 |
+
+De cima pra baixo reduz-se o comprimento da query.
+
+Da esquerda pra direita aumenta-se o tamanho da lista de postings
 
 Acaba sendo necessário varrer as listas. Então quanto mais frequentes foram as palavras, mais custosa será a pesquisa.
 
@@ -2015,35 +2058,85 @@ Acaba sendo necessário varrer as listas. Então quanto mais frequentes foram as
 
 #### Term-at-a-time (TAAT)
 
+- Inverted lists processed in sequence
+◦ Partial document scores accumulated
+
+| Term     | Postings      |
+| -------- | ------------- |
+| salt     | 1:1, 4:1      |
+| water    | 1:1, 2:1, 4:1 |
+| tropical | 1:2, 2:2, 3:1 |
+
 Podemos varrer um item por ver. Varrendo linha e depois coluna, ou coluna e depois linha. Sendo que a linha representa o termo e a coluna representa o documento.
 
 Mas ao varrer sequencialmente ainda não temos um score global, apenas o parcial que vai sendo acumulado a medida que for percorrido.
 
-- Inverted lists processed sequentially.
-- Partial document scores accumulated.
+---
+
+| Term      | Postings      |
+| --------- | ------------- |
+| salt      | **1:1, 4:1**  |
+| water     | 1:1, 2:1, 4:1 |
+| tropical  | 1:2, 2:2, 3:1 |
+| **SCORE** | **1:1, 4:1**  |
 
 ---
 
----
+| Term      | Postings          |
+| --------- | ----------------- |
+| salt      | 1:1, 4:1          |
+| water     | **1:1, 2:1, 4:1** |
+| tropical  | 1:2, 2:2, 3:1     |
+| **SCORE** | **1:2, 2:1, 4:2** |
 
 ---
 
-Example algorithm:
+| Term      | Postings               |
+| --------- | ---------------------- |
+| salt      | 1:1, 4:1               |
+| water     | 1:1, 2:1, 4:1          |
+| tropical  | **1:2, 2:2, 3:1**      |
+| **SCORE** | **1:4, 2:3, 3:1, 4:2** |
+
+---
 
 ```python
-function taat(query, index, k):
+def taat(query, index, k):
   scores = map()
   results = heap(k)
   for term in tokenize(query):
     postings = index[term]
     for (docid, weight) in postings:
-      if docid not in scores:
+      if docid not in scores.keys():
         scores[docid] = 0
       scores[docid] += weight
-  for docid in scores:
+  for docid in scores.keys():
     results.add(docid, scores[docid])
   return results
 ```
+
+- Funcionamento
+
+1. Inicialização:
+   - Cria um mapa vazio para armazenar os scores dos documentos
+   - Cria uma heap de tamanho k para armazenar os k melhores resultados
+2. Processamento por termo:
+   - Para cada termo na consulta:
+     - Obtém a lista de postings (documentos) associada ao termo
+     - Para cada documento na lista:
+       - Se o documento ainda não está no mapa de scores, inicializa seu score como 0
+       - Adiciona o peso do termo naquele documento ao score acumulado
+3. Seleção final:
+   - Percorre todos os documentos no mapa de scores
+   - Adiciona cada documento e seu score final à heap
+   - Retorna os k documentos com maiores score
+
+Características
+Processa um termo por vez
+Mantém scores parciais em memória
+Adequado para consultas com poucos termos
+Requer mais memória devido ao armazenamento dos scores parciais
+O algoritmo é uma alternativa ao DAAT (Document-at-a-Time) e é especialmente eficiente para acesso sequencial às listas invertidas, embora use mais memória para os acumuladores de scores.
 
 #### Document-at-a-time (DAAT)
 
@@ -2190,6 +2283,11 @@ Uma forma interessante de garantir o tempo do processamento é definir um tempo 
   - Poderia-se fazer uma busca binária entre os dois limites, baseado no valor esperado nesse meio do caminho
   - Talvez deduzindo alguma linearidade
 - Devo engajar menos na aula para dar brecha pros outros alunos?
+  - Resposta: a preocupação é natural, mas não o está incomodando e ele não sente que a turma está incomodada com isso. Posso continuar o quanto achar devido.
+
+### Coisas para pesquisar posteriormente (Aula 07)
+
+- Zipf
 
 ## Aula 08 - 07/04/2025 - Efficient Matching
 
