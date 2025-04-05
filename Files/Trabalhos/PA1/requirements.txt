@@ -1,0 +1,8 @@
+BeautifulSoup4==4.13.3
+requests==2.32.3
+datetime==5.5
+warcio==1.7.5
+# os
+# json
+# gzip
+# threading
