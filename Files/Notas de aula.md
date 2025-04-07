@@ -2297,7 +2297,372 @@ Uma forma interessante de garantir o tempo do processamento é definir um tempo 
 
 ### The ranking problem
 
+- Given
+- ◦ Some evidence of the user’s need
+- Produce
+- ◦ A list of matching information items
+- ◦ In decreasing order of relevance
 
+---
+
+- Given
+- ◦ Some evidence of the user’s need query
+- Produce
+- ◦ A list of matching information items documents
+- ◦ In decreasing order of relevance
+
+---
+
+- $f(q, d)$
+
+```mermaid
+flowchart LR
+  q((q)) .-> d((d))
+```
+
+### Why rank?
+
+- Couldn’t $f(q,d)$ be just an indicator function?
+
+### Document selection vs. ranking
+
+[IMAGEM]
+
+### Why not select?
+
+- The classifier is unlikely accurate
+- ◦ Over-constrained: no relevants returned
+- ◦ Under-constrained: too many relevants returned
+- ◦ Hard to find an appropriate threshold
+- Not all relevant documents are equally relevant!
+- ◦ Prioritization is needed
+
+### Probability Ranking Principle (PRP)
+
+- > Ranking documents by decreasing probability of relevance results in optimal effectiveness, provided that probabilities are estimated (1) with certainty and (2) independently.
+  - Robertson, 1977
+
+### Ranking effectiveness
+
+- Effectiveness is about doing the right thing; it’s about finding documents that are relevant to the user
+- Relevance is influenced by many factors
+- ◦ Topical relevance vs. user relevance
+- ◦ Task, context, novelty, style
+- Ranking models define a view of relevance
+
+### Ranking models
+
+- Provide a mathematical framework for ranking
+- ◦ Each model builds upon different assumptions
+- Progress in ranking models has corresponded with improvements in effectiveness
+- ◦ An effective model should score relevant documents higher than non-relevant documents
+
+### Fundamental elements
+
+- f(q="presidential campaign news", d)
+  - $g("news", d)$
+  - $g("campaign", d)$
+  - $g("presidential", d)$
+    - How many times does "presidential" occur in d?
+      - **Term Frequency (TF):** $c("presidential", d)$
+    - How long is d?
+      - **Document length:** $|d|$
+    - How often do we see "presidential" in the entire collection?
+      - **Document Frequency:** $df("presidential")$
+      - $P("presidential"|collection)$
+
+### Many classical models
+
+- Similarity-based models: 𝑓(𝑞, 𝑑) = sim(𝑞, 𝑑)
+- ◦ Vector space models
+- Probabilistic models: 𝑓(𝑑, 𝑞) = 𝑝(𝑅 = 1|𝑑, 𝑞)
+- ◦ Classic probabilistic models
+- ◦ Language models
+- ◦ Information-theoretic models
+
+### Many extended models
+
+- Structural models
+- ◦ Beyond bags-of-words
+- Semantic models
+- ◦ Beyond lexical matching
+- Contextual models
+- ◦ Beyond queries
+
+### Vector Space Model (VSM)
+
+[Imagem gráfico $R^3$ (Programming, Library, Presidential)]
+
+### VSM is a framework
+
+- Queries and documents as term vectors
+- ◦ Term as the basic concept (e.g., word or phrase)
+- A vocabulary 𝑉 defines a |𝑉|-dimensional space
+- ◦ Vector components as real-valued term weights
+- Relevance estimated as 𝑓 𝑞, 𝑑 = sim(𝑞, 𝑑)
+- ◦ 𝑞 = 𝑥1, … , 𝑥 𝑉 and 𝑑 = (𝑦1, … , 𝑦 𝑉 )
+
+### What VSM doesn’t say
+
+- How to define vector dimensions
+- ◦ Concepts are assumed to be orthogonal
+- How to place vectors in the space
+- ◦ Term weight in query indicates importance of term
+- ◦ Term weight in document indicates topicality
+- How to define the similarity measure
+
+---
+
+- [Imagem gráfico $R^3$ (?, ?, ?)]
+  - $q = (x_1, \dots, x_{|V|}), x_i = ?$
+  - $d = (y_1, \dots, y_{|V|}), y_i = ?$
+  - $sim(q, d) = ?$
+
+### Dimensions as a bag of words (BOW)
+
+- Vocabulary: $V = (w_1, \dots, w_{|V|})$
+- [Imagem gráfico $R^3$ $(w_1, w_2, w_3)$]
+
+### Vectors placed as bit vectors
+
+- $x_i, y_i \in {0,1}$
+  - 1: word $w_i$ is present
+  - 0: word $w_i$ is absent
+
+- [Imagem gráfico $R^3$ $(w_1, w_2, w_3)$]
+  - $q = (1, 1, 1)$
+  - $d = (0, 1, 1)$
+
+### Similarity as dot product
+
+- $sim(q, d)$
+  - $= q \cdot d$
+  - $= x_1 y_1 + \dots + x_{|V|} y_{|V|}$
+  - $= \sum_{i=1}^{|V|} x_i y_i$
+
+- [Imagem gráfico $R^3$ $(w_1, w_2, w_3)$]
+  - $q = (1, 1, 1)$
+  - $d = (0, 1, 1)$
+
+### Simplest VSM = BOW + bit vectors + dot
+
+- $q = (x_1, \dots, x_{|V|})$
+- $d = (y_1, \dots, y_{|V|})$
+- $x_i, y_i \in {0,1}$
+  - 1: word $w_i$ is present
+  - 0: word $w_i$ is absent
+- $sim(q, d)$
+  - $= q \cdot d$
+  - $= x_1 y_1 + \dots + x_{|V|} y_{|V|}$
+  - $= \sum_{i=1}^{|V|} x_i y_i$
+
+- What does this ranking function intuitively capture?
+- Is this a good ranking function?
+
+### How would you rank these documents?
+
+- $q$ = [ news about presidential campaign ]
+- $d_1$ = [ ... **news about** ... ]
+- $d_2$ = [ ... **news about** organic food **campaign** ... ]
+- $d_3$ = [ ... **news** of **presidential campaign** ... ]
+- $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
+- $d_5$ = [ ... **news** of organic food **campaign** ... **campaign** ... **campaign** ... **campaign** ... ]
+
+| Document | Ideal rank |
+| -------- | ---------- |
+| $d_1$    | $d_4 +$    |
+| $d_2$    | $d_3 +$    |
+| $d_3$    | $d_1 -$    |
+| $d_4$    | $d_2 -$    |
+| $d_5$    | $d_5 -$    |
+
+### Ranking using the simplest VSM
+
+- $q$ = [ news about presidential campaign ]
+- $d_1$ = [ ... **news about** ... ]
+- $d_3$ = [ ... **news** of **presidential campaign** ... ]
+- $V = { news, about, presidential, campaign, food, ... }$
+  - $q = (1, 1, 1, 1, 0, \dots )$
+  - $d_1 = (1, 1, 0, 0, 0, \dots )$: $sim(q, q_1) = 2$
+  - $d_3 = (1, 0, 1, 1, 0, \dots )$: $sim(q, q_3) = 3$
+
+### Is it effective?
+
+- $q$ = [ news about presidential campaign ]
+- $d_1$ = [ ... **news about** ... ]
+- $d_2$ = [ ... **news about** organic food **campaign** ... ]
+- $d_3$ = [ ... **news** of **presidential campaign** ... ]
+- $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
+- $d_5$ = [ ... **news** of organic food **campaign** ... **campaign** ... **campaign** ... **campaign** ... ]
+
+| Document | $f(q, d)$ | ranking |   Ideal |
+| -------: | --------: | ------: | ------: |
+|    $d_1$ |         2 |   $d_2$ | $d_4 +$ |
+|    $d_2$ |         3 |   $d_3$ | $d_3 +$ |
+|    $d_3$ |         3 |   $d_4$ | $d_1 -$ |
+|    $d_4$ |         3 |   $d_1$ | $d_2 -$ |
+|    $d_5$ |         2 |   $d_5$ | $d_5 -$ |
+
+### What’s wrong with it?
+
+- $q$ = [ news about presidential campaign ]
+- $d_3$ = [ ... **news** of **presidential campaign** ... ]
+- $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
+
+| Document | $f(q, d)$ | ranking |   Ideal |
+| -------: | --------: | ------: | ------: |
+|    $d_1$ |         2 |   $d_2$ | $d_4 +$ |
+|    $d_2$ |         3 |   $d_3$ | $d_3 +$ |
+|    $d_3$ |         3 |   $d_4$ | $d_1 -$ |
+|    $d_4$ |         3 |   $d_1$ | $d_2 -$ |
+|    $d_5$ |         2 |   $d_5$ | $d_5 -$ |
+
+- Matching "presidential" **more times** deserves more credit!
+
+### Vectors placed as tf (Term Frequency (?)) vectors
+
+- $x_i, y_i \in \mathbb{N}$
+  - $x_i: tf_{w_{i, q}}$
+  - $y_i: tf_{w_{i, d}}$
+- [Imagem gráfico $R^3$ $(w_1, w_2, w_3)$]
+  - $q = (1, 1, 1)$
+  - $d = (2, 0, 5)$
+
+### Ranking using VSM with tf vectors
+
+- $q$ = [ news about presidential campaign ]
+- $d_3$ = [ ... **news** of **presidential campaign** ... ]
+- $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
+
+- $V = \{ news, about, presidential, campaign, food, \dots \}$
+  - $q = (1, 1, 1, 1, 0, \dots )$
+  - $d_3$ = (1, 0, 1, 1, 0, $\dots$ ): $sim(q, d_3) = 3$
+  - $d_4$ = (1, 0, 2, 1, 0, $\dots$ ): $sim(q, d_4) = 4$
+
+### What’s wrong with it? (2)
+
+- $q$ = [ news about presidential campaign ]
+- $d_2$ = [ ... **news about** organic food **campaign** ... ]
+- $d_3$ = [ ... **news** of **presidential campaign** ... ]
+
+| Document | $f(q, d)$ | ranking |   Ideal |
+| -------: | --------: | ------: | ------: |
+|    $d_1$ |           |   $d_2$ | $d_4 +$ |
+|    $d_2$ |         3 |   $d_3$ | $d_3 +$ |
+|    $d_3$ |         3 |   $d_4$ | $d_1 -$ |
+|    $d_4$ |           |   $d_1$ | $d_2 -$ |
+|    $d_5$ |           |   $d_5$ | $d_5 -$ |
+
+- Matching "presidential" is **more important** than matching "about"!
+
+### Vectors placed as tf-idf vectors
+
+- $x_i, y_i \in \mathbb{R}$
+  - $x_i: tf_{w_{i, q}} \cdot idf_{w_i}$
+  - $y_i: tf_{w_{i, d}} \cdot idf_{w_i}$
+- [Imagem gráfico $R^3$ $(w_1, w_2, w_3)$]
+  - $q = (1, 1, 1)$
+  - $d = (2, 0, 5)$
+
+### Inverse document frequency (idf)
+
+- $idf_w = \log \frac{n+1}{n_w}$
+  - $n$: number of documents in the corpus
+  - $n_w$: number of documents where $w$ appears
+
+### Why a log-based penalization?
+
+- [Imagem gráfico $R^2: (n_w, idf_w = \log \frac{n+1}{n_w})$]
+  - Rapid decay after a small fraction of the corpus
+
+### Ranking using VSM with tf-idf vectors
+
+- $q$ = [ news about presidential campaign ]
+- $d_2$ = [ ... **news about** organic food **campaign** ... ]
+- $d_3$ = [ ... **news** of **presidential campaign** ... ]
+- $V = \{ news, about, presidential, campaign, food, \dots \}$
+- $idf = (1.5, 1.0, 2.5, 3.1, 1.8, \dots)$
+  - $q = (1, 1, 1, 1, 0, \dots )$
+  - $d_2 =$ (1 \* 1.5, **1 \* 1.0**, 0, 1 \* 3.1, 0, $\dots$): $sim(q, d_2) = 5.6$
+  - $d_3 =$ (1 \* 1.5, 0, **1 \* 2.5**, 1 \* 3.1, 0, $\dots$): $sim(q, d_3) = 7.1$
+
+### Is it effective? (2)
+
+- $q$ = [ news about presidential campaign ]
+- $d_1$ = [ ... **news about** ... ]
+- $d_2$ = [ ... **news about** organic food **campaign** ... ]
+- $d_3$ = [ ... **news** of **presidential campaign** ... ]
+- $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
+- $d_5$ = [ ... **news** of organic food **campaign** ... **campaign** ... **campaign** ... **campaign** ... ]
+
+| Document | $f(q, d)$ | ranking |   Ideal |
+| -------: | --------: | ------: | ------: |
+|    $d_1$ |       2.5 |   $d_5$ | $d_4 +$ |
+|    $d_2$ |       5.6 |   $d_4$ | $d_3 +$ |
+|    $d_3$ |       7.1 |   $d_3$ | $d_1 -$ |
+|    $d_4$ |       9.6 |   $d_2$ | $d_2 -$ |
+|    $d_5$ |      13.9 |   $d_1$ | $d_5 -$ |
+
+---
+
+- $q$ = [ news about presidential campaign ]
+- $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
+- $d_5$ = [ ... **news** of organic food **campaign** ... **campaign** ... **campaign** ... **campaign** ... ]
+
+- $V = \{ news, about, presidential, campaign, food, \dots \}$
+- $idf = (1.5, 1.0, 2.5, 3.1, 1.8, \dots)$
+  - $q = (1, 1, 1, 1, 0, \dots )$
+- $q$ = [ news about presidential campaign ]
+- $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
+- $d_5$ = [ ... **news** of organic food **campaign** ... **campaign** ... **campaign** ... **campaign** ... ]
+
+### Ranking using VSM with tf-idf vectors (2)
+
+### Transforming tf
+
+### What about document length?
+
+### Document length normalization
+
+### Pivoted length normalization (pln)
+
+---
+
+### State-of-the-art VSM ranking
+
+- Pivoted length normalization VSM [Singhal et al. 1996]
+  - $f(q, d) = \sum_{w \in q} c(w, q) \cdot \frac{\ln (1 + \ln(1 + c(w, d)))}{(1 - b) + b \cdot \frac{|d|}{avgdl}} \cdot \log \frac{n+1}{n_w}$
+- Okapi/BM25 [Robertson and Walker, 1994]
+  - $f(q, d) = \sum_{w \in q} c(w, q) \cdot \frac{(k_1 + 1)(c(w, d) + k_1)}{c(w, d) + k_1 \cdot ((1-b) + b \cdot \frac{|d|}{avgdl})} \cdot \log \frac{n+1}{n_w}$
+
+### Summary - Aula 09
+
+- Fundamental ranking components
+- ◦ Term and document frequency
+- ◦ Document length
+- VSM is a framework
+- ◦ Components as term and document weights
+- ◦ Relevance as query-document similarity
+
+---
+
+- Lack of theoretical justification
+- ◦ Axiomatic approaches, probabilistic approaches
+- Room for further improvement
+- ◦ Structure, semantics, feedback, context
+- ◦ Feature-based models
+
+### References - Aula 09
+
+- [Pivoted document length normalization Singhal et al., SIGIR 1996][Link_1996]
+- [Some simple effective approximations to the 2-Poisson model for probabilistic weighted retrieval Robertson and Walker, SIGIR 1994][Link_1994]
+- [The probability ranking principle in IR Robertson, J. Doc. 1977][Link_1977]
+
+[Link_1996]: <https://dl.acm.org/doi/10.1145/243199.243206>
+[Link_1994]: <https://dl.acm.org/doi/10.5555/188490.188561>
+[Link_1977]: <https://www.emerald.com/insight/content/doi/10.1108/eb026647/full/html>
+
+### Coming Next... Language Models
 
 ## Aula 10 - 16/04/2025 - Language Models
 
