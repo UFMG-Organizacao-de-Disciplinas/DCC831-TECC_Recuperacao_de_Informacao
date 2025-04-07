@@ -1,8 +1,12 @@
-BeautifulSoup4==4.13.3
-requests==2.32.3
-datetime==5.5
-warcio==1.7.5
-# os
-# json
-# gzip
-# threading
+beautifulsoup4==4.13.3    # BeautifulSoup wrapper for parsing HTML and XML
+certifi==2025.1.31        # Root certificates for validating SSL/TLS (used by requests)
+charset-normalizer==3.4.1 # Used for detecting and normalizing text encodings (dependency of requests)
+idna==3.10                # Internationalized domain name support (dependency of requests)
+Protego==0.4.0            # Parses and enforces robots.txt rules
+requests==2.32.3          # HTTP library for making requests to web resources
+six==1.17.0               # Compatibility layer for writing Python 2/3 code (used by many older libs)
+soupsieve==2.6            # CSS selector engine for BeautifulSoup
+typing_extensions==4.13.1 # Adds backported or experimental typing features for older Python versions
+url-normalize==2.2.0      # Normalizes URLs into a consistent format
+urllib3==2.3.0            # Low-level HTTP library used by requests
+warcio==1.7.5             # Library for reading and writing WARC (Web ARChive) files
