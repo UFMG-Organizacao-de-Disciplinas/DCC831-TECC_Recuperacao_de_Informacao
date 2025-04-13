@@ -6,3 +6,4 @@
 - MVP
 - WARC fail: Copilot, pypi, GPT
 - Text splitting
+- Args parsing
