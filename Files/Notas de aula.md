@@ -58,6 +58,7 @@ Nosso foco é o dos "10 blue links". Suponho eu que seria conseguir encontrar os
 ---
 
 - The search problem:
+
   - Given: some ~~evidence of the user's need~~ query
   - Produce: ~~relevant information~~
   - Produce:
@@ -137,6 +138,7 @@ What do search engineers do?
 ---
 
 - Search pipeline
+
   - Query
   - query representation
   - Matching + Scoring
@@ -172,7 +174,7 @@ What do search engineers do?
     - genuinely: accessibility, readability, authority, depth
     - maliciously: content/link farms, misinformation
 - Document indexing
-  - Efficient retrieval  through indexes
+  - Efficient retrieval through indexes
   - Indexes must be updated
     - New documents, updates, deletionsLike the index of book
       - For each word, a list of document it appears on
@@ -186,6 +188,7 @@ What do search engineers do?
 ---
 
 - Query understanding
+
   - keywords are poor descriptions of the user's need
     - Interaction and context also matter
   - Query understanding...
@@ -303,6 +306,7 @@ Uma ou mais aulas sobre cada uma dessas coisas. Nessa aula de hoje ele deseja pa
 ##### Crawling overview
 
 - Aquisição de documentos: o documento serve como uma generalização de todo o tipo de informação que pode ser buscada. Essa disciplina focará mais na parte textual.
+
   - BUilds a local corpus for searching
   - Many types - Web, enterprise, desktop
 
@@ -332,6 +336,7 @@ flowchart LR
 "O conteúdo em si é selvagem. Tem coisa boa, ruim, bem formatada, mal formatada"
 
 - A lot of time is spent waiting for responses
+
   - Parallel crawling is essential
 
 - Could potentially flood sites with requests
@@ -411,6 +416,7 @@ Uma forma de enriquecer o índice é através da adição de frequência de cada
 Outro método poderia ser a informação da posição em que aparece a palavra. A importância disso é que, se o usuário está buscando por duas palavras, é esperado que essas duas palavras, caso encontradas no índice remissivo esteja próximas entre si.
 
 - Inverted index: fields
+
   - Document structure is useful in search
     - field restrictions (date, from)
     - Some fields are more important than others
@@ -583,7 +589,7 @@ def crawler (frontier, corpus):
 #### Traversing
 
 - Separar as filas por descoberta e atualização
-  
+
   - Lista de busca
     - URLs que apontam para páginas baixadas.
     - O objetivo é aumentar a busca
@@ -765,6 +771,7 @@ Ele comentou sobre uma startup que foca em dar notícias importantes para CEO's 
 - Crawling traditionally focused on the surface Web
   - Web pages accessible by following links
 - Conteúdo escondido mas potencialmente útil
+
   - Páginas não linkadas
   - Sites Privados
   - Conteúdo Scriptado
@@ -851,6 +858,7 @@ endsubgraph
 <div id="foo">
   <div id="bar">
     <span> Test</span>
+  </div>
 </div>
 ```
 
@@ -884,6 +892,7 @@ Um par de palavras seria um bigrama
 ###### What could go wrong
 
 - Ex
+
   - Bigcorp's 2007 bi-annual report showed profits of 10%
   - Bigcorp s 2007 bi annual report showed profits of 10
   - Bigcorp 2007 annual report showed profits
@@ -937,11 +946,11 @@ Mas e tokens sem espaços?
 - And this?!
   - [Texto em Japonês]
 
-Como quebrar  "Whitehouse"?
+Como quebrar "Whitehouse"?
 
 9 Pontos possíveis de quebra. Há uma combinação de possibilidades. Algumas estratégias de particionamento são mais prováveis que outras.
 
-Quão provável é  "W" "hitehouse"? E "Whit", "ehou", "se"?
+Quão provável é "W" "hitehouse"? E "Whit", "ehou", "se"?
 
 Pode-se fazer probabilisticamente com um log de [alguma coisa]
 
@@ -973,6 +982,7 @@ Mas e como determinar esse corte em uma linguagem arbitrária?
 Determinar um limite, um threshold de frequência das palavras encontradas na nossa coleção.
 
 - Pode ser padronizado ou automaticamente definida
+
   - Pode depender do domínio/contexto: "click" for anchor text
 
 - Pergunta: Como separar as stopwords das entidades?
@@ -1147,7 +1157,7 @@ Ele exemplificou casos de padrões frequentes no inglês onde NN seguido de NNS,
       - Resposta: usualmente não. Blogs talvez sim tenham os backlinks
 - Detectar documentos com conteúdo duplicado
   - Exact duplicates: compare hash
-  - Near duplicates -> compare *shingles* instead
+  - Near duplicates -> compare _shingles_ instead
 
 #### Near duplicates via $n$-shingling
 
@@ -1546,7 +1556,7 @@ Como ser mais acertivo para encontrar aquili que desejo?
 ### Spelling correction
 
 - 10-15% of all web queries have spelling errors
-  - For today’s searchers, a search engine without robust spelling correction simply doesn’t work
+  - For today's searchers, a search engine without robust spelling correction simply doesn't work
 
 ---
 
@@ -1626,27 +1636,27 @@ Se não estiver encontrando nenhuma solução apropriada, pode-se afrouxar os cr
 5. Delete hyphens
 6. Keep first 3 numbers and pad with zeros
 
-|    # | extenssions | extensions |
-| ---: | ----------- | ---------- |
-|    1 | Extenssions | Extensions |
-|    2 | Ext–nss––ns | Ext–ns––ns |
-|    3 | E23–522––52 | E23–52––52 |
-|    4 | E23–52––52  | E23–52––52 |
-|    5 | E235252     | E235252    |
-|    6 | E235        | E235       |
+|   # | extenssions | extensions |
+| --: | ----------- | ---------- |
+|   1 | Extenssions | Extensions |
+|   2 | Ext–nss––ns | Ext–ns––ns |
+|   3 | E23–522––52 | E23–52––52 |
+|   4 | E23–52––52  | E23–52––52 |
+|   5 | E235252     | E235252    |
+|   6 | E235        | E235       |
 
 ---
 
 Contraexemplo: falso negativo
 
-|    # | poiner | pointer |
-| ---: | ------ | ------- |
-|    1 | Poiner | Pointer |
-|    2 | P––n–r | P––nt–r |
-|    3 | P––5–6 | P––53–6 |
-|    4 | P––5–6 | P––53–6 |
-|    5 | P56    | P536    |
-|    6 | P560   | P536    |
+|   # | poiner | pointer |
+| --: | ------ | ------- |
+|   1 | Poiner | Pointer |
+|   2 | P––n–r | P––nt–r |
+|   3 | P––5–6 | P––53–6 |
+|   4 | P––5–6 | P––53–6 |
+|   5 | P56    | P536    |
+|   6 | P560   | P536    |
 
 ### Displaying the best correction
 
@@ -1659,7 +1669,7 @@ Isso por questão de custo e também por interface.
   - lawers $\to$ lowers, lawyers, layers, lasers, lagers
   - trial lawers $\to$ trial lawyers
 
-Ele pode computar a probabilidade de *lawers* se válido para cada um dos contextos retornados baseado em erros passados de usuários que, quando direcionados para uma das buscas próximas fez com que o usuário entrasse em algum dos sites mostrados.
+Ele pode computar a probabilidade de _lawers_ se válido para cada um dos contextos retornados baseado em erros passados de usuários que, quando direcionados para uma das buscas próximas fez com que o usuário entrasse em algum dos sites mostrados.
 
 - Could mine query logs or other corpora for stats
 
@@ -1710,7 +1720,7 @@ Poderia mapear todas as palavras que mapeiam a quais radicais, e depois fazer o 
 - Some queries may return very limited sets of results
   - Some may return nothing (aka null queries)
 - Vocabulary mismatch problem
-  - Searcher and publisher’s vocabularies may differ
+  - Searcher and publisher's vocabularies may differ
 - Solution: bridge the gap by tuning query specificity
   - Either remove or add terms as required
 
@@ -1782,11 +1792,11 @@ Essa notação é por inconsistência. Aquela de {chave chav chaves} com palavra
 - Relatedness via word co-occurrence
   - Either in the entire document collection, a large collection of queries, or the top-ranked documents
 - Several co-occurrence measures
-  - Mutual information, Pearson’s Chi-squared, Dice
+  - Mutual information, Pearson's Chi-squared, Dice
 
 ###### Interactive query expansion
 
-- Require user’s (explicit, implicit) feedback
+- Require user's (explicit, implicit) feedback
   - Rated, clicked, viewed documents
 
 Uma possibilidade é pegar os top documentos ranqueados, minerar as palavras mais frequentes deles, e acrescentar essas palavras à pesquisa e então refazer a pesquisa, assim gerando um novo resultado de pesquisa.
@@ -1804,7 +1814,7 @@ Uma possibilidade é pegar os top documentos ranqueados, minerar as palavras mai
 
 - Queries often contain multiple semantic units
   - [new battery charger for hp pavilion notebook]
-    - [**new** *battery charger* **hp pavilion** *notebook*]
+    - [**new** _battery charger_ **hp pavilion** _notebook_]
 - Leverage query structure via segmentation
   - Identify multiple segments
   - Process segments separately
@@ -1817,7 +1827,7 @@ Uma possibilidade é pegar os top documentos ranqueados, minerar as palavras mai
 - [**machine learning toolkit**]
 - [**machine** learning toolkit]
 - [**machine learning** toolkit]
-- [**machine** learning *toolkit*]
+- [**machine** learning _toolkit_]
 
 ###### Query segmentation approaches
 
@@ -1980,11 +1990,11 @@ Deve-se considerar que enquanto um usuário tá acessando certa informação, di
 #### Solution #1: Bypass Scoring
 
 - Query distributions similar to Zipf
-◦ Popular queries account for majority of traffic
+  ◦ Popular queries account for majority of traffic
 - Caching can significantly improve efficiency
-◦ Cache search results, or at least inverted lists
+  ◦ Cache search results, or at least inverted lists
 - Problem: cache misses will happen eventually
-◦ New queries, index updates
+  ◦ New queries, index updates
 
 As consultas mais repetidas podem ser armazenadas em um cache, e assim, quando um usuário fizer uma consulta que já foi feita antes, o resultado pode ser retornado mais rapidamente.
 
@@ -1995,8 +2005,8 @@ Em algum momento precisamos expirar a cache por ela já não ser mais tão relev
 #### Solution #2: Distribute the Burden
 
 - Indexes are often distributed in a cluster
-◦ Too large to fit in a single machine
-◦ Replication helps load balancing
+  ◦ Too large to fit in a single machine
+  ◦ Replication helps load balancing
 
 Índices grandes já não são comportados em um único computador, logo já estarão distribuídos. Assim, cada máquina também acaba precisando acessar outras máquinas.
 
@@ -2016,22 +2026,22 @@ Pode haver então um **broker** que agrupa os resultados dos índices para retor
 ---
 
 - Indexes are often distributed in a cluster
-◦ Too large to fit in one machine
-◦ Replication helps load balancing
+  ◦ Too large to fit in one machine
+  ◦ Replication helps load balancing
 - Problem: cannot scale indefinitely
-◦ Costly resources (hardware, energy)
-◦ Intra-node efficiency still crucial
+  ◦ Costly resources (hardware, energy)
+  ◦ Intra-node efficiency still crucial
 
 Ainda precisa se preocupar quanto ao nível de eficiência em cada um dos computadores individualmente.
 
 #### Solution #3: Score Parsimoniously
 
 - Some ranking models can be expensive
-◦ Infeasible to score billions of documents
+  ◦ Infeasible to score billions of documents
 - Ranking as a multi-stage cascade
-◦ Stage #1: Boolean matching (billions)
-◦ Stage #2: Unsupervised scoring (millions)
-◦ Stage #3: Supervised scoring (thousands)
+  ◦ Stage #1: Boolean matching (billions)
+  ◦ Stage #2: Unsupervised scoring (millions)
+  ◦ Stage #3: Supervised scoring (thousands)
 
 Podemos trabalhar com apenas parte do índice.
 
@@ -2040,8 +2050,8 @@ Podemos usar técnicas computacionalmente caras, desde que usemos em volumes peq
 ### Why is it still so costly?
 
 - Inherent cost of matching documents to queries
-◦ Query length (number of posting lists)
-◦ Posting lists length (number of postings per list)
+  ◦ Query length (number of posting lists)
+  ◦ Posting lists length (number of postings per list)
 
 | Term     | Postings           |
 | -------- | ------------------ |
@@ -2059,7 +2069,7 @@ Acaba sendo necessário varrer as listas. Então quanto mais frequentes foram as
 #### Term-at-a-time (TAAT)
 
 - Inverted lists processed in sequence
-◦ Partial document scores accumulated
+  ◦ Partial document scores accumulated
 
 | Term     | Postings      |
 | -------- | ------------- |
@@ -2267,9 +2277,9 @@ Uma forma interessante de garantir o tempo do processamento é definir um tempo 
 
 ### References (Aula 07)
 
-- *Search Engines: Information Retrieval in Practice*, Ch. 5 - Croft et al., 2009
-- *Scalability Challenges in Web Search Engines*, Ch. 4 - Cambazoglu and Baeza-Yates, 2015
-- *Efficient Query Processing Infrastructures* - Tonellotto and Macdonald, SIGIR 2018
+- _Search Engines: Information Retrieval in Practice_, Ch. 5 - Croft et al., 2009
+- _Scalability Challenges in Web Search Engines_, Ch. 4 - Cambazoglu and Baeza-Yates, 2015
+- _Efficient Query Processing Infrastructures_ - Tonellotto and Macdonald, SIGIR 2018
   - [Amazon Link](https://www.amazon.com/Search-Engines-Information-Retrieval-Practice/dp/0136072240)
   - [DOI Link 1](https://doi.org/10.2200/S00662ED1V01Y201508ICR045)
   - [DOI Link 2](https://doi.org/10.1145/3209978.3210191)
@@ -2327,6 +2337,7 @@ Uma forma interessante de garantir o tempo do processamento é definir um tempo 
     - aquarium: 3:1
     - fish: 1:2, 2:3, 3:2, 4:2
 - Score matching documents
+
   - $f(q, d) = \sum_{t \in q} f(t, d)$
 
 - Index access cost
@@ -2342,6 +2353,7 @@ Veremos hoje sobre métodos de reduzir esses dois custos.
 ### Index Access Cost
 
 - Inherent cost of matching documents to queries
+
   - Query length (number of posting lists)
   - Posting lists length (number of postings per list)
 
@@ -2373,18 +2385,18 @@ Se é um AND, só processa se tá presente nos 3. Senão, não processa.
 
 Se é um OR, processa todos os marcados no menor índice.
 
-- A: ***[1:3]***, [2:3], [3:4], [8:4]
-- B: ***[1:4]***, [5:2], [7:2], [8:5], [9:2], [11:5]
-- C: ***[1:6]***, [2:5], [5:3], [6:7], [10:1], [11:7]
+- A: **_[1:3]_**, [2:3], [3:4], [8:4]
+- B: **_[1:4]_**, [5:2], [7:2], [8:5], [9:2], [11:5]
+- C: **_[1:6]_**, [2:5], [5:3], [6:7], [10:1], [11:7]
 - scores: [1:13]
 
 ---
 
 [Explicar o que os slides querem dizer]
 
-- A: *[1:3]*, ***[2:3]***, [3:4], [8:4]
-- B: *[1:4]*, **[5:2]**, [7:2], [8:5], [9:2], [11:5]
-- C: *[1:6]*, ***[2:5]***, [5:3], [6:7], [10:1], [11:7]
+- A: _[1:3]_, **_[2:3]_**, [3:4], [8:4]
+- B: _[1:4]_, **[5:2]**, [7:2], [8:5], [9:2], [11:5]
+- C: _[1:6]_, **_[2:5]_**, [5:3], [6:7], [10:1], [11:7]
 
 - scores: [1:13], [2:8d]
 
@@ -2409,8 +2421,8 @@ Se eu ordenasse dos documentos com maior e menor score por palavra, poderia faci
 MORE EFFECTIVE
 
 - **Safe:** exhaustive (i.e. no pruning) matching
-- ***Score safe:*** top $k$ with correct scores
-- ***Rank safe:*** top $k$ with correct order
+- **_Score safe:_** top $k$ with correct scores
+- **_Rank safe:_** top $k$ with correct order
   - > Não preciso manter o mesmo score desde que a ordem esteja a mesma
 - **Set safe:** top $k$ with correct documents
   - Sem garantia de que os documentos corretos estão em ordem
@@ -2433,14 +2445,15 @@ Dessa forma, os termos não essenciais não precisariam ser computados.
 #### MaxScore $(k = 2)$
 
 - Each list has an upper bound (aka max-score)
+
   - Top 𝑘 results have acceptance threshold $\theta$
   - terms sorted by inc. max-score
   - pivot chosen as least term that cumulatively beats threshold $\theta$
   - terms at least as promising as the pivot deemed “essential”
     - others are “non-essential”
 
-- > A: (CumulativeMS: 4)  (MaxScore: 4) [1:3], [2:3], [3:4], [8:4]
-- B: (CumulativeMS: 9)  (MaxScore: 5) [1:4], [5:2], [7:2], [8:5], [9:2], [11:5]
+- > A: (CumulativeMS: 4) (MaxScore: 4) [1:3], [2:3], [3:4], [8:4]
+- B: (CumulativeMS: 9) (MaxScore: 5) [1:4], [5:2], [7:2], [8:5], [9:2], [11:5]
 - C: (CumulativeMS: 16) (MaxScore: 7) [1:6], [2:5], [5:3], [6:7], [10:1], [11:7]
 
 Top $k = 2$: [] []
@@ -2454,8 +2467,8 @@ $\theta = 0$
 - update top 𝑘 results and $\theta$
 - update pivot on $\theta$ changes
 
-- > A: (CumulativeMS: 4)  (MaxScore: 4) **[1:3]**, [2:3], [3:4], [8:4]
-- B: (CumulativeMS: 9)  (MaxScore: 5) **[1:4]**, [5:2], [7:2], [8:5], [9:2], [11:5]
+- > A: (CumulativeMS: 4) (MaxScore: 4) **[1:3]**, [2:3], [3:4], [8:4]
+- B: (CumulativeMS: 9) (MaxScore: 5) **[1:4]**, [5:2], [7:2], [8:5], [9:2], [11:5]
 - C: (CumulativeMS: 16) (MaxScore: 7) **[1:6]**, [2:5], [5:3], [6:7], [10:1], [11:7]
 
 Top $k = 2$: [] []
@@ -2588,7 +2601,7 @@ Weak AND
 ### Summary - Aula 08
 
 - Efficient matching for subsecond response times
-  - Skip postings (or lists) that won’t help make the top $k$
+  - Skip postings (or lists) that won't help make the top $k$
 - Carefully play with upper bounds and thresholds
   - Can be extended with blocks, layers, list orderings
 - Can always trade-off safety for efficiency
@@ -2606,21 +2619,21 @@ Weak AND
 - [Link][Link_2003_Bro] Efficient query eval. using a two-level retrieval process Broder et al., CIKM 2003
 - [Link][Link_2011_Din] Faster top-k document retr. using block-max indexes Ding and Suel, SIGIR 2011
 
-[Link_2015_Bae]: <https://link.springer.com/book/10.1007/978-3-031-02298-2>
-[Link_2018_Mac]: <https://dl.acm.org/doi/10.1145/3209978.3210191>
-[Link_2018_Ton]: <https://www.nowpublishers.com/article/Details/INR-057>
-[Link_1995_Tur]: <https://www.sciencedirect.com/science/article/pii/030645739500020H?via%3Dihub>
-[Link_2003_Bro]: <https://dl.acm.org/doi/10.1145/956863.956944>
-[Link_2011_Din]: <https://dl.acm.org/doi/10.1145/2009916.2010048>
+[Link_2015_Bae]: https://link.springer.com/book/10.1007/978-3-031-02298-2
+[Link_2018_Mac]: https://dl.acm.org/doi/10.1145/3209978.3210191
+[Link_2018_Ton]: https://www.nowpublishers.com/article/Details/INR-057
+[Link_1995_Tur]: https://www.sciencedirect.com/science/article/pii/030645739500020H?via%3Dihub
+[Link_2003_Bro]: https://dl.acm.org/doi/10.1145/956863.956944
+[Link_2011_Din]: https://dl.acm.org/doi/10.1145/2009916.2010048
 
 ### Coming next: Vector Space Models
 
-## Aula 09 - 14/04/2025 - Vector Space Models
+## Aula 09 - 23/04/2025 - Vector Space Models
 
 ### The ranking problem
 
 - Given
-  - Some evidence of the user’s need
+  - Some evidence of the user's need
 - Produce
   - A list of matching information items
   - In decreasing order of relevance
@@ -2628,7 +2641,7 @@ Weak AND
 ---
 
 - Given
-  - Some evidence of the user’s need query
+  - Some evidence of the user's need query
 - Produce
   - A list of matching information items documents
   - In decreasing order of relevance
@@ -2644,11 +2657,15 @@ flowchart LR
 
 ### Why rank?
 
-- Couldn’t $f(q,d)$ be just an indicator function?
+- Couldn't $f(q,d)$ be just an indicator function?
 
 ### Document selection vs. ranking
 
 [IMAGEM]
+
+- [JV]
+  - A seleção é um ranqueamento binário. Ela pode inclusive ter falsos positivos e falsos negativos.
+  - No caso do ranqueamento, ele precisa definir um corte.
 
 ### Why not select?
 
@@ -2662,42 +2679,56 @@ flowchart LR
 ### Probability Ranking Principle (PRP)
 
 - > Ranking documents by decreasing probability of relevance results in optimal effectiveness, provided that probabilities are estimated (1) with certainty and (2) independently.
+
   - Robertson, 1977
+
+- [JV]
+  - Num caso de ranqueamento, onde os mais relevantes estão no topo, às vezes, não necessariamente o segundo colocado é de fato tão relevante. Isso porque, talvez, o primeiro colocado já cobre o conteúdo do segundo.
 
 ### Ranking effectiveness
 
-- Effectiveness is about doing the right thing; it’s about finding documents that are relevant to the user
+- Effectiveness is about doing the right thing; it's about finding documents that are relevant to the user
 - Relevance is influenced by many factors
   - Topical relevance vs. user relevance
+  - [JV] Uma pesquisa como "Natal Rio Grande do Norte" pode ter uma variação de relevância devido a localização do usuário (de BH? Do RJ?), ao que ele busca (Passagens? Hotel? História?)
   - Task, context, novelty, style
+  - [JV] Atualmente LLMs processam o texto de forma muito poderosa.
 - Ranking models define a view of relevance
+  - [JV] No final, é sempre o usuário que diz se a função de ranking é boa ou não.
 
 ### Ranking models
 
 - Provide a mathematical framework for ranking
   - Each model builds upon different assumptions
 - Progress in ranking models has corresponded with improvements in effectiveness
+
   - An effective model should score relevant documents higher than non-relevant documents
+
+- [JV]
+  - Essa é uma das partes mais focadas na pesquisa porque os outros problemas são mais objetivos, já este acaba sendo mais subjetivo porque depende do usuário.
 
 ### Fundamental elements
 
-- f(q="presidential campaign news", d)
-  - $g("news", d)$
-  - $g("campaign", d)$
-  - $g("presidential", d)$
-    - How many times does "presidential" occur in d?
-      - **Term Frequency (TF):** $c("presidential", d)$
-    - How long is d?
-      - **Document length:** $|d|$
-    - How often do we see "presidential" in the entire collection?
-      - **Document Frequency:** $df("presidential")$
-      - $P("presidential"|collection)$
+- f(q="**presidential** campaign _news_", d)
+  - "Bag of Words"
+    - g("**presidential**", d)
+    - g("campaign", d)
+    - g("_news_", d)
+  - How many times does "**presidential**" occur in $d$?
+    - **Term Frequency (TF):** $c("**presidential**", d)$
+  - How long is $d$?
+    - **Document length:** $|d|$
+  - How often do we see "**presidential**" in the entire collection?
+    - **Document Frequency:** $df("**presidential**")$
+    - $P("**presidential**"|collection)$
 
 ### Many classical models
 
-- Similarity-based models: 𝑓(𝑞, 𝑑) = sim(𝑞, 𝑑)
+- Similarity-based models: $f(q, d) = sim(q, d)$
   - Vector space models
-- Probabilistic models: 𝑓(𝑑, 𝑞) = 𝑝(𝑅 = 1|𝑑, 𝑞)
+  - [JV]
+    - Baseado em álgebra linear
+- Probabilistic models: $f(d, q) = p(R = 1|d, q)$
   - Classic probabilistic models
   - Language models
   - Information-theoretic models
@@ -2706,25 +2737,41 @@ flowchart LR
 
 - Structural models
   - Beyond bags-of-words
+  - [JV]
+    - As sequência de que forma as palavras estão dispostas no texto
+    - Alguma tag em cada uma das palavras
 - Semantic models
   - Beyond lexical matching
+  - [JV]
+    - Além do casamento exato, buscaria-se palavras que têm significado similar, onde tendem a representar a mesma coisa.
 - Contextual models
   - Beyond queries
+  - [JV]
+    - Historicamente nas buscas do usuário, essa query é relevante?
 
 ### Vector Space Model (VSM)
 
 [Imagem gráfico $R^3$ (Programming, Library, Presidential)]
 
+- [JV]
+  - Existem estruturas para armazenar vetores densos.
+  - Busca-se encontrar o documento nesse espaço vetorial.
+  - Cada dimensão é uma palavra do documento único.
+
 ### VSM is a framework
 
 - Queries and documents as term vectors
   - Term as the basic concept (e.g., word or phrase)
-- A vocabulary 𝑉 defines a |𝑉|-dimensional space
+    - [JV]
+      - Poderiam ser usados outros conceitos para definir as dimensões, como sinônimos, bigramas, trigramas, etc.
+- A vocabulary $V$ defines a $|V|$-dimensional space
   - Vector components as real-valued term weights
-- Relevance estimated as 𝑓 𝑞, 𝑑 = sim(𝑞, 𝑑)
-  - 𝑞 = 𝑥1, … , 𝑥 𝑉 and 𝑑 = (𝑦1, … , 𝑦 𝑉 )
+- Relevance estimated as $f(q, d) = sim(q, d)$
+  - $q = (x_1, \dots, x_{|V|})$ and $d = (y_1, \dots, y_{|V|})$
+    - [JV]
+      - Mas como escolho qual valor colocar em cada eixo?
 
-### What VSM doesn’t say
+### What VSM doesn't say
 
 - How to define vector dimensions
   - Concepts are assumed to be orthogonal
@@ -2745,9 +2792,10 @@ flowchart LR
 - Vocabulary: $V = (w_1, \dots, w_{|V|})$
 - [Imagem gráfico $R^3$ $(w_1, w_2, w_3)$]
 
-### Vectors placed as bit vectors
+#### Vectors placed as bit vectors
 
 - $x_i, y_i \in {0,1}$
+
   - 1: word $w_i$ is present
   - 0: word $w_i$ is absent
 
@@ -2758,13 +2806,19 @@ flowchart LR
 ### Similarity as dot product
 
 - $sim(q, d)$
+
   - $= q \cdot d$
   - $= x_1 y_1 + \dots + x_{|V|} y_{|V|}$
   - $= \sum_{i=1}^{|V|} x_i y_i$
 
 - [Imagem gráfico $R^3$ $(w_1, w_2, w_3)$]
+
   - $q = (1, 1, 1)$
   - $d = (0, 1, 1)$
+
+- [JV]
+  - Essa multiplicação representa a quantidade de palavras que a query tem que o documento também tem.
+  - Embora simples, ainda assim é bastante prática e útil.
 
 ### Simplest VSM = BOW + bit vectors + dot
 
@@ -2774,6 +2828,7 @@ flowchart LR
   - 1: word $w_i$ is present
   - 0: word $w_i$ is absent
 - $sim(q, d)$
+
   - $= q \cdot d$
   - $= x_1 y_1 + \dots + x_{|V|} y_{|V|}$
   - $= \sum_{i=1}^{|V|} x_i y_i$
@@ -2789,6 +2844,11 @@ flowchart LR
 - $d_3$ = [ ... **news** of **presidential campaign** ... ]
 - $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
 - $d_5$ = [ ... **news** of organic food **campaign** ... **campaign** ... **campaign** ... **campaign** ... ]
+
+- [JV]
+  - $d_1$, $d_2$ e $d_5$ Seriam irrelevantes.
+
+---
 
 | Document | Ideal rank |
 | -------- | ---------- |
@@ -2825,7 +2885,10 @@ flowchart LR
 |    $d_4$ |         3 |   $d_1$ | $d_2 -$ |
 |    $d_5$ |         2 |   $d_5$ | $d_5 -$ |
 
-### What’s wrong with it?
+- [JV]
+  - Poderiam ser feitos swaps para alternar as ordenações para melhorar.
+
+### What's wrong with it?
 
 - $q$ = [ news about presidential campaign ]
 - $d_3$ = [ ... **news** of **presidential campaign** ... ]
@@ -2858,30 +2921,38 @@ flowchart LR
 
 - $V = \{ news, about, presidential, campaign, food, \dots \}$
   - $q = (1, 1, 1, 1, 0, \dots )$
+    - [JV] É comum que as buscas acabem tendendo a ter uma pesquisa parecida com binária nessa representação de frequência.
   - $d_3$ = (1, 0, 1, 1, 0, $\dots$ ): $sim(q, d_3) = 3$
   - $d_4$ = (1, 0, 2, 1, 0, $\dots$ ): $sim(q, d_4) = 4$
 
-### What’s wrong with it? (2)
+### What's wrong with it? (2)
 
 - $q$ = [ news about presidential campaign ]
 - $d_2$ = [ ... **news about** organic food **campaign** ... ]
 - $d_3$ = [ ... **news** of **presidential campaign** ... ]
 
-| Document | $f(q, d)$ | ranking |   Ideal |
-| -------: | --------: | ------: | ------: |
-|    $d_1$ |           |   $d_2$ | $d_4 +$ |
-|    $d_2$ |         3 |   $d_3$ | $d_3 +$ |
-|    $d_3$ |         3 |   $d_4$ | $d_1 -$ |
-|    $d_4$ |           |   $d_1$ | $d_2 -$ |
-|    $d_5$ |           |   $d_5$ | $d_5 -$ |
+| Document | $f(q, d)$ | ranking |  Ideal  |
+| :------: | :-------: | :-----: | :-----: |
+|    -     |     -     |  $d_2$  | $d_4 +$ |
+|  $d_2$   |     3     |  $d_3$  | $d_3 +$ |
+|  $d_3$   |     3     |  $d_4$  | $d_1 -$ |
+|    -     |     -     |  $d_1$  | $d_2 -$ |
+|    -     |     -     |  $d_5$  | $d_5 -$ |
 
 - Matching "presidential" is **more important** than matching "about"!
+
+- [JV]
+  - Presidential acaba sendo mais raro que about, logo, mais significativo.
 
 ### Vectors placed as tf-idf vectors
 
 - $x_i, y_i \in \mathbb{R}$
   - $x_i: tf_{w_{i, q}} \cdot idf_{w_i}$
   - $y_i: tf_{w_{i, d}} \cdot idf_{w_i}$
+  - [JV]
+    - $tf$ é o inteiro, a frequência que já temos calculado
+    - $idf$ será o peso real.
+      - Existem várias aplicações dela na literatura.
 - [Imagem gráfico $R^3$ $(w_1, w_2, w_3)$]
   - $q = (1, 1, 1)$
   - $d = (2, 0, 5)$
@@ -2889,6 +2960,7 @@ flowchart LR
 ### Inverse document frequency (idf)
 
 - $idf_w = \log \frac{n+1}{n_w}$
+  - [JV] O $i$ é de inversa.
   - $n$: number of documents in the corpus
   - $n_w$: number of documents where $w$ appears
 
@@ -2896,6 +2968,10 @@ flowchart LR
 
 - [Imagem gráfico $R^2: (n_w, idf_w = \log \frac{n+1}{n_w})$]
   - Rapid decay after a small fraction of the corpus
+  - [JV]
+    - Esse decaimento rápido busca rapidamente penalizar a existência de repetições.
+    - Dúvida: ora, mas e se uma palavra ocorrer por acaso em um documento, mas em n outros mais importantes ela aparecer algumas poucas vezes a mais, nesse caso, nesses mais relevantes, eles em si teriam um peso menor nesse cálculo. Não seria interessante uma outra curva diferente de log?
+      - Resposta: "In the big scheme of things", ou em português, "no frigir dos ovos", esses casos podem acabar sendo mais raros, então não impactaria tanto.
 
 ### Ranking using VSM with tf-idf vectors
 
@@ -2904,9 +2980,18 @@ flowchart LR
 - $d_3$ = [ ... **news** of **presidential campaign** ... ]
 - $V = \{ news, about, presidential, campaign, food, \dots \}$
 - $idf = (1.5, 1.0, 2.5, 3.1, 1.8, \dots)$
+
   - $q = (1, 1, 1, 1, 0, \dots )$
   - $d_2 =$ (1 \* 1.5, **1 \* 1.0**, 0, 1 \* 3.1, 0, $\dots$): $sim(q, d_2) = 5.6$
   - $d_3 =$ (1 \* 1.5, 0, **1 \* 2.5**, 1 \* 3.1, 0, $\dots$): $sim(q, d_3) = 7.1$
+
+- [JV]:
+
+| **V** | News     | About        | Presidential | Campaign | Food | $\dots$ |
+| ----- | -------- | ------------ | ------------ | -------- | ---- | ------- |
+| $idf$ | 1.5      | 1.0          | 2.5          | 3.1      | 1.8  | $\dots$ |
+| $d_2$ | 1 \* 1.5 | **1 \* 1.0** | 0            | 1 \* 3.1 | 0    | $\dots$ |
+| $d_3$ | 1 \* 1.5 | 0            | **1 \* 2.5** | 1 \* 3.1 | 0    | $\dots$ |
 
 ### Is it effective? (2)
 
@@ -2917,13 +3002,13 @@ flowchart LR
 - $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
 - $d_5$ = [ ... **news** of organic food **campaign** ... **campaign** ... **campaign** ... **campaign** ... ]
 
-| Document | $f(q, d)$ | ranking |   Ideal |
-| -------: | --------: | ------: | ------: |
-|    $d_1$ |       2.5 |   $d_5$ | $d_4 +$ |
-|    $d_2$ |       5.6 |   $d_4$ | $d_3 +$ |
-|    $d_3$ |       7.1 |   $d_3$ | $d_1 -$ |
-|    $d_4$ |       9.6 |   $d_2$ | $d_2 -$ |
-|    $d_5$ |      13.9 |   $d_1$ | $d_5 -$ |
+| Document | $f(q, d)$ | ranking |  Ideal  |
+| :------: | --------: | :-----: | :-----: |
+|  $d_1$   |       2.5 |  $d_5$  | $d_4 +$ |
+|  $d_2$   |       5.6 |  $d_4$  | $d_3 +$ |
+|  $d_3$   |       7.1 |  $d_3$  | $d_1 -$ |
+|  $d_4$   |       9.6 |  $d_2$  | $d_2 -$ |
+|  $d_5$   |      13.9 |  $d_1$  | $d_5 -$ |
 
 ---
 
@@ -2960,6 +3045,8 @@ flowchart LR
 - $tf_{w, d} = \log(1 + \log(1 + c(w, d)))$
 - $tf_{w, d} = 1(c(w, d) > 0)$
 
+- [JV] Estamos saturando a utilidade de determinado documento
+
 ### What about document length?
 
 - q = [news about presidential campaign]
@@ -2971,6 +3058,7 @@ flowchart LR
 ### Document length normalization
 
 - Penalize long documents
+  - [JV] Embora possa penalizar bons documentos, essa heurística muitas vezes funciona.
   - Avoid matching by chance
   - Must also avoid over-penalization
 - A document is long because
@@ -2990,14 +3078,19 @@ flowchart LR
 
 [Imagem: gráfico $R^2$ $(|d|, pln_d)$, relação entre recompensa e penalização. Recompensa quando é menro que avdl e penalização quando é maior que avdl]
 
-Inclusive isso me lembra um pouco o PID.
+- [JV]
+  - Inclusive isso me lembra um pouco o PID.
+  - A ideia é que, quando o documento é menor que a média, ele acaba sendo mais relevante, então a recompensa é maior. Quando ele é maior que a média, ele acaba sendo penalizado.
 
 ### State-of-the-art VSM ranking
 
 - Pivoted length normalization VSM [Singhal et al. 1996]
-  - $f(q, d) = \sum_{w \in q} c(w, q) \cdot \frac{\ln (1 + \ln(1 + c(w, d)))}{(1 - b) + b \cdot \frac{|d|}{avgdl}} \cdot \log \frac{n+1}{n_w}$
+  - $f(q, d) = \sum_{w \in q} c(w, q) \frac{\ln (1 + \ln(1 + c(w, d)))}{(1 - b) + b \frac{|d|}{avgdl}} \log \frac{n+1}{n_w}$
 - Okapi/BM25 [Robertson and Walker, 1994]
-  - $f(q, d) = \sum_{w \in q} c(w, q) \cdot \frac{(k_1 + 1)(c(w, d) + k_1)}{c(w, d) + k_1 \cdot ((1-b) + b \cdot \frac{|d|}{avgdl})} \cdot \log \frac{n+1}{n_w}$
+
+  - $f(q, d) = \sum_{w \in q} c(w, q) \frac{(k_1 + 1)(c(w, d) + k_1)}{c(w, d) + k_1 ((1-b) + b \frac{|d|}{avgdl})} \log \frac{n+1}{n_w}$
+
+- [JV] Não decorem as fórmulas, mas as feature emergentes das fórmulas
 
 ### Summary - Aula 09
 
@@ -3022,9 +3115,9 @@ Inclusive isso me lembra um pouco o PID.
 - [Some simple effective approximations to the 2-Poisson model for probabilistic weighted retrieval Robertson and Walker, SIGIR 1994][Link_1994]
 - [The probability ranking principle in IR Robertson, J. Doc. 1977][Link_1977]
 
-[Link_1996]: <https://dl.acm.org/doi/10.1145/243199.243206>
-[Link_1994]: <https://dl.acm.org/doi/10.5555/188490.188561>
-[Link_1977]: <https://www.emerald.com/insight/content/doi/10.1108/eb026647/full/html>
+[Link_1996]: https://dl.acm.org/doi/10.1145/243199.243206
+[Link_1994]: https://dl.acm.org/doi/10.5555/188490.188561
+[Link_1977]: https://www.emerald.com/insight/content/doi/10.1108/eb026647/full/html
 
 ### Coming Next... Language Models
 
