@@ -3121,46 +3121,46 @@ flowchart LR
 
 ### Coming Next... Language Models
 
-## Aula 10 - 16/04/2025 - Language Models
+## Aula 10 - 24/04/2025 - Language Models
 
-## Aula 11 - 21/04/2025 - Experimental Methods
+## Aula 11 - 28/04/2025 - Experimental Methods
 
-## Aula 12 - 23/04/2025 - Offline Evaluation
+## Aula 12 - 30/04/2025 - Offline Evaluation
 
-## Aula 13 - 28/04/2025 - Exam #1
+## Aula 13 - 05/05/2025 - Exam #1
 
-## Aula 14 - 30/04/2025 - Quality Models
+## Aula 14 - 07/05/2025 - Quality Models
 
-## Aula 15 - 05/05/2025 - Feedback Models
+## Aula 15 - 12/05/2025 - Feedback Models
 
-## Aula 16 - 07/05/2025 - Diversification Models
+## Aula 16 - 14/05/2025 - Diversification Models
 
-## Aula 17 - 12/05/2025 - Learning to Rank: Fundamentals
+## Aula 17 - 19/05/2025 - Learning to Rank: Fundamentals
 
-## Aula 18 - 14/05/2025 - Learning to Rank: Algorithms
+## Aula 18 - 21/05/2025 - Learning to Rank: Algorithms
 
-## Aula 19 - 19/05/2025 - Neural Models: Reranking
+## Aula 19 - 26/05/2025 - Neural Models: Reranking
 
-## Aula 20 - 21/05/2025 - Neural Models: Retrieval
+## Aula 20 - 28/05/2025 - Neural Models: Retrieval
 
-## Aula 21 - 26/05/2025 - Online Evaluation
+## Aula 21 - 02/06/2025 - Online Evaluation
 
-## Aula 22 - 28/05/2025 - Online Learning to Rank
+## Aula 22 - 04/06/2025 - Online Learning to Rank
 
-## Aula 23 - 02/06/2025 - Seminars
+## Aula 23 - 09/06/2025 - Seminars
 
-## Aula 24 - 04/06/2025 - Seminars
+## Aula 24 - 11/06/2025 - Seminars
 
-## --- - 09/06/2025 - Exam #2
+## Aula XX - 16/06/2025 - Exam #2
 
-## Aula 25 - 11/06/2025 - Recess: Corpus Christi
+## Aula 25 - 18/06/2025 - Recess: Corpus Christi
 
-## Aula 26 - 16/06/2025 - RC Development (off-class)
+## Aula 26 - 23/06/2025 - RC Development (off-class)
 
-## Aula 27 - 18/06/2025 - RC Presentations
+## Aula 27 - 25/06/2025 - RC Presentations
 
-## Aula 28 - 23/06/2025 - RC Presentations
+## Aula 28 - 30/06/2025 - RC Presentations
 
-## Aula 29 - 25/06/2025 - Replacement Exam
+## Aula 29 - XX/07/2025 - Replacement Exam
 
-## Aula 30 - 30/06/2025 - Replacement Exam
+## Aula 30 - XX/07/2025 - Replacement Exam
