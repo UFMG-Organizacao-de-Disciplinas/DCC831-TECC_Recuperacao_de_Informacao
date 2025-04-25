@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.7.7)  25 APR 2025 14:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.7.7)  25 APR 2025 14:05
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -971,7 +971,7 @@ LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
 (Font)              scaled to size 8.0pt on input line 24.
 LaTeX Font Info:    Font shape `U/ntxexa/m/n' will be
 (Font)              scaled to size 6.2pt on input line 24.
-) (./TeX/04_text.tex
+) (./TeX/05_text.tex
 
 [1.1{b:/Programas/Programming/LaTeX/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{b:/Programas/Programming/LaTeX/texlive/2024/texmf-dist/fonts/enc/dvips/libertine/lbtn_25tcsq.enc}{b:/Programas/Programming/LaTeX/texlive/2024/texmf-dist/fonts/enc/dvips/libertine/lbtn_76gpa5.enc}{b:/Programas/Programming/LaTeX/texlive/2024/texmf-dist/fonts/enc/dvips/libertine/lbtn_naooyc.enc}{b:/Programas/Programming/LaTeX/texlive/2024/texmf-dist/fonts/enc/dvips/libertine/lbtn_nh77jq.enc}
 
@@ -1037,7 +1037,7 @@ LaTeX Font Info:    Font shape `T1/zi4/b/n' will be
 Processing 'acks' comment.
 \openout3 = `comment.cut'.
 
- Comment 'acks' writing to comment.cut. Straight input of comment.cut. (build/comment.cut)) (./TeX/05_bibliography.tex (build/clean-sigconf.bbl
+ Comment 'acks' writing to comment.cut. Straight input of comment.cut. (build/comment.cut)) (./TeX/06_bibliography.tex (build/clean-sigconf.bbl
 LaTeX Info: Redefining \tempurl on input line 58.
 LaTeX Info: Redefining \tempurl on input line 68.
 LaTeX Info: Redefining \tempurl on input line 86.
@@ -1064,7 +1064,7 @@ LaTeX Info: Redefining \tempurl on input line 385.
 LaTeX Info: Redefining \tempurl on input line 395.
 LaTeX Info: Redefining \tempurl on input line 406.
 LaTeX Info: Redefining \tempurl on input line 417.
-)) (./TeX/06_appendix.tex
+)) (./TeX/07_appendix.tex
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
