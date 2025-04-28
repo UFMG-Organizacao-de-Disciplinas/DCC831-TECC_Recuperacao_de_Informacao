@@ -32,6 +32,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed # For multithrea
 import os
 from threading import Lock
 
+from requests.exceptions import SSLError, ConnectTimeout, ReadTimeout, ConnectionError, RequestException
+
 
 
 # Adicionar no início do script
@@ -139,9 +141,30 @@ def default_requester(url, timeout=5):
         response = requests.get(url, timeout=timeout)
         # print(response.status_code)  # Print the status code of the response
         return get_response_dict(response)  # Call the function to get the response dictionary
-    except requests.RequestException as e:
-        # response.raise_for_status()  # Raise an error for bad responses
-        print(f"Error fetching {url}: {e}")
+    
+    except SSLError as e:
+        msg = f'-> {e}'
+        print(f"[SSL ERROR]\t{url}")
+        return None
+
+    except ConnectTimeout as e:
+        msg = f'-> {e}'
+        print(f"[CONNECT TIMEOUT]\t{url}")
+        return None
+
+    except ReadTimeout as e:
+        msg = f'-> {e}'
+        print(f"[READ TIMEOUT]\t{url}")
+        return None
+
+    except ConnectionError as e:
+        msg = f'-> {e}'
+        print(f"[CONNECTION ERROR]\t{url}")
+        return None
+
+    except RequestException as e:
+        msg = f'-> {e}'
+        print(f"[REQUEST ERROR]\t{url}")
         return None
 
 """ benchmarking """
