@@ -30,6 +30,7 @@ from collections import deque # Needed for the sitemap exploring
 import time # Time functions
 from concurrent.futures import ThreadPoolExecutor, as_completed # For multithreading
 import os
+import threading # For multithreading
 from threading import Lock
 
 from requests.exceptions import SSLError, ConnectTimeout, ReadTimeout, ConnectionError, RequestException
@@ -516,10 +517,11 @@ scraping['frontier'] = set([get_base_url(url) for url in scraping['frontier']])
 
 """ Actual Scraping """
 
-def debug_scrape_print(scraping, url):
+def debug_scrape_print(scraping, url, active_threads=None):
     """ Prints the scraping state. """
     msg = f'({scraping["count"]:04}/{len(scraping["frontier"]):04})\t'
     msg += url
+    msg += f'\t[Threads: {threading.active_count()}]'
     # msg += f' => {PAGES_LIMIT}'
     # first_3_plus_last_3 = list(scraping['frontier'])[:2] + list(scraping['frontier'])[-2:]
     # msg += f'\nFrontier: {first_3_plus_last_3}'
@@ -582,6 +584,7 @@ def parallel_scrape(function, scraping, max_workers=MAX_THREADS):
         while futures:
             # Espera qualquer uma terminar
             for future in as_completed(futures):
+                print(f'[THREADS: {len(futures)}||{threading.active_count()}]')
                 futures.remove(future)
                 try:
                     future.result()
@@ -593,6 +596,6 @@ def parallel_scrape(function, scraping, max_workers=MAX_THREADS):
                     futures.add(executor.submit(function, scraping))
                 break  # Importante: sair do for depois de pegar UM terminado
 
-parallel_scrape(scrape_once, scraping, 50)
+parallel_scrape(scrape_once, scraping, MAX_THREADS)
 
 print(f"Total execution time: {time.time() - start_time:.2f} seconds")
