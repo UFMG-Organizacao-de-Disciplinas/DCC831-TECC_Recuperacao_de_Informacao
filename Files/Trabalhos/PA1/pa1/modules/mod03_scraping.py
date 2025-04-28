@@ -1,3 +1,21 @@
+""" Scraping module for web crawling and data extraction. """
+
+# Importing my modules
+
+from modules.mod00_debugging import debug_time_elapsed, debug_scrape_print
+from modules.mod01_constants import constants
+from modules.mod06_url_parsing import scrape_url
+from modules.mod07_frontier import update_frontier
+from modules.mod08_WARC_handling import store_warcs
+
+# Global variables
+
+CONSTANTS = constants()
+MAX_THREADS = CONSTANTS['MAX_THREADS'] # Maximum number of threads to use for crawling
+PAGES_LIMIT = CONSTANTS['CORPUS_SIZE'] # Number of pages to write to a WARC file before creating a new one
+WARC_SIZE = CONSTANTS['WARC_SIZE'] # Number of pages to write to a WARC file before creating a new one
+
+# Scraping function
 
 def scrape_once(scraping):
     """ Scrapes a single URL and updates the scraping state. """
@@ -34,7 +52,7 @@ def scrape_once(scraping):
     if scraping['count'] % WARC_SIZE == 0:
         # Store the parsed URL in a WARC file and clean up the content
         print(f">>> Storing WARC file for {scraping['count']} pages... <<<")
-        store_warcs(scraping, WARC_SIZE, debug_time_elapsed)
+        store_warcs(scraping, WARC_SIZE)
         scraping['content'] = dict()
         scraping['stored'] += 1
 

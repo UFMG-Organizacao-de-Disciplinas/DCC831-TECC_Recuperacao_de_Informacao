@@ -1,45 +1,36 @@
+""" Utility functions for the project. """
+
+# Importing my modules
+
+from modules.mod00_debugging import print_json
+
+# Importing my needed libraries
+
 import requests
 from requests.utils import urlparse
 from requests.exceptions import SSLError, ConnectTimeout, ReadTimeout, ConnectionError, RequestException
+import os
+from time import time # Getting unix timestamp
 
-import datetime # Getting unix timestamp
+# Utility functions
 
-""" default_requester: useful for removing try_except blocks from the main code """
-
-def constants():
-    """ Returns the constants used in the script. """
-    return {
-        'MIN_DELAY': 1,  # Minimum delay between requests in seconds
-        'MAX_DELAY': 5,  # Maximum delay between requests in seconds
-        'MAX_RETRIES': 3,  # Maximum number of retries for a request
-        'MAX_THREADS': 60,  # Maximum number of threads to use for crawling
-        'WARC_SIZE': 1000,  # Number of pages to write to a WARC file before creating a new one
-        'CORPUS_SIZE': 100000,  # Number of pages to crawl before stopping
-        'SEEDS_PATH': '../Seeds/seeds-2024711370.txt',  # Path to the seed file
-        'DEBUG_MODE': False,  # Enable debug mode
-    }
-
-
-""" get_base_url: Get the base URL from a given URL """
+def set_working_directory(file_path):
+    # Adicionar no início do script
+    print(file_path)
+    os.chdir(os.path.dirname(os.path.abspath(file_path)))
 
 def get_base_url(url):
-    """ Get the base URL from a given URL. """
+    """ Get the base URL from a given URL, only with the scheme and netloc. """
     
     parsed_url = urlparse(url)
     base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
     return base_url
 
-
-""" get_timestamp: Returns the current timestamp in seconds since 1970 """
-    
 def get_timestamp():
     """ Returns the current timestamp in seconds since 1970 """
-    return int(datetime.datetime.now().timestamp())
+    return int(time())
 
-
-""" get_seeds: Getting seeds from file """
-
-def get_seeds(path='./Seeds/seeds-2024711370.txt'):
+def get_seeds(path):
     """ Reads all seeds from a file and returns them as a set. """
     seeds = set()
     with open(path, 'r') as file:
@@ -128,3 +119,12 @@ def default_requester(url, timeout=5):
         print(f"[REQUEST ERROR]\t{url}")
         return None
 
+def debug_print(parsed_url):
+    """ Prints the parsed URL in a readable format that is defined in the assignment. """
+    debug_info = {
+        'URL': parsed_url['URL'],
+        'Title': parsed_url['Title'],
+        'Text': parsed_url['Text'],
+        'Timestamp': parsed_url['Timestamp'],
+    }
+    print_json(debug_info)

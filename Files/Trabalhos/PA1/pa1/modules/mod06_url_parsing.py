@@ -1,9 +1,15 @@
-from modules.mod02_utils import get_timestamp, default_requester, get_base_url # HTTP request handling functions
+""" Parse URL module """
+
+# Importing my modules
+
+from modules.mod04_utils import get_timestamp, default_requester, get_base_url # HTTP request handling functions
+
+# Importing my needed libraries
 
 import re # Splitting strings
 import bs4 as bs # BeautifulSoup wrapper for parsing HTML and XML
 
-""" scrape_url: Parses a URL and returns its components. """
+# Scraping functions
 
 def scrape_url(url):
     """ Parses a URL and returns its components. """

@@ -2,9 +2,11 @@
 
 # Importing my modules
 
-from modules.mod02_utils import constants
+from modules.mod00_debugging import debug_time_elapsed
 
-# Importing libraries
+# Importing Suggested libraries
+
+# Importing my needed libraries
 
 from warcio.warcwriter import WARCWriter # GPT is helping me with WARCing
 from warcio.statusandheaders import StatusAndHeaders
@@ -13,8 +15,11 @@ import gzip # Needed for reading WARC files
 from io import BytesIO # GPT is helping me with WARCing
 from threading import Lock
 
-""" store_warc: Stores the parsed URL in a WARC file. """
-warc_lock = Lock()  # Lock for thread-safe writing to WARC files
+# Global variables
+
+warc_lock = Lock() # Global lock for thread-safe WARC file operations this ensures multiple threads don't write to the same WARC file simultaneously
+
+# WARC Store and Read functions
 
 def store_warc(parsed_url, index, warc_file_saving_method='ab', is_compressed=True):
     """ Stores the parsed URL in a WARC file. """
@@ -56,7 +61,7 @@ def store_warc(parsed_url, index, warc_file_saving_method='ab', is_compressed=Tr
         writer.write_record(record)
 
 
-def store_warcs(scraping, warc_size=1000, debug_time_elapsed=None):
+def store_warcs(scraping, warc_size=1000):
     """ Stores the parsed URLs in a WARC file. """
     with warc_lock:
         content = scraping['content']

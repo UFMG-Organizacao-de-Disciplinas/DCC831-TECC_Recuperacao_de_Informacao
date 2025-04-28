@@ -1,5 +1,7 @@
 """ update_frontier: Adds a new URL to the frontier. """
 
+# Update frontier function
+
 def update_frontier(scraping, scraped_url):
     """ Updates the frontier with new links found in the parsed URL thar weren't scraped neither stored """
     frontier = scraping['frontier']

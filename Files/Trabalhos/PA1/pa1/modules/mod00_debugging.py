@@ -1,10 +1,18 @@
+""" Debugging functions to assist in the development of the web scraper """
+
+# Importing my needed libraries
 
 import json
 import time # Time functions
 from requests.structures import CaseInsensitiveDict
 import threading # For multithreading
 
-""" print_json: Pretty print JSON data """
+# Global variables
+
+start_time = time.time()  # Start time for the entire script
+partial_time = time.time()  # Start time for the partial checkpoint
+
+# Debugging functions
 
 def print_json(data):
     """ Pretty prints JSON data. """
@@ -17,9 +25,6 @@ def print_json(data):
 
     print(json.dumps(data, indent=4, default=convert))
 
-
-""" benchmarking """
-
 def benchmark_test(function, parameters):
     """ Benchmarking function to measure execution time. """
     start_time = time.time()
@@ -30,28 +35,12 @@ def benchmark_test(function, parameters):
         f"Function {function.__name__} executed in {elapsed_time:.4f} seconds")
     return result
 
-# benchmark_test(get_robots_txt, ['https://olhardigital.com.br'])
-# benchmark_test(get_sitemap, ['https://olhardigital.com.br', {'sitemap': []}])
-
-
-""" debug_print: Prints the parsed URL in a readable format that is defined in the assignment. """
-
-def debug_print(parsed_url):
-    """ Prints the parsed URL in a readable format. """
-    debug_info = {
-        'URL': parsed_url['URL'],
-        'Title': parsed_url['Title'],
-        'Text': parsed_url['Text'],
-        'Timestamp': parsed_url['Timestamp'],
-    }
-    print_json(debug_info)
-
-
 def debug_scrape_print(scraping, url, active_threads=None):
     """ Prints the scraping state. """
-    msg = f'({scraping["count"]:04}/{len(scraping["frontier"]):04})\t'
-    msg += url
-    msg += f'\t[Threads: {threading.active_count()}]'
+    scraping_count = f'({scraping["count"]:04}/{len(scraping["frontier"]):04})\t'
+    thread_count = f'[Threads: {threading.active_count()}]'
+    msg = f'{thread_count}\t{scraping_count}\t\t{url}'
+    
     # msg += f' => {PAGES_LIMIT}'
     # first_3_plus_last_3 = list(scraping['frontier'])[:2] + list(scraping['frontier'])[-2:]
     # msg += f'\nFrontier: {first_3_plus_last_3}'
@@ -59,3 +48,17 @@ def debug_scrape_print(scraping, url, active_threads=None):
     print(msg)
     # print_json(scraping)
     # if scraping['count'] % 100 == 0:  # Print status every 100 iterations
+
+def debug_time_elapsed():
+    """ Returns the time elapsed since the start time """
+    global start_time, partial_time
+    end_time = time.time()
+    
+    from_last_checkpoint = end_time - partial_time
+    from_start = end_time - start_time
+    
+    msg = f'TIMES: from start: {from_start:.2f} seconds\tfrom last save: {from_last_checkpoint:2f} seconds'
+    print(msg)
+    
+    partial_time = end_time  # Update the checkpoint time
+

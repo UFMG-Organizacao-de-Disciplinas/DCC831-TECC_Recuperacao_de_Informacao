@@ -1,16 +1,16 @@
 """ Robots and Sitemaps Module """
 
-# Importing other modules
+# Importing my modules
 
-from modules.mod02_utils import default_requester, contants # Needed for the default requester
+from modules.mod04_utils import default_requester, contants # Needed for the default requester
 
-# Importing libraries
+# Importing my needed libraries
 
 import bs4 as bs # BeautifulSoup wrapper for parsing HTML and XML
 from collections import deque # Needed for the sitemap exploring
 import requests # Needed for HTTP requests
 
-""" get_robots_txt: processes the contents of the robots.txt file. """
+# Parsing robots.txt and sitemaps
 
 def get_robots_txt(url):
     """ Returns the robots.txt file for a given URL. """
@@ -68,8 +68,6 @@ def get_robots_txt(url):
     except requests.RequestException as e:
         print(f"Error fetching robots.txt for {url}: {e}")
     return None
-
-""" get_sitemap: processes the contents of the sitemap.xml file. """
 
 def get_sitemap(url, robots_info=None):
     def parse_sitemap(sitemap_url):
