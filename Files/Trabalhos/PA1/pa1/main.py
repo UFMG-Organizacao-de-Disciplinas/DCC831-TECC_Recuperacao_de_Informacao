@@ -39,7 +39,9 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 """ Simulating the python CLI arguments """
 
-initial_code_time = time.time()  # Start time for the entire script
+start_time = time.time()  # Start time for the entire script
+
+partial_time = time.time()  # Start time for the partial checkpoint
 
 def get_args():
     """ Set up command line arguments """
@@ -202,6 +204,19 @@ def debug_print(parsed_url):
 def get_timestamp():
     """ Returns the current timestamp in seconds since 1970 """
     return int(datetime.datetime.now().timestamp())
+
+def debug_time_elapsed():
+    """ Returns the time elapsed since the start time """
+    global start_time, partial_time
+    end_time = time.time()
+    
+    from_last_checkpoint = end_time - partial_time
+    from_start = end_time - start_time
+    
+    msg = f'TIMES: from start: {from_start:.2f} seconds\tfrom last save: {from_last_checkpoint:2f} seconds'
+    print(msg)
+    
+    partial_time = end_time  # Update the checkpoint time
 
 """ get_seeds: Getting seeds from file """
 
@@ -456,6 +471,9 @@ def store_warcs(scraping):
     with warc_lock:
         content = scraping['content']
         index = scraping['count'] // WARC_SIZE
+        
+        debug_time_elapsed()
+        
         for parsed_url in content.values():
             store_warc(parsed_url, index, 'ab')
 
@@ -552,6 +570,4 @@ def parallel_scrape(function, scraping, max_workers=MAX_THREADS):
 
 parallel_scrape(scrape_once, scraping, 50)
 
-ending_code_time = time.time()  # End time for the entire script
-
-print(f"Total execution time: {ending_code_time - initial_code_time:.4f} seconds")
+print(f"Total execution time: {time.time() - start_time:.2f} seconds")
