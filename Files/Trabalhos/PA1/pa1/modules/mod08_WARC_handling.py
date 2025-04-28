@@ -14,6 +14,7 @@ from warcio.archiveiterator import ArchiveIterator # Needed for reading WARC fil
 import gzip # Needed for reading WARC files
 from io import BytesIO # GPT is helping me with WARCing
 from threading import Lock
+import os # Assure the directory exists
 
 # Global variables
 
@@ -21,23 +22,20 @@ warc_lock = Lock() # Global lock for thread-safe WARC file operations this ensur
 
 # WARC Store and Read functions
 
-def store_warc(parsed_url, index, warc_file_saving_method='ab', is_compressed=True):
+
+def get_protocol_version(version):
+    """ Returns the protocol version used in the response. """
+    protocol  = f'unknown {version}'
+    if version == 10:
+        protocol = 'HTTP/1.0'
+    elif version == 11:
+        protocol = 'HTTP/1.1'
+    elif version == 20:
+        protocol = 'HTTP/2.0'
+    return protocol
+
+def store_warc(warc_file, parsed_url, is_compressed):
     """ Stores the parsed URL in a WARC file. """
-
-    def get_protocol_version(version):
-        """ Returns the protocol version used in the response. """
-        protocol  = f'unknown {version}'
-        if version == 10:
-            protocol = 'HTTP/1.0'
-        elif version == 11:
-            protocol = 'HTTP/1.1'
-        elif version == 20:
-            protocol = 'HTTP/2.0'
-        return protocol
-
-    output_path = f'WARCs/output_{index:03}.warc'
-    if is_compressed:
-        output_path += '.gz'
 
     headers = StatusAndHeaders(
         statusline=str(parsed_url['Status_Code']),
@@ -46,31 +44,40 @@ def store_warc(parsed_url, index, warc_file_saving_method='ab', is_compressed=Tr
         protocol=get_protocol_version(parsed_url['Version']),
     )
 
-    # print_json(parsed_url['HTML'])
     # ab = Append and Binary mode.
-    with open(output_path, warc_file_saving_method) as output:
-        # gzip = True makes it automatically compressed.
-        writer = WARCWriter(output, gzip=is_compressed)
-        record = writer.create_warc_record(
-            uri=parsed_url['URL'],
-            record_type='response',
-            payload=BytesIO(parsed_url['HTML'].encode('utf-8')),
-            # payload=parsed_url['Raw'],
-            http_headers=headers,
-        )
-        writer.write_record(record)
+    # gzip = True makes it automatically compressed.
+    writer = WARCWriter(warc_file, gzip=is_compressed)
+    record = writer.create_warc_record(
+        uri=parsed_url['URL'],
+        record_type='response',
+        payload=BytesIO(parsed_url['HTML'].encode('utf-8')),
+        # payload=parsed_url['Raw'],
+        http_headers=headers,
+    )
+    writer.write_record(record)
 
 
-def store_warcs(scraping, warc_size=1000):
+def store_warcs(scraping, is_compressed=False):
     """ Stores the parsed URLs in a WARC file. """
+    debug_time_elapsed()
+    
     with warc_lock:
-        content = scraping['content']
-        index = scraping['count'] // warc_size
+        scraping['stored'] += 1  # Increment the stored count
+        content = scraping['content'].copy()  # Copy the content to avoid modifying it while iterating
+        scraping['content'] = dict()  # Clear the content after copying
+
+        output_path = f'WARCs/output_{scraping['stored']:03}.warc'
+        if is_compressed:
+            output_path += '.gz'
+
+        warc_file_saving_method = 'ab'
         
-        debug_time_elapsed()
+        os.makedirs('WARCs', exist_ok=True)  # Create the directory if it doesn't exist
+        with open(output_path, warc_file_saving_method) as warc_file:
         
-        for parsed_url in content.values():
-            store_warc(parsed_url, index, 'ab')
+            for parsed_url in content.values():
+                store_warc(warc_file, parsed_url, is_compressed)
+            
 
 
 """ read_warc: Reads the WARC file and prints its contents. """
