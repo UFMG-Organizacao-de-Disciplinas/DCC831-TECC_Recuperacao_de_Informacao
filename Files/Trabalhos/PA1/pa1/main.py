@@ -53,7 +53,7 @@ def get_args():
     parser.add_argument('-d', '--debug', action='store_true', help="Enable debug mode")
     
     if '__file__' not in globals():  # Detecta se está em um notebook
-        params = ['-s', '../Seeds/seeds-2024711370.txt', '-n', '1000', '-d']
+        params = ['-s', '../Seeds/seeds-2024711370.txt', '-n', '100000', '-d']
         args = parser.parse_args(params)  # Ignora args ou simula
     else:
         args = parser.parse_args()   # Usa normalmente no terminal
@@ -70,7 +70,7 @@ SEEDS_FILE = ARGS.seeds if ARGS.seeds else './Seeds/seeds-2024711370.txt'
 PAGES_LIMIT = ARGS.limit if ARGS.limit else 2500
 DEBUG_MODE = ARGS.debug if ARGS.debug else False
 MIN_DELAY = 100 # Delay in milliseconds between requests
-MAX_THREADS = 10 # Maximum number of threads to use for crawling
+MAX_THREADS = 40 # Maximum number of threads to use for crawling
 WARC_SIZE = 100 # Number of pages to write to a WARC file before creating a new one
 
 """ print_json: Pretty print JSON data """
@@ -476,6 +476,7 @@ def store_warc(parsed_url, index, warc_file_saving_method='ab', is_compressed=Tr
         protocol=get_protocol_version(parsed_url['Version']),
     )
 
+    # print_json(parsed_url['HTML'])
     # ab = Append and Binary mode.
     with open(output_path, warc_file_saving_method) as output:
         # gzip = True makes it automatically compressed.
@@ -543,7 +544,7 @@ def scrape_once(scraping):
     def was_scraped(url, scraped_content):
         """ Checks if the URL has already been scraped. """
         if url in scraped_content:
-            print(f"URL already scraped: {url}")
+            print(f"[SCRAPED]\t{url}")
             return True
         return False
 
