@@ -32,7 +32,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed # For multithrea
 import os
 import threading # For multithreading
 from threading import Lock
-
+from concurrent.futures import wait, FIRST_COMPLETED
 from requests.exceptions import SSLError, ConnectTimeout, ReadTimeout, ConnectionError, RequestException
 
 
@@ -71,7 +71,7 @@ SEEDS_FILE = ARGS.seeds if ARGS.seeds else './Seeds/seeds-2024711370.txt'
 PAGES_LIMIT = ARGS.limit if ARGS.limit else 2500
 DEBUG_MODE = ARGS.debug if ARGS.debug else False
 MIN_DELAY = 100 # Delay in milliseconds between requests
-MAX_THREADS = 40 # Maximum number of threads to use for crawling
+MAX_THREADS = 60 # Maximum number of threads to use for crawling
 WARC_SIZE = 100 # Number of pages to write to a WARC file before creating a new one
 
 """ print_json: Pretty print JSON data """
@@ -583,18 +583,19 @@ def parallel_scrape(function, scraping, max_workers=MAX_THREADS):
 
         while futures:
             # Espera qualquer uma terminar
-            for future in as_completed(futures):
-                print(f'[THREADS: {len(futures)}||{threading.active_count()}]')
-                futures.remove(future)
+            done, futures = wait(futures, return_when=FIRST_COMPLETED)
+
+            for future in done:
+                # print(f'[THREADS: {len(futures)}||{threading.active_count()}]')
                 try:
                     future.result()
                 except Exception as e:
                     print(f"Erro durante scraping: {e}")
 
-                # Quando uma terminar, tenta lançar outra
-                if scraping['frontier'] and scraping['count'] < PAGES_LIMIT:
-                    futures.add(executor.submit(function, scraping))
-                break  # Importante: sair do for depois de pegar UM terminado
+            # Depois que uma ou mais futures terminam, tentar preencher de novo até o máximo
+            while scraping['frontier'] and len(futures) < max_workers and scraping['count'] < PAGES_LIMIT:
+                futures.add(executor.submit(function, scraping))
+
 
 parallel_scrape(scrape_once, scraping, MAX_THREADS)
 
