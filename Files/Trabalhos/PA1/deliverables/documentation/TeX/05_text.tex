@@ -36,7 +36,21 @@ I could also go for a deque, since I could pop from both ends, but it goes down 
 
 I'll just go back a few steps at the crawling process. Since the sitemaps are so more clean to process than the usual HTML pages, I will just grab the main outlink domains and make it spread further.
 
+\subsubsection{Revisiting}
+
+Remove already visited or just shoo them away?
+
 % \section{Introduction}
+
+
+| Description | Threads | Collected URLs | Frontier | Time       | Mean Time per URL | Expected Time for 100k Collected URLs |
+| ----------- | ------- | -------------- | -------- | ---------- | ----------------- | ------------------------------------- |
+| Mono thread | 1       | 1647           | 5767     | 31min44seg | X                 | X                                     |
+| Mono thread | 1       | 1000           | 3000     | 14min19    | X                 | X                                     |
+| Thread Pool | 10      | 1002           | 3268     | 9min44     | X                 | X                                     |
+| Threading   | 1       | 1000           | 3000     | 14min19    | X                 | X                                     |
+
+
 
 % ACM's consolidated article template, introduced in 2017, provides a consistent \LaTeX\ style for use across ACM publications, and incorporates accessibility and metadata-extraction functionality necessary for future Digital Library endeavors. Numerous ACM and SIG-specific \LaTeX\ templates have been examined, and their unique features incorporated into this single new template.
 
