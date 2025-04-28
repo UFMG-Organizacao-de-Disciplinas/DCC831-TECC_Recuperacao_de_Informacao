@@ -397,6 +397,7 @@ def scrape_url(url):
         # base_parsed_url['Raw'] = response['raw']
         base_parsed_url['Status_Code'] = response['status_code']
         base_parsed_url['Version'] = response['version']
+        base_parsed_url['HTML'] = response['text']
         return base_parsed_url
     
     base_parsed_url = {
@@ -459,7 +460,7 @@ def store_warc(parsed_url, index, warc_file_saving_method='ab', is_compressed=Tr
         record = writer.create_warc_record(
             uri=parsed_url['URL'],
             record_type='response',
-            payload=BytesIO(parsed_url['Full_Text'].encode('utf-8')),
+            payload=BytesIO(parsed_url['HTML'].encode('utf-8')),
             # payload=parsed_url['Raw'],
             http_headers=headers,
         )
