@@ -71,8 +71,9 @@ SEEDS_FILE = ARGS.seeds if ARGS.seeds else './Seeds/seeds-2024711370.txt'
 PAGES_LIMIT = ARGS.limit if ARGS.limit else 2500
 DEBUG_MODE = ARGS.debug if ARGS.debug else False
 MIN_DELAY = 100 # Delay in milliseconds between requests
+
 MAX_THREADS = 60 # Maximum number of threads to use for crawling
-WARC_SIZE = 100 # Number of pages to write to a WARC file before creating a new one
+WARC_SIZE = 1000 # Number of pages to write to a WARC file before creating a new one
 
 """ print_json: Pretty print JSON data """
 
@@ -368,9 +369,20 @@ def get_sitemap(url, robots_info=None):
 
 """ update_frontier: Adds a new URL to the frontier. """
 
-def update_frontier(frontier, scraped_url):
-    """ Updates the frontier with new links found in the parsed URL. """
-    frontier.update(scraped_url['Outlinks'])
+def update_frontier(scraping, scraped_url):
+    """ Updates the frontier with new links found in the parsed URL thar weren't scraped neither stored """
+    frontier = scraping['frontier']
+    stored = scraping['stored_urls']
+    parsed_urls = set(scraping['content'].keys())
+    outlinks = set(scraped_url['Outlinks'])
+    # Adds new links to the frontier
+    
+    # Converte para conjunto para aproveitar operações eficientes
+    new_links = outlinks - stored - parsed_urls
+    
+    # Adiciona os novos links à frontier
+    frontier.update(new_links)
+    
     return frontier
 
 """ scrape_url: Parses a URL and returns its components. """
@@ -559,7 +571,7 @@ def scrape_once(scraping):
         return None
     parsed_url = scrape_url(url)
     scraping['content'][url] = parsed_url
-    scraping['frontier'] = update_frontier(scraping['frontier'], parsed_url)
+    scraping['frontier'] = update_frontier(scraping, parsed_url)
     scraping['count'] += 1  # Increment the count of pages scraped
     
     if scraping['count'] % WARC_SIZE == 0:
