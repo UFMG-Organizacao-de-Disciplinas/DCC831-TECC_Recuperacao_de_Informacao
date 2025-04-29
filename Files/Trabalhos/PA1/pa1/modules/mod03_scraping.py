@@ -48,11 +48,12 @@ def scrape_once(scraping):
         return None
 
     parsed_url = scrape_url(url)
-    scraping['content'][url] = parsed_url
+    # scraping['content'][url] = parsed_url
     scraping['frontier'] = update_frontier(scraping, parsed_url)
     scraping['count'] += 1  # Increment the count of pages scraped
 
     warc_as_you_go(scraping, parsed_url, is_compressed=True)
+
     
     # if scraping['count'] % WARC_SIZE == 0:
         # Store the parsed URL in a WARC file and clean up the content
