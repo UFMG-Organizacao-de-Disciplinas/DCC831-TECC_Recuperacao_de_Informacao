@@ -2,7 +2,6 @@
 
 % Task:  *documentation*, assessed based on a [short (pdf) report ^6][6] describing your implemented data structures and algorithms, their computational complexity, as well as a discussion of their empirical efficiency (e.g. the download rate throughout the crawling execution, the speedup achieved as new threads are added). Your documentation should also include a characterization of your crawled corpus, including (but not limited to) the following statistics: total number of unique domains, size distribution (in terms of number of webpages) per domain, and size distribution (in terms of number of tokens) per webpage.
 
-
 %  Introduce about the context of the activity
 
 The task at hand involves developing an efficient parallel web crawler capable of exploring and collecting web data at scale. Throughout this project, a variety of strategies and optimizations were considered to balance computational performance with robustness. In this report, we document the implemented data structures and algorithms, analyze their theoretical and empirical performance, and characterize the crawled corpus. Special attention was given to how threading could be leveraged to maximize URL collection rates without compromising data integrity or server politeness policies.
@@ -13,39 +12,11 @@ Considering the project extent, many ideas came to mind. The initial brainstormi
 
 \subsection{Expanding Frontier}
 
-Well, the simples would be to do a breadth-first search (BFS) on the website, starting from a seed URL and exploring all its links before moving on to the next level. This approach is simple and effective, but it can be slow and inefficient, especially for large websites with many links. But mostly because, using a list to store the frontier, we would not remove duplicates, and we would end up with a lot of repeated URLs.
+Well, the simples would be to do a \textbf{Breadth-First Search} (BFS) on the website, starting from a seed URL and exploring all its links before moving on to the next level. This approach is simple and effective, but it can be slow and inefficient, especially for large websites with many links.
 
-For that matter, we could use a set to store the URLs that have already been crawled. This would allow us to avoid crawling the same URL multiple times, but now we lose the ability to crawl URLs in a queue fashion, since we could only \textbf{pop} the top URL from the set. But the looping structures doesn't handle well when its iterable is being modified. So, we would have to use a different approach.
+To avoid visiting the same website, we could think of a \textbf{data structure} such that this issue is avoided. Using a \textbf{list} to store the frontier, would not remove duplicates, and then may end up with a lot of repeated URLs. For that matter, we could use a \textbf{set} to store the URLs that have already been crawled. This would allow us to avoid crawling the same URL multiple times, but now we lose the ability to crawl URLs in a queue fashion, since we could only \textit{pop} the top URL from the set. But the looping structures doesn't handle well when its iterable is being modified. So, we would have to use a different approach. Another possibility is to use a \textbf{deque} (double-ended queue) to store the URLs. This would allow us to efficiently pop URLs from both ends of the queue, but this just solves the last problem, returning us to the first one.
 
-Asking our friend Chat GPT for advice, it suggested using a deque (double-ended queue) to store the URLs. This would allow us to efficiently pop URLs from both ends of the queue, but this just solves the last problem, returning us to the first one.
-
-A more idealistic approach would be to traverse the sitemap of the website. This allows for a more structured approach to crawling, as sitemaps often provide a clear hierarchy of URLs and their relationships.
-
-Considering the quantity of URLs to be crawled, and, since the sitemaps results in thousands of URLs usually beginning with the same domain, a way os reducing the storage cost is to store it into a Trie, a tree-like data structure that is used to store prefixes of strings. This allows for efficient storage and retrieval of URLs, as well as the ability to quickly check for duplicates.
-
-\subsection{Parallelism}
-
-
-
-% - Explorar urls
-%   - Vasculhar o sitemap
-%   - Árvore de aprendizado descritivo pra armazenar links
-%     - Todas as tarefas computacionalmente intensas devem ser delegadas à threads?
-%     - Armazenar logo quando achar?
-%     - Percorrer a árvore pra poder extrair os dados?
-%     - Percorrer enquanto se preenche?
-%   - Threads
-%     1. Um que fica verificando se novas páginas foram adicionadas aos filhos
-%     2. Em cada filho da raiz
-
-% - Estruturas de Dados
-%   - Árvore de aprendizado descritivo
-%     - Cada nó é uma página
-
-% - Paralelismo
-%   - Adiar o processamento de threads que passarem de algum determinado tempo de processamento.  
-%   - Uma nova thread para cada nó de árvore? Não... Threads demais.
-%     - Qual limite?
+Instead of doing a BFS through the scraped outlinks of a page, a more idealistic approach would be to traverse the sitemap of the website. This allows for a more structured approach to crawling, as sitemaps often provide a clear hierarchy of URLs and their relationships. Considering the quantity of URLs to be crawled, and, since the sitemaps results in thousands of URLs usually beginning with the same domain, a way os reducing the storage cost is to store it into a \textbf{trie}, a tree-like data structure that is used to store prefixes of strings. This allows for efficient storage and retrieval of URLs, as well as the ability to quickly check for duplicates.
 
 \subsection{Knuth's optimization principle}
 
@@ -57,11 +28,11 @@ In adherence to Donald Knuth's famous dictum, ``\textbf{Premature optimization i
 
 \section{MVP}
 
-The concept for the \textbf{Minimum Viable Product (MVP)} was to create a pipeline that would create the needed flow for the application to work. It was basically consisting of a few steps: 1. Adding seeds to frontier, 2. Crawling the frontier, 3. Parsing the crawled pages, 4. Storing the crawled data.
+The concept for the \textbf{Minimum Viable Product (MVP)} was to create a pipeline that would create the needed flow for the application to work. It was basically consisting of a few steps: \textbf{1.} Adding seeds to frontier, \textbf{2.} Crawling the frontier, \textbf{3.} Parsing the crawled pages, 4. Storing the crawled data.
 
 Considering the need for \textbf{argument parsing}, and the desire for the easy reproducibility of the code, a few steps were taken to ensure that the code arguments were set as default values, then, not needing to be passed as arguments.
 
-Another new learned feature was the use of the \textbf{WARC files}. The Web ARChive (WARC) file format is a standard for storing web crawls and other web-related data. It is widely used in the web archiving community and is supported by many web crawlers and archiving tools. The WARC format allows for efficient storage and retrieval of web content, as well as the ability to include metadata about the crawled pages. After storing the crawled data in WARC files, it was analyzed and many apparent unuseful data was being stored, so, it was decided to remove some header information and compress the files to save space.
+Another new learned feature was the use of the \textbf{WARC files}. The Web ARChive (WARC) file format is a standard for storing web crawls and other web-related data. It is widely used in the web archiving community and is supported by many web crawlers and archiving tools. The WARC format allows for efficient storage and retrieval of web content, as well as the ability to include metadata about the crawled pages. After storing the crawled data in WARC files, it was analyzed and many apparent unuseful data was being stored, so, it was decided to remove some header information and compress the files to save space. Some other problems encountered were: 1. Some URLs were missing, making it so that the file had only a few URLs, it was caused by the fact that there was a missing entry in the dictionary regarding the full HTML page; 2. Batch saving the whole 1000 pages into one file at once seemed more efficient than append a new page every time it was crawled, but, surprisinly enough, it was even simpler doing the seemingly more inefficient way.
 
 \subsection{Robots.txt and Sitemap}
 
@@ -73,21 +44,29 @@ As for the \textbf{Sitemap} parsing, it was a bit more tricky, but ended up bein
 
 \textbf{Frontier} as a \textit{list} of URLs to be crawled could have many advantages, such as allowing for a \textit{queue} of URLs to be crawled. But, it would also allow the existance of a list of many duplicates. To avoid this, we could use a \textit{set} to store the URLs that have already been crawled. This would allow us to avoid crawling the same URL multiple times, but now we lose the ability to crawl URLs in a queue fashion, since we could only pop the top URL from the set. We could also go for a deque, since I could pop from both ends, but it goes down the same path as the list without any processing for duplicates, so, for the MVP sake, let's make it work with the set for now.
 
-Another point to be considered is the revisiting policy. The crawler should not revisit the same URL multiple times, so we need to implement a mechanism to track visited URLs. Many approaches could deal with that, but the feel that abusing of the operation \textbf{not in} would make the complexity skyrocket, so, we kept it at the set that naturally handles this.
+Another point to be considered is the revisiting policy. The crawler should not revisit the same URL multiple times, so we need to implement a mechanism to track visited URLs. Many approaches could deal with that, but the feel that abusing of the operation \textbf{not in} would make the complexity skyrocket, so we kept it at the \textbf{set} that naturally handles this.
 
-\subsection{Threading}
+Other major consideration that took place was the decision to use only the domain name for the scraped URLs. By following that approach, we could set the main point for crawling these websites later on. And, considering that this is a whole new domain, there is no need to worry about the domain revisiting delay. Another limit used was to not scrape URLs that refers to the same domain that it was scraped from, and by doing so, the crawler is forced to wander around the web.
 
-Errors: I was only running one thread for each of the 3 seeds.
+\section{Parallelism}
 
-\subsection{WARC}
+After implementing the MVP, it was time to consider parallelism. The initial approach was to use the \textit{threading} library, which allows for the creation of multiple threads to handle different tasks concurrently. This was a good starting point, but after some testing, and LLM suggestions, it was decided to use the \textit{ThreadPoolExecutor} class from the \textit{concurrent.futures} module. This class provides a high-level interface for asynchronously executing callables using threads. It ended up being a more efficient choice time-wise.
 
-For some reason I'm only saving 0.23\% of the data I'm still not sure why.
+But, even after implementing the ThreadPoolExecutor, it was still not as efficient as expected. The max-thread count was increased but no significant change was noticed. It kept at that until it was decided to print the number of active threads, and it was found that the number of active threads was equal to the number of the initial seeds. So, after some tweaking, as soon as the frontier received more URLs, the number of active threads increased until it reached its cap. Now the speed was much better.
 
 \section{Results}
 
+Considering everything that was done, the results were quite satisfactory. The crawler was able to crawl a large number of URLs in a relatively short amount of time. The use of parallelism made a huge difference in the crawling speed, and, surprisingly enough, the use of WARC files for storing the crawled data as it is parsed was less error prone than expected.
+
 \subsection{Algorithms}
 
-\subsubsection{Flowchart}
+As the algorithm implemented, we can summarize the following steps:
+
+\begin{itemize}
+  \item \textbf{Crawling:} the crawler uses the \textit{ThreadPoolExecutor} to crawl multiple URLs concurrently. Each thread is responsible for crawling a single URL and parsing its content.
+  \item \textbf{Frontier Expansion:} after the initial seeds are added to the frontier, the crawler pops one URLs, checks if it was already visited, parses it, and stores its main data into a dictionary and the domain of the parsed outlinks are added to the frontier.
+  \item \textbf{WARC Storage:} the parsed data is then appended to the correspondent WARC file. The WARC file is compressed to save space and the needed information is passed to it.
+\end{itemize}
 
 \subsubsection{Data Structures}
 
@@ -109,38 +88,39 @@ After tweaking a lot with the threads, some notable improvements were made. The 
 
 \begin{table}[!ht] \centering
   \caption{Crawling performance} \label{performance}
-  \begin{tabular}{rrrrrrrl}
-    \textbf{Attempt (\#)} & \textbf{Threads (\#)} & \textbf{Collected URLs (\#)} & \textbf{Frontier (\#)} & \textbf{Time (s)} & \textbf{Mean Time per URL (s/URL)} & \textbf{Expected Time for 100k Collected URLs} & \textbf{Description}                                     \\
-    1                     & 1                     & 1647                         & 5767                   & 1904.00           & 1,16                               & 32:13:20                                       & Mono thread                                              \\
-    2                     & 1                     & 1000                         & 3000                   & 859.00            & 0,86                               & 23:53:20                                       & Mono thread                                              \\
-    3                     & 10                    & 1002                         & 3268                   & 584.00            & 0,58                               & 16:06:40                                       & Thread Pool                                              \\
-    4                     & 1                     & 1000                         & 3000                   & 859.00            & 0,86                               & 23:53:20                                       & Threading                                                \\
-    5                     & 32                    & 100                          & 1009                   & 10.00             & 0,10                               & 02:46:40                                       & GPT                                                      \\
-    6                     & 16                    & 100                          & 1191                   & 14.00             & 0,14                               & 03:53:20                                       & GPT                                                      \\
-    7                     & 8                     & 100                          & 1590                   & 25.00             & 0,25                               & 06:56:40                                       & GPT                                                      \\
-    8                     & 40                    & 100                          & 417                    & 5.95              & 0,06                               & \textbf{01:40:00}                              & GPT                                                      \\
-    9                     & 64                    & 100                          & 613                    & 7.86              & 0,08                               & 02:13:20                                       & GPT                                                      \\
-    10                    & 48                    & 100                          & 417                    & 5.68              & 0,06                               & \textbf{01:40:00}                              & GPT                                                      \\
-    11                    & 56                    & 100                          & 824                    & 7.41              & 0,07                               & 01:56:40                                       & GPT                                                      \\
-    12                    & 50                    & 100                          & 502                    & 7.03              & 0,07                               & 01:56:40                                       & GPT                                                      \\
-    13                    & 50                    & 100                          & 848                    & 12.97             & 0,13                               & 03:36:40                                       & GPT + domain only                                        \\
-    14                    & 48                    & 100                          & 693                    & 16.81             & 0,17                               & 04:43:20                                       & GPT + domain only                                        \\
-    15                    & 50                    & 100                          & 558                    & 6.26              & 0,06                               & \textbf{01:40:00}                              & GPT                                                      \\
-    16                    & 1                     & 100                          & 1447                   & 60.94             & 0,61                               & 16:56:40                                       & GPT                                                      \\
-    17                    & 50                    & 1048                         & 3189                   & 82.60             & 0,08                               & 02:13:20                                       & ThreadPoolExecutor                                       \\
-    18                    & 50                    & 502                          & 2048                   & 109.63            & 0,22                               & 06:06:40                                       & ThreadPoolExecutor.py: broken warc by dictionary changed \\
-    19                    & 50                    & 502                          & 2092                   & 187.36            & 0,37                               & 10:16:40                                       & ThreadPoolExecutor.py: Storing each 100 parsed URL       \\
-    20                    & 40                    & 537                          & 1204                   & 47.35             & 0,09                               & 02:30:00                                       & ThreadPoolExecutor.py: Actually using 40 threads         \\
-    21                    & 50                    & 538                          & 2079                   & 37.76             & 0,07                               & 01:56:40                                       & ThreadPoolExecutor.py                                    \\
-    22                    & 60                    & 559                          & 2252                   & 32.63             & 0,06                               & \textbf{01:40:00}                              & ThreadPoolExecutor.py                                    \\
-    23                    & 70                    & 547                          & 1721                   & 51.55             & 0,09                               & 02:30:00                                       & ThreadPoolExecutor.py: Worsened                          \\
-    24                    & 60                    & 543                          & 1332                   & 31.13             & 0,06                               & \textbf{01:40:00}                              & ThreadPoolExecutor.py                                    \\
-    25                    & 60                    & 1200                         & 2113                   & 82.67             & 0,07                               & 01:56:40                                       & Converted to py                                          \\
-    26                    & 50                    & 527                          & 1810                   & 41.63             & 0,08                               & 02:13:20                                       & Warc As You Go                                           \\
-    27                    & 50                    & 517                          & 1948                   & 34.66             & 0,07                               & 01:56:40                                       & Warc As You Go Just In Time                              \\
-    28                    & 40                    & 539                          & 598                    & 58.98             & 0,11                               & 03:03:20                                       & Warc As You Go Just In Time                              \\
-    29                    & 50                    & 520                          & 1827                   & 47.69             & 0,09                               & 02:30:00                                       & Warc As You Go Just In Time                              \\
-    30                    & 50                    & 534                          & 2563                   & 44.40             & 0,08                               & 02:13:20                                       & Warc As You Go Just In Time.gz                           \\
+  \begin{tabular}{rrrrrrl}
+    % \textbf{Threads} & \textbf{Scraped} & \textbf{Frontier} & \textbf{Time (s)} & \textbf{Time/URL} & \textbf{Expected Conclusion Duration} & \textbf{Description}                                     \\
+    \textbf{[1]} & \textbf{[2]} & \textbf{[3]} & \textbf{[4]} & \textbf{[5]} & \textbf{[6]}      & \textbf{[7]}             \\
+    1            & 100          & 1447         & 60.94        & 0,61         & 16:56:40          &                          \\
+    1            & 1000         & 3000         & 859.00       & 0,86         & 23:53:20          &                          \\
+    1            & 1000         & 3000         & 859.00       & 0,86         & 23:53:20          &                          \\
+    1            & 1647         & 5767         & 1904.00      & 1,16         & 32:13:20          &                          \\
+    8            & 100          & 1590         & 25.00        & 0,25         & 06:56:40          &                          \\
+    10           & 1002         & 3268         & 584.00       & 0,58         & 16:06:40          & Thread Pool              \\
+    16           & 100          & 1191         & 14.00        & 0,14         & 03:53:20          &                          \\
+    32           & 100          & 1009         & 10.00        & 0,10         & 02:46:40          &                          \\
+    40           & 537          & 1204         & 47.35        & 0,09         & 02:30:00          & Thread Pool (Corrected)  \\
+    40           & 539          & 598          & 58.98        & 0,11         & 03:03:20          & No WARC Batch            \\
+    \textbf{40}  & 100          & 417          & 5.95         & 0,06         & \textbf{01:40:00} &                          \\
+    48           & 100          & 693          & 16.81        & 0,17         & 04:43:20          & Domain only              \\
+    \textbf{48}  & 100          & 417          & 5.68         & 0,06         & \textbf{01:40:00} &                          \\
+    \textbf{50}  & 100          & 558          & 6.26         & 0,06         & \textbf{01:40:00} &                          \\
+    50           & 100          & 502          & 7.03         & 0,07         & 01:56:40          &                          \\
+    50           & 100          & 848          & 12.97        & 0,13         & 03:36:40          & Domain only              \\
+    50           & 1048         & 3189         & 82.60        & 0,08         & 02:13:20          & Thread Pool              \\
+    50           & 502          & 2048         & 109.63       & 0,22         & 06:06:40          & Thread Pool: broken warc \\
+    50           & 502          & 2092         & 187.36       & 0,37         & 10:16:40          & Thread Pool: batch 100   \\
+    50           & 517          & 1948         & 34.66        & 0,07         & 01:56:40          & No WARC Batch            \\
+    50           & 520          & 1827         & 47.69        & 0,09         & 02:30:00          & No WARC Batch            \\
+    50           & 527          & 1810         & 41.63        & 0,08         & 02:13:20          & No WARC Batch            \\
+    50           & 534          & 2563         & 44.40        & 0,08         & 02:13:20          & No WARC Batch.gz         \\
+    50           & 538          & 2079         & 37.76        & 0,07         & 01:56:40          & Thread Pool              \\
+    56           & 100          & 824          & 7.41         & 0,07         & 01:56:40          &                          \\
+    \textbf{60}  & 543          & 1332         & 31.13        & 0,06         & \textbf{01:40:00} & Thread Pool              \\
+    \textbf{60}  & 559          & 2252         & 32.63        & 0,06         & \textbf{01:40:00} & Thread Pool              \\
+    60           & 1200         & 2113         & 82.67        & 0,07         & 01:56:40          & Converted to py          \\
+    64           & 100          & 613          & 7.86         & 0,08         & 02:13:20          &                          \\
+    70           & 547          & 1721         & 51.55        & 0,09         & 02:30:00          & Thread Pool: Worsened    \\
   \end{tabular}
 \end{table}
 
