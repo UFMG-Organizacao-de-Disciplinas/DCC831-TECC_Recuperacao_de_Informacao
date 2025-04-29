@@ -41,6 +41,8 @@ def debug_scrape_print(scraping, url, active_threads=None):
     # thread_count = f'[Threads: {threading.active_count():02}]'
     # storage_count = f'[Stored: {scraping['stored']:03}]'
 
+    # print_json(scraping)
+
     msg = ''
     # msg += f'{storage_count}\t'
     # msg += f'{thread_count}\t'

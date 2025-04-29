@@ -2,8 +2,9 @@
 
 # Importing my modules
 
-from modules.mod00_debugging import debug_scrape_print
+# from modules.mod00_debugging import debug_scrape_print, print_json
 from modules.mod01_constants import constants
+from modules.mod04_utils import debug_print
 from modules.mod06_url_parsing import scrape_url
 from modules.mod07_frontier import update_frontier
 # from modules.mod08_WARC_handling import store_warcs, parallel_store_warcs
@@ -54,12 +55,15 @@ def scrape_once(scraping):
 
     warc_as_you_go(scraping, parsed_url, is_compressed=True)
 
+    # print_json(scraping)
     
     # if scraping['count'] % WARC_SIZE == 0:
         # Store the parsed URL in a WARC file and clean up the content
         # parallel_store_warcs(scraping)
         # store_warcs(scraping)
 
-    debug_scrape_print(scraping, url)
+    if CONSTANTS['DEBUG_MODE']:
+        # debug_scrape_print(scraping, url)
+        debug_print(parsed_url)
 
 
