@@ -37,9 +37,15 @@ def benchmark_test(function, parameters):
 
 def debug_scrape_print(scraping, url, active_threads=None):
     """ Prints the scraping state. """
-    scraping_count = f'({scraping["count"]:04}/{len(scraping["frontier"]):04})\t'
-    thread_count = f'[Threads: {threading.active_count()}]'
-    msg = f'{thread_count}\t{scraping_count}\t\t{url}'
+    scraping_count = f'({scraping['count']:04}/{len(scraping['frontier']):04})\t'
+    thread_count = f'[Threads: {threading.active_count():02}]'
+    storage_count = f'[Stored: {scraping['stored']:03}]'
+
+    msg = ''
+    msg += f'{storage_count}\t'
+    # msg += f'{thread_count}\t'
+    msg += f'{scraping_count}\t'
+    # msg += f'{url}'
     
     # msg += f' => {PAGES_LIMIT}'
     # first_3_plus_last_3 = list(scraping['frontier'])[:2] + list(scraping['frontier'])[-2:]

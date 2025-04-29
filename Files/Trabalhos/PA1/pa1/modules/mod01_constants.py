@@ -18,7 +18,7 @@ def constants():
         'MIN_DELAY': 100,  # Minimum delay between requests in miliseconds
         'MAX_DELAY': 5,  # Maximum delay between requests in seconds
         'MAX_RETRIES': 3,  # Maximum number of retries for a request
-        'MAX_THREADS': 50,  # Maximum number of threads to use for crawling
+        'MAX_THREADS': 5,  # Maximum number of threads to use for crawling
         'WARC_SIZE': 100,  # Number of pages to write to a WARC file before creating a new one
         'CORPUS_SIZE': DEFAULT_LIMIT,  # Number of pages to crawl before stopping
         'SEEDS_PATH': DEFAULT_PATH,  # Path to the seed file

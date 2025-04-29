@@ -6,7 +6,8 @@ from modules.mod00_debugging import debug_scrape_print
 from modules.mod01_constants import constants
 from modules.mod06_url_parsing import scrape_url
 from modules.mod07_frontier import update_frontier
-from modules.mod08_WARC_handling import store_warcs
+# from modules.mod08_WARC_handling import store_warcs, parallel_store_warcs
+from modules.mod08_WARC_handling import parallel_store_warcs
 
 # Global variables
 
@@ -51,8 +52,8 @@ def scrape_once(scraping):
     
     if scraping['count'] % WARC_SIZE == 0:
         # Store the parsed URL in a WARC file and clean up the content
-        print(f">>> Storing WARC file for {scraping['count']} pages... <<<")
-        store_warcs(scraping)
+        parallel_store_warcs(scraping)
+        # store_warcs(scraping)
 
     debug_scrape_print(scraping, url)
 
