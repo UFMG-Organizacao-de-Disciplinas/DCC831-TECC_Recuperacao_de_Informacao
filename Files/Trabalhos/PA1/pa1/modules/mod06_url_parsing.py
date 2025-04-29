@@ -69,7 +69,8 @@ def scrape_url(url):
         'Full_Text': '',
         'Headers': dict(),
         'Status_Code': None,
-        'Version': None
+        'Version': None,
+        'HTML': '',
     }
     response = default_requester(url)
     if response is None:

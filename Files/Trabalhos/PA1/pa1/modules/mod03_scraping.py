@@ -7,7 +7,8 @@ from modules.mod01_constants import constants
 from modules.mod06_url_parsing import scrape_url
 from modules.mod07_frontier import update_frontier
 # from modules.mod08_WARC_handling import store_warcs, parallel_store_warcs
-from modules.mod08_WARC_handling import parallel_store_warcs
+# from modules.mod08_WARC_handling import parallel_store_warcs
+from modules.mod08_WARC_handling import warc_as_you_go
 
 # Global variables
 
@@ -45,14 +46,17 @@ def scrape_once(scraping):
     
     if was_scraped(url, scraping['content']):
         return None
+
     parsed_url = scrape_url(url)
     scraping['content'][url] = parsed_url
     scraping['frontier'] = update_frontier(scraping, parsed_url)
     scraping['count'] += 1  # Increment the count of pages scraped
+
+    warc_as_you_go(scraping, parsed_url, is_compressed=True)
     
-    if scraping['count'] % WARC_SIZE == 0:
+    # if scraping['count'] % WARC_SIZE == 0:
         # Store the parsed URL in a WARC file and clean up the content
-        parallel_store_warcs(scraping)
+        # parallel_store_warcs(scraping)
         # store_warcs(scraping)
 
     debug_scrape_print(scraping, url)

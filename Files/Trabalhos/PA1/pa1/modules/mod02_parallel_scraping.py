@@ -17,8 +17,10 @@ def parallel_scrape(scrape_func, CONSTANTS):
         'count': 0,
         'stored': 0,
         'content': dict(),
+        'timed_out': set(), # Set of URLs that timed out
         'stored_urls': set(),  # Set of URLs already stored in WARC
         'frontier': get_seeds(CONSTANTS['SEEDS_PATH']),  # Set of URLs to scrape
+        'constants': CONSTANTS,  # Constants for the scraper
     }
 
     with ThreadPoolExecutor(max_workers=CONSTANTS['MAX_THREADS']) as executor:
