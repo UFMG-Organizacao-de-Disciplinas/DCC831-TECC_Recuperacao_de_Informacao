@@ -267,12 +267,12 @@ Próxima aula: Search Architecture
 
 #### Search Infrastructure
 
-- Bandwidth: ...
-- Storage: ...
-- Processing: crawling, indexing...
-
-Must scale from a single computer in one datacenter...
-to huge clusters spread across availability zones
+- Search engines run on resource-intensive regimes
+  - **Bandwidth** for handling crawling and search traffic
+  - **Storage** for persisting documents, indexes, metadata
+  - **Processing** for crawling, indexing and retrieval
+- Must scale from a single computer in one datacenter...
+  - ... to huge clusters spread across availability zones
 
 #### Financial costs
 
@@ -284,12 +284,24 @@ to huge clusters spread across availability zones
 
 A software achitectuer conssits of software components, the interfaces
 
-- Effectuveness: ...
+- Effectiveness: ...
 - Efficiency: ...
 
 #### Search components
 
-World Wide Web > Crawling > Indexing > Query Processing > Ranking > User Interface
+```mermaid
+graph LR
+
+  WWW((WWW))
+  Crawler[[Crawler]]
+  Corpus[(Corpus)]
+  Indexer[[Indexer]]
+  Index[(Index)]
+  QueryProcessor[[Query Processor]]
+  Actor((Actor))
+
+  WWW --> Crawler --> Corpus --> Indexer --> Index <--> QueryProcessor <--> Actor
+```
 
 - Crawler: é o que navega na internet. Ele gera um Corpus
 - Corpus: uma cache da coleção original. Ele é importante para que os dados presentes nele sejam representativos, ou seja, ele filtra a massa de informações presentes na WWW e armazena localmente.
@@ -311,31 +323,28 @@ Uma ou mais aulas sobre cada uma dessas coisas. Nessa aula de hoje ele deseja pa
 
 ---
 
+```mermaid
+graph LR
+
+  subgraph Crawling
+    direction LR
+    WWW((WWW))
+    fetch[[Fetcher]]
+    DNS[[DNS Resolver]]
+    contr[[Controller]]
+    front[(Frontier)]
+    corp[(Corpus)]
+  end
+
+  WWW --> fetch --> contr --> front & corp
+  front --> fetch
+  fetch <--> DNS
+```
+
 - Controller: uma forma de definir o comportamento esperado
   - Frontier: uma fila de URLs a serem vasculhadas
 - Fetcher: É o que vai buscar a informação da WWW e retorna pro Controller
   - DNS Resolver: uma das partes mais caras, que é a resolução de IP.
-
-```mermaid
-graph LR
-
-  %% [[Controller]] --> [(Frontier)] --> [[Fetcher]] <--> [[DNS Resolver]] & ((WWW))
-  %% [[Fetcher]] --> [[Controller]] --> [(Corpus)]
-
-  contr[[Controller]]
-  front[(Frontier)]
-  fetch[[Fetcher]]
-  DNS[[DNS Resolver]]
-  WWW((WWW))
-  corp[(Corpus)]
-
-  contr --> front
-  front --> fetch
-  fetch <--> DNS
-  fetch <--> WWW
-  fetch --> contr
-  contr --> corp
-```
 
 ###### Key Challegnes: Crawling
 
@@ -358,6 +367,16 @@ Dúvida de outro aluno: "Se o site é uma ilha: ninguém linka para o meu site e
 Professor: uma forma seriam pelos logs do chrome por exemplo. Se não tá indexado, mas pessoas o acessam, o Chrome talvez tenha algum log e pode informar pro seu BD sobre o site ilhado.
 
 ---
+
+```mermaid
+graph LR
+
+  Corpus[(Corpus)]
+  Indexer[[Indexer]]
+  Index[(Index)]
+
+  Corpus --> Indexer --> Index
+```
 
 ##### Indexing Overview
 
@@ -396,7 +415,7 @@ CP --> PR --> TK --> AN --> WR --> ID
 - Corpus
 - Parser: filtra de alguma forma o texto
 - Tokenizer: separa em blocos de texto úteis [JV: é mais ou menos isso]
-- Analyzer: processa mai
+- Analyzer: processa mais
 - Writer: armazena o que foi analizado de alguma forma
 - Index: estoca os dados encontrados
 
@@ -3960,38 +3979,38 @@ Isso seria o $p$-Hacking; É uma má prática
 
 ## Aula 13 - 05/05/2025 - Exam #1
 
-## Aula 14 - 07/05/2025 - Quality Models
+### Aula 14 - 07/05/2025 - Quality Models
 
-## Aula 15 - 12/05/2025 - Feedback Models
+### Aula 15 - 12/05/2025 - Feedback Models
 
-## Aula 16 - 14/05/2025 - Diversification Models
+### Aula 16 - 14/05/2025 - Diversification Models
 
-## Aula 17 - 19/05/2025 - Learning to Rank: Fundamentals
+### Aula 17 - 19/05/2025 - Learning to Rank: Fundamentals
 
-## Aula 18 - 21/05/2025 - Learning to Rank: Algorithms
+### Aula 18 - 21/05/2025 - Learning to Rank: Algorithms
 
-## Aula 19 - 26/05/2025 - Neural Models: Reranking
+### Aula 19 - 26/05/2025 - Neural Models: Reranking
 
-## Aula 20 - 28/05/2025 - Neural Models: Retrieval
+### Aula 20 - 28/05/2025 - Neural Models: Retrieval
 
-## Aula 21 - 02/06/2025 - Online Evaluation
+### Aula 21 - 02/06/2025 - Online Evaluation
 
-## Aula 22 - 04/06/2025 - Online Learning to Rank
+### Aula 22 - 04/06/2025 - Online Learning to Rank
 
-## Aula 23 - 09/06/2025 - Seminars
+### Aula 23 - 09/06/2025 - Seminars
 
-## Aula 24 - 11/06/2025 - Seminars
+### Aula 24 - 11/06/2025 - Seminars
 
-## Aula XX - 16/06/2025 - Exam #2
+### Aula XX - 16/06/2025 - Exam #2
 
-## Aula 25 - 18/06/2025 - Recess: Corpus Christi
+### Aula 25 - 18/06/2025 - Recess: Corpus Christi
 
-## Aula 26 - 23/06/2025 - RC Development (off-class)
+### Aula 26 - 23/06/2025 - RC Development (off-class)
 
-## Aula 27 - 25/06/2025 - RC Presentations
+### Aula 27 - 25/06/2025 - RC Presentations
 
-## Aula 28 - 30/06/2025 - RC Presentations
+### Aula 28 - 30/06/2025 - RC Presentations
 
-## Aula 29 - XX/07/2025 - Replacement Exam
+### Aula 29 - XX/07/2025 - Replacement Exam
 
-## Aula 30 - XX/07/2025 - Replacement Exam
+### Aula 30 - XX/07/2025 - Replacement Exam
