@@ -10,7 +10,7 @@ Essa é a área principal de pesquisa dele. Ele também tem foco nos sistemas de
 
 A última edição foi dois anos atrás.
 
-A disciplina está passando por grandes mudanças devido as IAs.
+A disciplina está passando por grandes mudanças devido às IAs.
 
 > Information retrieval is a field concerned with the structure, analysis, organization, storage, searching, and retrieval of information.
 > Gerard Salton, 1968
@@ -68,7 +68,7 @@ Nosso foco é o dos "10 blue links". Suponho eu que seria conseguir encontrar os
 - Pergunta: é preferível uma resposta direta ou uma lista de documentos?
   - Minha resposta: a resposta direta e objetiva
   - Outra resposta: lista de documentos, porque como as pessoas não sabem exatamente o que querem, é melhor ter uma lista de opções para escolher.
-  - Outras resposta: lista de documentos para poder haver um fact checking
+  - Outra resposta: lista de documentos para poder haver um fact checking
 
 As IAs são excessivamente autoconfiantes. Idealmente as pessoas razoáveis verificariam as informações "mas o mundo é cheio de pessoas não razoáveis".
 
@@ -85,10 +85,6 @@ $f(query, document)$
 > E esse problema já não está resolvido? Por que ainda estudamos?
 > "Google doesn't have all the answers"
 
-<!-- Slides de PAA:
-tinyurl.com/3na6t7dk
--->
-
 - Search in numbers
   - A lot of people
   - From a lot of places
@@ -96,7 +92,7 @@ tinyurl.com/3na6t7dk
     - Smartphones, smartwatch, TV, etc.
     - Exemplo de problemas por dispositivo: se eu estiver usando um speaker, não cabe o retorno de 10 links. Estragaria a experiência do usuário. O texto é muito mais informal e indefinido.
   - Looking for a lot of info
-    - Problema: com modelos de imagem generativa, e agora é muito mais fácil de gerar conteúdos falsos.
+    - Problema: com modelos de Linguagem Generativa, e agora é muito mais fácil de gerar conteúdos falsos.
   - Spread all over the internet
     - É um sistema distribuído; Para onde devo enviar essa query?
 
@@ -196,8 +192,8 @@ What do search engineers do?
     - Query scoping through semantic annotation
       - [**san jose** convetion center]
     - Query expansion through acronym expansion
-      - [**gm** trucks] -> [**general motors** trucks]
-      - [**gm** corns] -> [**genetically modified** corns]
+      - [**gm** trucks] $\to$ [**general motors** trucks]
+      - [**gm** corns] $\to$ [**genetically modified** corns]
       - "Qual é o ponto exato de corte entre ... e ...? Depende do contexto"
   - Matching and scoring
     - Send the query to all the shards
@@ -321,11 +317,24 @@ Uma ou mais aulas sobre cada uma dessas coisas. Nessa aula de hoje ele deseja pa
   - DNS Resolver: uma das partes mais caras, que é a resolução de IP.
 
 ```mermaid
-flowchart LR
+graph LR
 
-[[Controller]] --> [(Frontier)] --> [[Fetcher]] <-> [[DNS Resolver]] & ((WWW))
+  %% [[Controller]] --> [(Frontier)] --> [[Fetcher]] <--> [[DNS Resolver]] & ((WWW))
+  %% [[Fetcher]] --> [[Controller]] --> [(Corpus)]
 
-[[Fetcher]] --> [[Controller]] --> [(Corpus)]
+  contr[[Controller]]
+  front[(Frontier)]
+  fetch[[Fetcher]]
+  DNS[[DNS Resolver]]
+  WWW((WWW))
+  corp[(Corpus)]
+
+  contr --> front
+  front --> fetch
+  fetch <--> DNS
+  fetch <--> WWW
+  fetch --> contr
+  contr --> corp
 ```
 
 ###### Key Challegnes: Crawling
@@ -372,9 +381,9 @@ Professor: uma forma seriam pelos logs do chrome por exemplo. Se não tá indexa
 ---
 
 ```mermaid
-flowchart lr
+graph LR
 
-CP[(Crpus)]
+CP[(Corpus)]
 PR[[Parser]]
 TK[[Tokenizer]]
 AN[[Analyser]]
@@ -442,15 +451,15 @@ Outro método poderia ser a informação da posição em que aparece a palavra. 
 ---
 
 ```mermaid
-flowchart LR
+graph LR
 
-Person ((Actor))
-Und[[Understanding]]
-Know[[Knowledge Resources]]
+  Person((Actor))
+  Und[[Understanding]]
+  Know[[Knowledge Resources]]
 
-Person -->|Query/Feedback| Und
-Und <--> Know
-...
+  Person -->|Query/Feedback| Und
+  Und <--> Know
+  %% ...
 ```
 
 - Query
@@ -550,7 +559,11 @@ Und <--> Know
 
 #### Crawling overview (2)
 
-WWW -> Fetcher --> Controller -> Frontier -> Fetcher -> WWW
+```mermaid
+graph LR
+
+  WWW --> Fetcher --> Controller --> Frontier --> Fetcher --> WWW
+```
 
 ---
 
@@ -607,7 +620,7 @@ def crawler (frontier, corpus):
 ###### URL Keying
 
 - Múltiplas URLs mapeiam para a mesma página
-  - <http:/www.cnn.com:80/x/../index.html> -> <cnn.com>
+  - <http:/www.cnn.com:80/x/../index.html> $\to$ <cnn.com>
     - Nome de domínio é case-insensitive;
     - Porta HTTP padrão pode ser ignorada;
     - WWW é desnecessário?
@@ -638,11 +651,24 @@ def crawler (frontier, corpus):
 
 ##### Page fetching
 
-[(Frontier)] -->|"foo.com/bar; foo.com/baz"| Fetcher -->|foo.com| DNS Server <--> [(DNS Cache)]
+```mermaid
+graph LR
 
-[(DNS Cache)] -->|208.77.188.166| Fetcher
+  front[(Frontier)]
+  fetch[Fetcher]
+  DNS[DNS Server]
+  DNSCache[(DNS Cache)]
+  web[WebServer]
 
-Fetcher -->|Connect| WebServer
+  front --> |"foo.com/bar; foo.com/baz"| fetch
+  fetch -->|foo.com| DNS
+  DNS <--> DNSCache
+  DSNC -->|208.77.188.166| Fetcher
+  Fetcher -->|Connect| web
+
+```
+
+<!-- %% Front[(Frontier)] -->|"foo.com/bar; foo.com/baz"| Fetcher -->|foo.com| DNS Server <--> [(DNS Cache)] -->
 
 ##### Multi-threading
 
@@ -801,7 +827,7 @@ Scalability Challenges in Web Search Engines, Ch. 2Cambazoglu and Baeza-Yates, 2
 ### Search Components
 
 ```mermaid
-flowchart LR
+graph LR
 WWW --> Crawler
 Crawler --> Corpus[(Corpus)]
 Corpus[(Corpus)] --> Indexer
@@ -813,15 +839,17 @@ Query_Processor <--> Actor
 ### Indexing Overview (2)
 
 ```mermaid
-flowchart LR
-[(Corpus)] --> Document Understanding --> Writer --> Index
+graph LR
+corp[(Corpus)] --> Doc[Document Understanding] --> Writer --> Index
 ```
 
 ```mermaid
-flowchart LR
-subgraph Document Understanding
-  Parser --> Tokenizer --> Analyzer
-endsubgraph
+graph LR
+
+  subgraph Document Processing
+    direction LR
+    Parser --> Tokenizer --> Analyzer --> Writer
+  end
 ```
 
 - Por que não escrever diretamente no índice?
@@ -1012,7 +1040,7 @@ Geralmente apenas fazemos a busca de casamento exato das palavras.
   - Inflectional: plural, tenses
   - Derivational: making verbs into nouns
 - In most cases, these have very similar meanings
-  - Swimming, swam -> Swim
+  - Swimming, swam $\to$ Swim
 
 ---
 
@@ -1021,23 +1049,23 @@ Geralmente apenas fazemos a busca de casamento exato das palavras.
     - Geralmente remove sufixos
   - ...Lemmatization...
   - **Porter's Stemmer**
-    - SSESS -> SS
-    - IES -> I
-    - SS -> SS
+    - SSESS $\to$ SS
+    - IES $\to$ I
+    - SS $\to$ SS
     - S ->
   - **Stemming effectiveness**
     - Usualmente aumenta a quantidade de retornos
       - Porém, pode danificar a precisão da busca: aumenta tanto o retorno por trazer casamentos parecidos, porém pode gerar falsos positivos
     - Falsos positivos
-      - Ex: universal, university, universe -> univers
+      - Ex: universal, university, universe $\to$ univers
     - Falso negativo
-      - Alumnus -> Alumnu; Alumni -> alumni
+      - Alumnus $\to$ Alumnu; Alumni $\to$ alumni
 
 ###### Fonetic and semantic Equivalence
 
 - Fonética
   - Reduz palavras que soam parecido à mesma forma
-    - Hermann <-> Herman
+    - Hermann <--> Herman
 - Semântica
   - diferentes paravas a um mesmo conceito
 
@@ -1150,14 +1178,14 @@ Ele exemplificou casos de padrões frequentes no inglês onde NN seguido de NNS,
 ### Document Prefiltering
 
 - Detectar spams
-  - Term spamming -> Text classification
-  - Link Spamming -> trust propagation
+  - Term spamming $\to$ Text classification
+  - Link Spamming $\to$ trust propagation
     - PageRank: as páginas que recebem links
     - Dúvida: determinada página tem registro de quais são as páginas que tem inlinks para si?
       - Resposta: usualmente não. Blogs talvez sim tenham os backlinks
 - Detectar documentos com conteúdo duplicado
   - Exact duplicates: compare hash
-  - Near duplicates -> compare _shingles_ instead
+  - Near duplicates $\to$ compare _shingles_ instead
 
 #### Near duplicates via $n$-shingling
 
@@ -1252,8 +1280,8 @@ Para isso, geralmente armazenamos o índice do documento (que tende a ser na cas
 - Algoritmo:
   - represente o número como sendo ele mesmo como esse número de zeros seguido do número 1
 - Exemplo:
-  - 5 -> 000001
-  - 7 -> 00000001
+  - 5 $\to$ 000001
+  - 7 $\to$ 00000001
 
 ##### Example: gamma encoding
 
@@ -1426,7 +1454,7 @@ Parece um pouco com o conceito de RAIDS de armazenamento.
 ### Search Components (Aula 6)
 
 ```mermaid
-flowchart LR
+graph LR
   WWW --> Crawler
   Crawler --> Corpus[(Corpus)]
   Corpus[(Corpus)] --> Indexer
@@ -1438,7 +1466,7 @@ flowchart LR
 ---
 
 ```mermaid
-flowchart LR
+graph LR
 Index[(Index)] <--> Query_Processor
 Query_Processor <--> Actor
 ```
@@ -1446,7 +1474,7 @@ Query_Processor <--> Actor
 ### Query Processing Overview (Aula 6)
 
 ```mermaid
-flowchart LR
+graph LR
 Actor -->|"Query|feedback"| Understanding
 Index[(Index)] --> Matching
 Understanding --> Matching
@@ -1915,7 +1943,7 @@ Uma possibilidade é pegar os top documentos ranqueados, minerar as palavras mai
 ### Search Components (Aula 07)
 
 ```mermaid
-flowchart LR
+graph LR
   WWW --> Crawler
   Crawler --> Corpus[(Corpus)]
   Corpus[(Corpus)] --> Indexer
@@ -1927,7 +1955,7 @@ flowchart LR
 ---
 
 ```mermaid
-flowchart LR
+graph LR
 Index[(Index)] <--> Query_Processor
 Query_Processor <--> Actor
 ```
@@ -1935,7 +1963,7 @@ Query_Processor <--> Actor
 #### Query Processing Overview (Aula 07)
 
 ```mermaid
-flowchart LR
+graph LR
   Actor -->|"Query|feedback"| Understanding
   Index[(Index)] --> Matching
   Understanding --> Matching
@@ -1948,7 +1976,7 @@ flowchart LR
 ---
 
 ```mermaid
-flowchart LR
+graph LR
   Index[(Index)] --> Matching
 ```
 
@@ -2013,7 +2041,7 @@ Em algum momento precisamos expirar a cache por ela já não ser mais tão relev
 ---
 
 ```mermaid
-flowchart LR
+graph LR
   Actor -->|query| Broker
   Broker --> Matching_1[Matching]
   Broker --> Matching_2[Matching]
@@ -2651,7 +2679,7 @@ Weak AND
 - $f(q, d)$
 
 ```mermaid
-flowchart LR
+graph LR
   q((q)) .-> d((d))
 ```
 
@@ -3328,7 +3356,7 @@ Estado da arte
     - Nem sempre dá pra publicar resultado negativo, mas para mestrado e doutorado até que daria.
 
 ```mermaid
-flowchart LR
+graph LR
   AskQ['Ask a question']
   Back['Do background research']
   Hypo['Formulate a hypothesis']
@@ -3700,6 +3728,7 @@ flowchart LR
   - Not making a bad oversight
   - Key assumption: the user has time to filter through ranked results
 - We can also combine both
+
   - $F1(R, G) = 2 \frac{Prec(R, G) \cdot Rec(R, G)}{Prec(R, G) + Rec(R, G)}$
   - [JV] Frequência Harmônica
 
@@ -3766,14 +3795,14 @@ These have exactly the same Prec@4 (0.25)
 
 - Simple idea: average precision values at the ranking positions where relevant documents were found
   - $AP(R_q, G_q) =$
-  - [JV] vai varrer cada uma das precisões 
-
+  - [JV] vai varrer cada uma das precisões
 
 Simple idea: averaging precision values at the ranking
 positions where relevant documents were found
 AP 𝑅𝑞, 𝐺𝑞 = 1
 |𝐺𝑞| σ𝑖=1
 𝑘 1 𝑔𝑞𝑑𝑖 > 0 Prec@𝑖
+
 ---
 
 - [JV] O cálculo da média, baseando sobre o G_q a gente penaliza devidamente para evitar que situações como consultas que retornam apenas um por exemplo
@@ -3872,15 +3901,13 @@ Gera um cenário mais rigoroso pro experimento
 Onesided: 5% de serem equivalentes
 Two-sided: 10% de serem equivalentes
 
-### Paired $t$-test
+### Paired $t$-test (2)
 
 Deve-se considerar um $p$ value para reprovar. 0.05 é recorrente por é abaixo dos 95% de confiança
 
 Define-se isso de antemão para não **Roubar** e ter viés
 
 ### Criticisms
-
-
 
 Essa parte estatística pode ser abusada
 
