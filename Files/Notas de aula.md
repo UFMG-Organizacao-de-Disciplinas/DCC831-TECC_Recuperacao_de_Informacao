@@ -826,20 +826,20 @@ Ele comentou sobre uma startup que foca em dar notícias importantes para CEO's 
   - Microsoft Playride
 - Uma máquina de busca conseguiria simular o uso de botões e formulários em páginas? Ele considera que sim.
 
-### Summary - Aula 3
+#### Summary - Aula 3
 
 - O Scopus é um cache da Web que viabilida indexação e busca mais rápida
 - A Web é um ambiente grande e dinâmico
 - Deve-se visar a cobertura e atualização, preferencialmente mantendo o politeness
 - Several open Challenges
 
-### Referências
+#### Referências
 
 Search Engines: Information Retrieval in Practice, Ch. 3Croft et al., 2009
 
 Scalability Challenges in Web Search Engines, Ch. 2Cambazoglu and Baeza-Yates, 2015
 
-### Próxima aula: Document Understanding
+#### Próxima aula: Document Understanding
 
 ## Aula 04 - 24/03/2025 - Document Understanding Slide: 04-???
 
@@ -882,7 +882,7 @@ graph LR
 
 #### Documento Parsing
 
-- Assumido previamente]
+- Assumido previamente
   - Sabemos o que o documento é
   - Podemos "machine-read" cada documetno
 
@@ -1220,7 +1220,7 @@ Ele exemplificou casos de padrões frequentes no inglês onde NN seguido de NNS,
 
 - Features computed offline
   - **Conteúdo:** Spam score, domain quality score
-  - **Web Graph:** PAgeRank, HostRank
+  - **Web Graph:** PageRank, HostRank
   - **Usage:** click count, CTR, dwell time
     - Essas informações estariam disponíveis apenas para os hosts dos sites, ou donos das máquinas de busca e navegadores
 - Features computed online
@@ -1779,7 +1779,7 @@ Poderia mapear todas as palavras que mapeiam a quais radicais, e depois fazer o 
   - [Provide information on international support provided to either side in the Spanish Civil War]
     - [spanish civil war]
 
-COmo escolher quais palavras deletar para encontrar melhores resultados?
+Como escolher quais palavras deletar para encontrar melhores resultados?
 
 ###### Query relaxation approaches
 
@@ -1983,7 +1983,8 @@ Query_Processor <--> Actor
 
 ```mermaid
 graph LR
-  Actor -->|"Query|feedback"| Understanding
+  Actor -->|Query| Understanding
+  Actor -->|feedback| Understanding
   Index[(Index)] --> Matching
   Understanding --> Matching
   Understanding <--> KR[("Knowledge Resources: (Query Logs, Knowledge bases, User Preferences)")]
@@ -2030,18 +2031,18 @@ Aqui busca-se ser "exato", para que encontremos tudo que possa vir a ser útil n
   - Must score billions (or trillions?) of documents
   - Must answer thousands of concurrent queries
 
-Essa tende a ser a parte mais custosa, visto que é a parte mais computacionalmente custoso
+Essa tende a ser a parte mais custosa, visto que é a parte mais computacionalmente custosa
 
 Deve-se considerar que enquanto um usuário tá acessando certa informação, diversos outros usuários podem estar tentando acessar o exato mesmo documento.
 
 #### Solution #1: Bypass Scoring
 
 - Query distributions similar to Zipf
-  ◦ Popular queries account for majority of traffic
+  - Popular queries account for majority of traffic
 - Caching can significantly improve efficiency
-  ◦ Cache search results, or at least inverted lists
+  - Cache search results, or at least inverted lists
 - Problem: cache misses will happen eventually
-  ◦ New queries, index updates
+  - New queries, index updates
 
 As consultas mais repetidas podem ser armazenadas em um cache, e assim, quando um usuário fizer uma consulta que já foi feita antes, o resultado pode ser retornado mais rapidamente.
 
@@ -2052,8 +2053,8 @@ Em algum momento precisamos expirar a cache por ela já não ser mais tão relev
 #### Solution #2: Distribute the Burden
 
 - Indexes are often distributed in a cluster
-  ◦ Too large to fit in a single machine
-  ◦ Replication helps load balancing
+  - Too large to fit in a single machine
+  - Replication helps load balancing
 
 Índices grandes já não são comportados em um único computador, logo já estarão distribuídos. Assim, cada máquina também acaba precisando acessar outras máquinas.
 
@@ -2061,11 +2062,19 @@ Em algum momento precisamos expirar a cache por ela já não ser mais tão relev
 
 ```mermaid
 graph LR
-  Actor -->|query| Broker
-  Broker --> Matching_1[Matching]
-  Broker --> Matching_2[Matching]
-  Index_1[(Index)] --> Matching_1
-  Index_2[(Index)] --> Matching_2
+
+  subgraph Matching
+    direction LR
+    broker[[Broker]]
+    matching_1[[Matching]]
+    matching_2[[Matching]]
+    index_1[(Index)]
+    index_2[(Index)]
+  end
+
+  actor(Actor) -->|query| broker --> matching_1 & matching_2
+  index_1 --> matching_1
+  index_2 --> matching_2
 ```
 
 Pode haver então um **broker** que agrupa os resultados dos índices para retornar ao usuário.
@@ -2073,22 +2082,22 @@ Pode haver então um **broker** que agrupa os resultados dos índices para retor
 ---
 
 - Indexes are often distributed in a cluster
-  ◦ Too large to fit in one machine
-  ◦ Replication helps load balancing
+  - Too large to fit in one machine
+  - Replication helps load balancing
 - Problem: cannot scale indefinitely
-  ◦ Costly resources (hardware, energy)
-  ◦ Intra-node efficiency still crucial
+  - Costly resources (hardware, energy)
+  - Intra-node efficiency still crucial
 
 Ainda precisa se preocupar quanto ao nível de eficiência em cada um dos computadores individualmente.
 
 #### Solution #3: Score Parsimoniously
 
 - Some ranking models can be expensive
-  ◦ Infeasible to score billions of documents
+  - Infeasible to score billions of documents
 - Ranking as a multi-stage cascade
-  ◦ Stage #1: Boolean matching (billions)
-  ◦ Stage #2: Unsupervised scoring (millions)
-  ◦ Stage #3: Supervised scoring (thousands)
+  - Stage #1: Boolean matching (billions)
+  - Stage #2: Unsupervised scoring (millions)
+  - Stage #3: Supervised scoring (thousands)
 
 Podemos trabalhar com apenas parte do índice.
 
@@ -2097,8 +2106,8 @@ Podemos usar técnicas computacionalmente caras, desde que usemos em volumes peq
 ### Why is it still so costly?
 
 - Inherent cost of matching documents to queries
-  ◦ Query length (number of posting lists)
-  ◦ Posting lists length (number of postings per list)
+  - Query length (number of posting lists)
+  - Posting lists length (number of postings per list)
 
 | Term     | Postings           |
 | -------- | ------------------ |
@@ -2116,7 +2125,7 @@ Acaba sendo necessário varrer as listas. Então quanto mais frequentes foram as
 #### Term-at-a-time (TAAT)
 
 - Inverted lists processed in sequence
-  ◦ Partial document scores accumulated
+  - Partial document scores accumulated
 
 | Term     | Postings      |
 | -------- | ------------- |
@@ -2174,26 +2183,26 @@ def taat(query, index, k):
 
 - Funcionamento
 
-1. Inicialização:
-   - Cria um mapa vazio para armazenar os scores dos documentos
-   - Cria uma heap de tamanho k para armazenar os k melhores resultados
-2. Processamento por termo:
-   - Para cada termo na consulta:
-     - Obtém a lista de postings (documentos) associada ao termo
-     - Para cada documento na lista:
-       - Se o documento ainda não está no mapa de scores, inicializa seu score como 0
-       - Adiciona o peso do termo naquele documento ao score acumulado
-3. Seleção final:
-   - Percorre todos os documentos no mapa de scores
-   - Adiciona cada documento e seu score final à heap
-   - Retorna os k documentos com maiores score
+  1. Inicialização:
+     - Cria um mapa vazio para armazenar os scores dos documentos
+     - Cria uma heap de tamanho k para armazenar os k melhores resultados
+  2. Processamento por termo:
+     - Para cada termo na consulta:
+       - Obtém a lista de postings (documentos) associada ao termo
+       - Para cada documento na lista:
+         - Se o documento ainda não está no mapa de scores, inicializa seu score como 0
+         - Adiciona o peso do termo naquele documento ao score acumulado
+  3. Seleção final:
+     - Percorre todos os documentos no mapa de scores
+     - Adiciona cada documento e seu score final à heap
+     - Retorna os k documentos com maiores score
 
-Características
-Processa um termo por vez
-Mantém scores parciais em memória
-Adequado para consultas com poucos termos
-Requer mais memória devido ao armazenamento dos scores parciais
-O algoritmo é uma alternativa ao DAAT (Document-at-a-Time) e é especialmente eficiente para acesso sequencial às listas invertidas, embora use mais memória para os acumuladores de scores.
+  - Características:
+    - Processa um termo por vez
+    - Mantém scores parciais em memória
+    - Adequado para consultas com poucos termos
+    - Requer mais memória devido ao armazenamento dos scores parciais
+    - O algoritmo é uma alternativa ao DAAT (Document-At-A-Time) e é especialmente eficiente para acesso sequencial às listas invertidas, embora use mais memória para os acumuladores de scores.
 
 #### Document-at-a-time (DAAT)
 
@@ -2230,7 +2239,7 @@ function daat(query, index, k):
 
 Uma das ineficiências dessa implementação é ter que marcar cada um dos índices que estamos percorrendo no momento.
 
-Outra ineficiência é a inexistência de um iterador que marca o último índice que foi lido´.
+Outra ineficiência é a inexistência de um iterador que marca o último índice que foi lido.
 
 ### Optimization Techniques
 
@@ -2762,11 +2771,11 @@ graph LR
     - g("campaign", d)
     - g("_news_", d)
   - How many times does "**presidential**" occur in $d$?
-    - **Term Frequency (TF):** $c("**presidential**", d)$
+    - **Term Frequency (TF):** c("**presidential**", d)
   - How long is $d$?
     - **Document length:** $|d|$
   - How often do we see "**presidential**" in the entire collection?
-    - **Document Frequency:** $df("**presidential**")$
+    - **Document Frequency:** df("**presidential**")
     - $P("**presidential**"|collection)$
 
 ### Many classical models
@@ -2785,7 +2794,7 @@ graph LR
 - Structural models
   - Beyond bags-of-words
   - [JV]
-    - As sequência de que forma as palavras estão dispostas no texto
+    - De que forma as palavras estão dispostas em sequência no texto
     - Alguma tag em cada uma das palavras
 - Semantic models
   - Beyond lexical matching
@@ -3801,7 +3810,8 @@ graph LR
 [Imagem]
 
 These have exactly the same Prec@4 (0.25)
-◦ Are they equally good?
+
+- Are they equally good?
 
 ### Position-aware metrics
 
