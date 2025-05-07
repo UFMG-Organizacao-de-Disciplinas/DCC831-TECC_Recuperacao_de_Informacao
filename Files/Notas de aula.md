@@ -2665,15 +2665,15 @@ Weak AND
 
 ### References - Aula 08
 
-- [Link][Link_2015_Bae] Scalability Challenges in Web Search Engines, Ch. 4 Cambazoglu and Baeza-Yates, 2015
-- [Link][Link_2018_Mac] Efficient Query Processing Infrastructures Tonellotto and Macdonald, SIGIR 2018
-- [Link][Link_2018_Ton] Efficient Query Processing for Scalable Web Search Tonellotto et al., FnTIR 2018
+- [[Link]][Link_2015_Bae] Scalability Challenges in Web Search Engines, Ch. 4 Cambazoglu and Baeza-Yates, 2015
+- [[Link]][Link_2018_Mac] Efficient Query Processing Infrastructures Tonellotto and Macdonald, SIGIR 2018
+- [[Link]][Link_2018_Ton] Efficient Query Processing for Scalable Web Search Tonellotto et al., FnTIR 2018
 
 ---
 
-- [Link][Link_1995_Tur] Query evaluation: strategies and optimizations Turtle and Flood, IP&M 1995
-- [Link][Link_2003_Bro] Efficient query eval. using a two-level retrieval process Broder et al., CIKM 2003
-- [Link][Link_2011_Din] Faster top-k document retr. using block-max indexes Ding and Suel, SIGIR 2011
+- [[Link]][Link_1995_Tur] Query evaluation: strategies and optimizations Turtle and Flood, IP&M 1995
+- [[Link]][Link_2003_Bro] Efficient query eval. using a two-level retrieval process Broder et al., CIKM 2003
+- [[Link]][Link_2011_Din] Faster top-k document retr. using block-max indexes Ding and Suel, SIGIR 2011
 
 [Link_2015_Bae]: https://link.springer.com/book/10.1007/978-3-031-02298-2
 [Link_2018_Mac]: https://dl.acm.org/doi/10.1145/3209978.3210191
@@ -2776,7 +2776,7 @@ graph LR
     - **Document length:** $|d|$
   - How often do we see "**presidential**" in the entire collection?
     - **Document Frequency:** df("**presidential**")
-    - $P("**presidential**"|collection)$
+    - P("**presidential**"|collection)
 
 ### Many classical models
 
@@ -2807,7 +2807,7 @@ graph LR
 
 ### Vector Space Model (VSM)
 
-[Imagem gráfico $R^3$ (Programming, Library, Presidential)]
+[Imagem gráfico $\mathbb{R}^3$ (Programming, Library, Presidential)]
 
 - [JV]
   - Existem estruturas para armazenar vetores densos.
@@ -2826,6 +2826,7 @@ graph LR
   - $q = (x_1, \dots, x_{|V|})$ and $d = (y_1, \dots, y_{|V|})$
     - [JV]
       - Mas como escolho qual valor colocar em cada eixo?
+      - Há algum grau de prioridade entre os eixos?
 
 ### What VSM doesn't say
 
@@ -2838,7 +2839,7 @@ graph LR
 
 ---
 
-- [Imagem gráfico $R^3$ (?, ?, ?)]
+- [Imagem gráfico $\mathbb{R}^3$ (?, ?, ?)]
   - $q = (x_1, \dots, x_{|V|}), x_i = ?$
   - $d = (y_1, \dots, y_{|V|}), y_i = ?$
   - $sim(q, d) = ?$
@@ -2933,13 +2934,21 @@ graph LR
 - $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
 - $d_5$ = [ ... **news** of organic food **campaign** ... **campaign** ... **campaign** ... **campaign** ... ]
 
-| Document | $f(q, d)$ | ranking |   Ideal |
-| -------: | --------: | ------: | ------: |
-|    $d_1$ |         2 |   $d_2$ | $d_4 +$ |
-|    $d_2$ |         3 |   $d_3$ | $d_3 +$ |
-|    $d_3$ |         3 |   $d_4$ | $d_1 -$ |
-|    $d_4$ |         3 |   $d_1$ | $d_2 -$ |
-|    $d_5$ |         2 |   $d_5$ | $d_5 -$ |
+| Document | $f(q, d)$ |
+| -------: | --------: |
+|    $d_1$ |         2 |
+|    $d_2$ |         3 |
+|    $d_3$ |         3 |
+|    $d_4$ |         3 |
+|    $d_5$ |         2 |
+
+| ranking |   Ideal |
+| ------: | ------: |
+|   $d_2$ | $d_4 +$ |
+|   $d_3$ | $d_3 +$ |
+|   $d_4$ | $d_1 -$ |
+|   $d_1$ | $d_2 -$ |
+|   $d_5$ | $d_5 -$ |
 
 - [JV]
   - Poderiam ser feitos swaps para alternar as ordenações para melhorar.
@@ -3009,7 +3018,7 @@ graph LR
     - $tf$ é o inteiro, a frequência que já temos calculado
     - $idf$ será o peso real.
       - Existem várias aplicações dela na literatura.
-- [Imagem gráfico $R^3$ $(w_1, w_2, w_3)$]
+- [Imagem gráfico $\mathbb{R}^3$ $(w_1, w_2, w_3)$]
   - $q = (1, 1, 1)$
   - $d = (2, 0, 5)$
 
@@ -3022,7 +3031,7 @@ graph LR
 
 ### Why a log-based penalization?
 
-- [Imagem gráfico $R^2: (n_w, idf_w = \log \frac{n+1}{n_w})$]
+- [Imagem gráfico $\mathbb{R}^2: (n_w, idf_w = \log \frac{n+1}{n_w})$]
   - Rapid decay after a small fraction of the corpus
   - [JV]
     - Esse decaimento rápido busca rapidamente penalizar a existência de repetições.
@@ -3058,13 +3067,21 @@ graph LR
 - $d_4$ = [ ... **news** of **presidential candidate** ... **presidential** candidate ... ]
 - $d_5$ = [ ... **news** of organic food **campaign** ... **campaign** ... **campaign** ... **campaign** ... ]
 
-| Document | $f(q, d)$ | ranking |  Ideal  |
-| :------: | --------: | :-----: | :-----: |
-|  $d_1$   |       2.5 |  $d_5$  | $d_4 +$ |
-|  $d_2$   |       5.6 |  $d_4$  | $d_3 +$ |
-|  $d_3$   |       7.1 |  $d_3$  | $d_1 -$ |
-|  $d_4$   |       9.6 |  $d_2$  | $d_2 -$ |
-|  $d_5$   |      13.9 |  $d_1$  | $d_5 -$ |
+| Document | $f(q, d)$ |
+| :------: | --------: |
+|  $d_1$   |       2.5 |
+|  $d_2$   |       5.6 |
+|  $d_3$   |       7.1 |
+|  $d_4$   |       9.6 |
+|  $d_5$   |      13.9 |
+
+| ranking |  Ideal  |
+| :-----: | :-----: |
+|  $d_5$  | $d_4 +$ |
+|  $d_4$  | $d_3 +$ |
+|  $d_3$  | $d_1 -$ |
+|  $d_2$  | $d_2 -$ |
+|  $d_1$  | $d_5 -$ |
 
 ---
 
@@ -3094,7 +3111,7 @@ graph LR
 
 ### Transforming tf
 
-[Imagem Gráfico $R^2$ $(c(w, d), tf_{w, d})$]
+[Imagem Gráfico $\mathbb{R}^2$ $(c(w, d), tf_{w, d})$]
 
 - $tf_{w, d} = c(w, d)$
 - $tf_{w, d} = \log(1 + c(w, d))$
@@ -3132,7 +3149,7 @@ graph LR
 
 - $pln_d = (1-b) + b \frac{|d|}{avdl}$
 
-[Imagem: gráfico $R^2$ $(|d|, pln_d)$, relação entre recompensa e penalização. Recompensa quando é menro que avdl e penalização quando é maior que avdl]
+[Imagem: gráfico $\mathbb{R}^2$ $(|d|, pln_d)$, relação entre recompensa e penalização. Recompensa quando é menor que avdl e penalização quando é maior que avdl]
 
 - [JV]
   - Inclusive isso me lembra um pouco o PID.
@@ -3181,8 +3198,11 @@ graph LR
 
 ### The ranking problem (Aula 10)
 
-- $q$
-- $d$
+```mermaid
+graph LR
+  q((q)) .-> d((d))
+```
+
 - $f(q, d)$
 
 ### Ranking models recap
@@ -3203,16 +3223,16 @@ graph LR
 ### Statistical language model
 
 - A probability distribution over word sequences
-  - $P("Today is Wednesday") \approx 0.001$
-  - $P("Today Wednesday is") \approx 0.0000000000001$
-  - $P("The eigenvalue is positive") \approx 0.00001$
+  - $P(``Today\ is\ Wednesday") \approx 0.001$
+  - $P(``Today\ Wednesday\ is") \approx 0.0000000000001$
+  - $P(``The\ eigenvalue\ is\ positive") \approx 0.00001$
 - Can also be regarded as a probabilistic mechanism for "generating" text, thus also called a "generative" model
 
 ### Types of language models
 
 - Full dependence model
 
-  - $P(w_1 \dots  w_k) = P(w_1)\,P(w_2 | w_1)\, \dots \,P(w_k | w_1 \dots  w_{k-1})$
+  - $P(w_1 \dots  w_k) = P(w_1) P(w_2 | w_1) \dots P(w_k | w_1 \dots w_{k-1})$
   - [JV]
     - Estimar essas probabilidades é complexo e muito caro
     - Acaba que por falta de contexto, pode-se estimar erroneamente a probabilidade de uma palavra
@@ -3253,11 +3273,12 @@ graph LR
 | ...   |         ... |
 | STOP  |        0.20 |
 
-- $P("frog said that toad likes frog STOP") = 0.01 \times 0.03 \times 0.04 \times 0.01 \times 0.02 \times 0.01 \times 0.02 = 0.0000000000048$
+- $P(``frog\ said\ that\ toad\ likes\ frog\ STOP") = 0.01 \cdot 0.03 \cdot 0.04 \cdot 0.01 \cdot 0.02 \cdot 0.01 \cdot 0.02 = 0.0000000000048$
 
 ### Example Text Generation
 
-- Model $\theta$:
+- Model $\theta_1$:
+- Model $\theta_2$:
 
 ### Evaluation of language models
 
@@ -3346,6 +3367,13 @@ Estado da arte
 ## Aula 11 - 28/04/2025 - Experimental Methods
 
 ### One Problem
+
+```mermaid
+graph LR
+  q((q)) .-> d((d))
+```
+
+- $f(q, d)$
 
 ### Many Solutions
 
@@ -3541,7 +3569,7 @@ graph LR
 - What is the level of agreement?
   - Redundancy to counter subjectivity
 
-### WHat to judge for relevance
+### What to judge for relevance
 
 - Exhaustive assessment is not practical
   - Alternative: document sampling
@@ -3611,7 +3639,7 @@ graph LR
   - Improved queries: 20
   - Harmed queries: 20
 
-[IMG: Gráfico $R^2$ onde o A1 tem maior variação, podendo ser muito bom, mas também um pouco ruim. Já no A2 é mais consistente e sempre melhor]
+[IMG: Gráfico $\mathbb{R}^2$ onde o A1 tem maior variação, podendo ser muito bom, mas também um pouco ruim. Já no A2 é mais consistente e sempre melhor]
 
 ### Results significance (Aula 11)
 
@@ -3653,9 +3681,9 @@ graph LR
 
 ### References (Aula 11)
 
-- [Link][Aula_11.1] Experimental methods for information retrieval Metzler and Kurland, SIGIR 2012
-- [Link][Aula_11.2] Introduction to Information Retrieval, Ch. 8 Manning et al., 2008
-- [Link][Aula_11.3] Search Engines: Information Retrieval in Practice, Ch. 8 Croft et al., 2009
+- [[Link]][Aula_11.1] Experimental methods for information retrieval Metzler and Kurland, SIGIR 2012
+- [[Link]][Aula_11.2] Introduction to Information Retrieval, Ch. 8 Manning et al., 2008
+- [[Link]][Aula_11.3] Search Engines: Information Retrieval in Practice, Ch. 8 Croft et al., 2009
 
 [Aula_11.1]: https://dl.acm.org/doi/10.1145/2348283.2348534
 [Aula_11.2]: https://www.amazon.com/Introduction-Information-Retrieval-Christopher-Manning/dp/0521865719
@@ -3971,15 +3999,15 @@ Isso seria o $p$-Hacking; É uma má prática
 
 ### References (Aula 12)
 
-- [Link] Search Engines: Information Retrieval in Practice, Ch. 8 Croft et al., 2009
-- [Link] Introduction to Information Retrieval, Ch. 8 Manning et al., 2008
-- [Link] Test collection based evaluation of IR systems Sanderson, FnTIR 2010
+- [[Link]] Search Engines: Information Retrieval in Practice, Ch. 8 Croft et al., 2009
+- [[Link]] Introduction to Information Retrieval, Ch. 8 Manning et al., 2008
+- [[Link]] Test collection based evaluation of IR systems Sanderson, FnTIR 2010
 
 ---
 
-- [Link] Statistical reform in information retrieval? Sakai, SIGIR Forum 2014
-- [Link] Statistical significance testing in theory and in practice Carterette, SIGIR 2017
-- [Link] Statistical significance testing in information retrieval: an empirical analysis of type I, type II and type III errors Urbano et al., SIGIR 2019
+- [[Link]] Statistical reform in information retrieval? Sakai, SIGIR Forum 2014
+- [[Link]] Statistical significance testing in theory and in practice Carterette, SIGIR 2017
+- [[Link]] Statistical significance testing in information retrieval: an empirical analysis of type I, type II and type III errors Urbano et al., SIGIR 2019
 
 ### Coming next... Exam #1
 
@@ -3989,9 +4017,13 @@ Isso seria o $p$-Hacking; É uma má prática
 
 ## Aula 13 - 05/05/2025 - Exam #1
 
-### Aula 14 - 07/05/2025 - Quality Models
+1. Cálculo de threads pra maximizar throuput
+2. Query Likelihood vs Document Likelihood
+3.
 
-### Aula 15 - 12/05/2025 - Feedback Models
+## Aula 14 - 07/05/2025 - Quality Models
+
+## Aula 15 - 12/05/2025 - Feedback Models
 
 ### Aula 16 - 14/05/2025 - Diversification Models
 
