@@ -4017,9 +4017,18 @@ Isso seria o $p$-Hacking; É uma má prática
 
 ## Aula 13 - 05/05/2025 - Exam #1
 
-1. Cálculo de threads pra maximizar throuput
-2. Query Likelihood vs Document Likelihood
-3.
+1. Cálculo de threads pra maximizar throughput
+2. TAAT vs DAAT: Vantagens e desvantagens
+3. Equação de ranqueamento válida?
+4. .
+5. Estratégia sobre algo
+6. Query Likelihood vs Document Likelihood
+7. Precisão VS Recall
+8. Top5 vs Top10
+   1. a
+   2. b
+   3. c
+   4. d
 
 ## Aula 14 - 07/05/2025 - Quality Models
 
