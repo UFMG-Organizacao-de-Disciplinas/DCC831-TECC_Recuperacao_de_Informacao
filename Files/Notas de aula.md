@@ -4017,18 +4017,21 @@ Isso seria o $p$-Hacking; É uma má prática
 
 ## Aula 13 - 05/05/2025 - Exam #1
 
-1. Cálculo de threads pra maximizar throughput
+1. Cálculo de threads pra maximizar throughput: Considerando que todas as páginas pesem 10 Kb, que para baixar uma página demore 250 ms, e que você consegue baixar 10 Mb por segundo, quantas threads você deve usar para maximizar o throughput?
 2. TAAT vs DAAT: Vantagens e desvantagens
-3. Equação de ranqueamento válida?
-4. .
+3. Essa equação de ranqueamento é válida? (Não é exatamente essa, mas era algo parecido com isso) $f(q, d) = \sum_{w \in q} c(w, q) \frac{tf_{w,d}}{|d|} \log \frac{n+1}{n_w}$
+4. Se considerarmos que o usuário deseja fazer uma busca do tipo "Encontre documentos similares a este", qual componente deve ser modificado para que gere um resultado satisfatório? [E tinha mais algumas outras perguntas aqui que eu não lembro]
 5. Estratégia sobre algo
 6. Query Likelihood vs Document Likelihood
-7. Precisão VS Recall
-8. Top5 vs Top10
-   1. a
-   2. b
-   3. c
-   4. d
+7. Precisão e Recall: Considerando um Corpus com 16 documentos relevantes, numa consulta em que 10 itens foram retornados, apenas 5 deles são relevantes, calcule:
+   1. Precisão
+   2. Recall
+   3. Average Precision
+8. Top5 vs Top10: Considerando um Corpus, qual é a relação entre um ranking de 5 elementos e um ranking de 10 elementos? Considere "P" como "Precisão" e "R" como "Recall"
+   1. Tem como: P@5 ser maior que P@10?
+   2. Tem como: R@5 ser maior que R@10?
+   3. Considerando que existam 100 documentos relevantes, tem como: P@5 ser maior que P@10?
+   4. Considerando que exista 1 documento relevante, tem como: P@5 ser maior que P@10?
 
 ## Aula 14 - 07/05/2025 - Quality Models
 
