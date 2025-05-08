@@ -34,7 +34,6 @@
   - **Click-Through Rate (CTR):** Taxa de cliques
 - **Q:** O que é um Surfador Aleatório?
   - **R:** Um surfador aleatório é um modelo que simula o comportamento de um usuário navegando na web, escolhendo aleatoriamente entre seguir links ou ir para uma página aleatória.
-- **Q:** Como funciona o PageRank?
 
 ## The Ranking Problem
 
