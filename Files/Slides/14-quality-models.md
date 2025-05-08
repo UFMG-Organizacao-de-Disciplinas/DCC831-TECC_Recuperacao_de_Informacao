@@ -426,10 +426,8 @@ xychart-beta
 ## Summary
 
 - Document quality can be heterogeneous
-  - Quality models can help distinguish between
-- documents with similar relevance scores
-  - Also useful for queries that explicitly seek for high-
-- quality content (authority, readability)
+  - Quality models can help distinguish between documents with similar relevance scores
+  - Also useful for queries that explicitly seek for high-quality content (authority, readability)
   - And to combat adversarial behavior (spam, fakes)
 
 ## References
