@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Files/Slides/14-quality-models-resumo.md",
+                "file": "Files/Slides/16-diversification-models.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "14-quality-models-resumo"
+              "title": "16-diversification-models"
             }
           }
         ]
@@ -170,8 +170,8 @@
   },
   "active": "2bfa32c551fc897f",
   "lastOpenFiles": [
-    "Files/Slides/14-quality-models.md",
     "Files/Slides/14-quality-models-resumo.md",
+    "Files/Slides/14-quality-models.md",
     "Files/Notas de aula.md"
   ]
 }
