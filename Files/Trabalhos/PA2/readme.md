@@ -93,13 +93,13 @@ After processing **each query** (the `-q` argument above), your `processor.py`
 implementation must print a `JSON` document to standard output [$^6$][Note_6] with the top
 results retrieved for that query according to the following format:
 
-- `Query`, the query text;
-- `Results`, a list of results.
+- `Query`: the query text;
+- `Results`: a list of results.
 
 Each result in the Results list must be represented with the fields:
 
-- `ID`, the respective result ID;
-- `Score`, the final document score.
+- `ID:` the respective result ID;
+- `Score:` the final document score.
 
 The following example illustrates the required output format for a query:
 
@@ -118,7 +118,7 @@ The following example illustrates the required output format for a query:
 
 The results list for a query must be sorted in reverse document score order and include up to the top 10 results retrieved for that query.
 
-## Query Processing Policies
+### Query Processing Policies
 
 For each query in the list provided via the `-q` argument, your implementation must pre-process the query, retrieve candidate documents from the given index (the `-i` argument), score these documents according to the chosen ranking model (the `-r` argument), and print the top 10 results using the aforementioned format. In addition to this standard workflow, **your implementation must abide by the following policies**:
 
