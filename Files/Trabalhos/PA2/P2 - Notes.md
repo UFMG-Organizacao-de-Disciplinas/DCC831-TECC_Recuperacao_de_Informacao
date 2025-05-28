@@ -2,6 +2,7 @@
 
 - Pode assumir mínimo de 2Gb de RAM
 
+Eu poderia fazer aquele fonex e fazer uma gramática para regerar as palavras possíveis e assim gerar um funil para onde os documentos cairiam
 ## Fórum
 
 ### Vinicius
