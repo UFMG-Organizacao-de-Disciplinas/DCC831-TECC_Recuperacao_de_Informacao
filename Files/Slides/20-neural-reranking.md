@@ -117,3 +117,131 @@ Based on the survey:
 - Nogueira et al. (2019): monoBERT/duoBERT
 - PARADE (Li et al., 2020)
 - [Ranking Survey](https://arxiv.org/abs/2010.06467)
+
+
+----
+---
+---
+
+[JV] Só comecei a prestar atenção em torno da página 19.
+### Neural Ranking Models (>2016)
+
+- Representation-based
+- Interaction-based
+
+### Popular Neural Ranking Models
+
+- Muita coisa é por tentativa e erro. Não tem tanta teoria que justifique essas escolhas.
+
+## Machine Learning Background
+
+### Progress in Information Retrieval - Robust04
+
+- [Imagem]
+- Geralmente os modelos são pre-treinados para entender modelos de linguagem
+- O BERT generaliza bem o bastante mesmo no caso de "zero-shot"
+	- Certamente modela a linguagem muito melhor do que antigamente
+
+### Adoption by Commercial Search Engines
+
+### What is BERT?
+
+- Entrada: algum texto. Saída? O mesmo texto.
+- Treinamento autosupervisionado: ele pega uma palavra, pega o contexto em que ela tá, omite a palavra e tenta prevê-la.
+- Os modelos pré-treinados podem ser especificados com mais pequenos testes
+
+#### BERT's Pretraining Ingredients
+
+- Transformer
+- Muito texto
+- Fóruns de pergunta resposta
+- Muito poder computacional.
+- Geralmente quem treina são as grandes empresas.
+
+### BERT
+
+- Ele não processa símbolos, ele trabalha com números, então inicialmente ele começa tokenizando
+- Cada token então vira um embedding. Um vetor de números que representa esses tokens
+	- Token Embeddings
+		- Vetor que representam o token
+	- Segment Embeddings
+		- Segmentos são categorias diferentes de entradas (?)
+	- Position Embeddings
+		- Vetor que representa a posição do token.
+
+---
+
+- Word2Vec não disambiguava por contexto.
+- A saída será os encodings iniciais mas enriquecidas.
+- Softmax:
+	- Converte o embedding em uma distribuição de probabilidades entre as palavras possíveis.
+- Entender o BERT dimensionalmente
+
+### monoBERT: BERT reranker
+
+- Agora temos um segmento de query; e um segmento de texto.
+- O Softmax agora categoria apenas como relevante ou não relevante.
+- O S_i é um número real
+- O rótulo y é definido por humanos
+
+
+#### Training monoBERT
+
+- Os rótulos positivos são gerados pelos humanos.
+- Os negativos podem ser usados pelo BM25
+
+#### Once monoBERT is trained...
+
+- Usa BM25 para gerar os ranques
+- Depois, com os documentos ordenados, usa-se o monoBERT para reranquear em potenciais scores melhores.
+- É bom considerar um pouco além dos top-k afinal o bm25 pode ter ranqueado negativamente algo que seria positivo.
+- Por que ao invés de apenas considerar o monoBERT, não considerar também com o BM25
+- Naquele vetor de features de um documento que eram usados para ranquear, poderíamos usar a mesma ideia num vetor de scores que calculasse um score final ainda melhor?
+
+
+## Ranking with ...
+
+
+### BERT's limitations
+
+- ...
+### From Passages to Documents
+
+#### Handling length Limitation: Training
+
+- Pode-se passar os labels nos diversos chunks
+- Pelo que entendi os chunks são chamados de passages
+
+#### Inference
+
+- agregar scores pros documentos
+
+#### Over Passage Scores
+
+- Diferentes Métricas
+- Usualmente pegar o maior score funciona melhor
+- Intuitivamente, se algo for relevante no documento, isso significa que ele é relevante.
+
+#### Over Sentence Scores: Birch
+
+
+#### Over Sentence Scores: Birch - Results
+
+- O melhor resultado foi treinar com MB após treinar com MS MARCO
+
+#### Aggregation
+
+Usar um tipo de BERT para poder agregar os scores.
+
+
+#### CEDR
+
+Cria matriz de similaridades entre os vetores da query e do documento
+Aí usam outro cálculo específico para matrizes, a tal da convolucional
+
+One Term Embeddings:
+
+BERT foi melhor que GloVe no relevante, e deu um ranque pior quando não era relevante.
+
+
+### Over Passage Representations: PARADE
