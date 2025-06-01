@@ -1,7 +1,4 @@
-""" Indexer
-
-
-## Indexer
+""" ## Indexer
 
 Your implementation must include an `indexer.py` file, which will be executed in the same virtual
 environment described above, as follows:
@@ -91,39 +88,32 @@ lower bound, assume your implementation will be tested with `-m 1024`."
 
 import time  # Time tracking
 import json  # Pretty prints JSON
-import argparse  # Argument parsing
 import os  # File operations
 import nltk  # Natural Language Toolkit for text processing
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-# import psutil  # Process and system utilities for memory management
 import numpy as np  # Counting repeated terms
 
+# My modules
+
+from modules.auxiliar import get_indexer_args, print_json, get_memory_usage
+# paralelism module for thread-safe file operations
+from modules.parallelism import safe_load_json, safe_save_json, parallel_index
+
 FORCE_CREATE = True  # Force creation of index files even if they already exist
+STOP_WORDS = set(stopwords.words('english'))  # Set of stopwords for English
+
+# convert all terms to its id
 
 
-def get_indexer_args():
-    """ Return a dictionary of the needed arguments, those being:
-        -m <MEMORY> : Memory in MB
-        -c <CORPUS> : Corpus path
-        -i <INDEX>  : Index path
-    """
-
-    parser = argparse.ArgumentParser(description="Indexer arguments")
-    parser.add_argument("-m", "--memory", help="Memory in MB",
-                        required=True, type=int)
-    parser.add_argument("-c", "--corpus", help="Corpus path",
-                        required=True, type=str)
-    parser.add_argument("-i", "--index", help="Index path",
-                        required=True, type=str)
-    args = parser.parse_args()
-    args_dict = vars(args)
-
-    return args_dict
+def initialize_nltk_resources():
+    """ Ensure NLTK resources are available """
+    nltk.download('punkt', quiet=True)
+    nltk.download('stopwords', quiet=True)
 
 
-def compute_statistics(local_start_time=0, index_path="index.json"):
+def compute_statistics(local_start_time=0.0, index_path="index.json"):
     """ Compute statistics for the indexer """
 
     def get_index_size(index_path):
@@ -136,85 +126,68 @@ def compute_statistics(local_start_time=0, index_path="index.json"):
 
         return size_in_mb
 
-    def get_number_of_lists(index_path):
-        """ Get the number of inverted lists in the index """
+    def get_number_and_average(index_path):
+        """ Get the number of inverted lists in the index
+            and the average number of postings per inverted list
+        """
+
+        postings_info = {'Number of Lists': 0, 'Average List Size': 0.0}
+
         if not os.path.exists(index_path):
-            return None
+            return postings_info
 
-        with open(index_path, 'r', encoding='utf8') as f:
-            index_data = json.load(f)
+        try:
+            with open(index_path, 'r', encoding='utf8') as f:
+                index_data = json.load(f)
 
-        # Assuming the index is a dictionary where keys are terms
-        number_of_lists = len(index_data)
-        return number_of_lists
+            num_lists = len(index_data)
+            if num_lists == 0:
+                return postings_info
 
-    def get_average_number_of_postings(index_path):
-        """ Get the average number of postings per inverted list """
-        if not os.path.exists(index_path):
-            return None
+            total_postings = sum(len(postings)
+                                 for postings in index_data.values())
 
-        with open(index_path, 'r', encoding='utf8') as f:
-            index_data = json.load(f)
+            postings_info['Number of Lists'] = num_lists
+            postings_info['Average List Size'] = total_postings / num_lists
 
-        total_postings = 0
-        number_of_lists = len(index_data)
+        except (IOError, json.JSONDecodeError) as e:
+            print(f"Erro ao processar arquivo: {e}")
 
-        for _, postings in index_data.items():
-            total_postings += len(postings)
+        return postings_info
 
-        if number_of_lists == 0:
-            return 0
-
-        # Calculate average postings per list
-        average_postings = total_postings / number_of_lists
-
-        return average_postings
+    inverted_index_path = os.path.join(index_path, 'inverted_index.json')
+    postings_info = get_number_and_average(inverted_index_path)
 
     statistics = {
-        "Index Size": get_index_size(index_path),  # in MB
+        # in MB
+        "Index Size": get_index_size(inverted_index_path),
         "Elapsed Time": time.time() - local_start_time,  # in seconds
         # number of inverted lists
-        "Number of Lists": get_number_of_lists(index_path),
+        "Number of Lists": postings_info['Number of Lists'],
         # average number of postings per inverted list
-        "Average List Size": get_average_number_of_postings(index_path)
+        "Average List Size": postings_info['Average List Size']
     }
 
+    statistics['Index Size'] = int(statistics['Index Size'])
+    statistics['Elapsed Time'] = int(statistics['Elapsed Time'])
+    statistics['Average List Size'] = round(statistics['Average List Size'], 1)
+
     return statistics
-
-
-def print_json(data):
-    """ Print the data in JSON format """
-    print(json.dumps(data, indent=4))
 
 
 def generate_structures(index_path):
     """ Generate the index structures (inverted index, document index, term lexicon) """
 
-    def create_file(file_path):
+    def create_file(index_path, file_path):
         """ Create a file if it does not exist """
+        index_structure_file_path = os.path.join(index_path, file_path)
         if not os.path.exists(file_path) or FORCE_CREATE:
-            with open(file_path, 'w', encoding='utf8') as f:
+            with open(index_structure_file_path, 'w', encoding='utf8') as f:
                 json.dump({}, f, indent=4)
 
-    def generate_inverted_index(output_dir):
-        """ Generate the inverted index """
-        # Placeholder for actual implementation
-        inverted_index_path = os.path.join(output_dir, 'inverted_index.json')
-        create_file(inverted_index_path)
-
-    def generate_document_index(output_dir):
-        """ Generate the document index """
-        document_index_path = os.path.join(output_dir, 'document_index.json')
-        create_file(document_index_path)
-
-    def generate_term_lexicon(output_dir):
-        """ Generate the term lexicon """
-        term_lexicon_path = os.path.join(output_dir, 'term_lexicon.json')
-        create_file(term_lexicon_path)
-
-    generate_inverted_index(index_path)
-    generate_document_index(index_path)
-    generate_term_lexicon(index_path)
+    create_file(index_path, 'inverted_index.json')
+    create_file(index_path, 'document_index.json')
+    create_file(index_path, 'term_lexicon.json')
 
 
 def pre_processing(doc):
@@ -222,9 +195,6 @@ def pre_processing(doc):
 
     def tokenize(doc):
         """ Use NLTK to tokenize the document """
-        # Ensure NLTK resources are available
-        nltk.download('punkt', quiet=True)
-
         # Tokenize the document text
         doc['text'] = word_tokenize(doc['text'])
         doc['title'] = word_tokenize(doc['title'])
@@ -234,23 +204,13 @@ def pre_processing(doc):
     def remove_stopwords(doc):
         """ Remove stopwords from the document """
 
-        def get_stopwords():
-            """ Get previously defined stopwords """
-            nltk.download('stopwords', quiet=True)
-            stop_words = set(stopwords.words('english'))
-            # with open('source/input/stopwords.json', 'r', encoding='utf8') as f:
-            #     stop_words = json.load(f)
-            return stop_words
-
-        def remove_stopwords_from_list(word_list, stop_words):
+        def remove_stopwords_from_list(word_list):
             """ Remove stopwords from a list of words """
-            return [word for word in word_list if word.lower() not in stop_words]
+            return [word for word in word_list if word.lower() not in STOP_WORDS]
 
-        stop_words = get_stopwords()
-
-        doc['text'] = remove_stopwords_from_list(doc['text'], stop_words)
-        doc['title'] = remove_stopwords_from_list(doc['title'], stop_words)
-        doc['keywords'] = [remove_stopwords_from_list(keywords, stop_words)
+        doc['text'] = remove_stopwords_from_list(doc['text'])
+        doc['title'] = remove_stopwords_from_list(doc['title'])
+        doc['keywords'] = [remove_stopwords_from_list(keywords)
                            for keywords in doc['keywords']]
 
         # print(my_stopwords)
@@ -286,24 +246,51 @@ def pre_processing(doc):
 def append_to_structures(doc, index_path):
     """ Append the processed document to the index structures """
 
-    def load_json_from_path(file_path):
-        """ Load JSON data from a file """
-        if not os.path.exists(file_path):
-            return {}
+    def append_to_term_lexicon(doc, output_dir):
+        """ Add term lexicon entries for the document
+            - This is meant to create a mapping of terms to IDs
+            - Also, it updates the terms histogram
+            Code:
+            - loads the existing term lexicon or creates a new one
+            - updates the terms to id mappings
+            - updates the terms histogram
+        """
 
-        with open(file_path, 'r', encoding='utf8') as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                print(
-                    f'File {file_path} is empty or not a valid JSON, creating a new one')
-                return {}
+        term_hist = 'terms_histogram'
 
-    def save_json_to_path(data, file_path):
-        """ Save JSON data to a file """
-        with open(file_path, 'w', encoding='utf8') as f:
-            # json.dump(data, f, ensure_ascii=False, indent=indent_size)
-            json.dump(data, f, ensure_ascii=False)
+        lexicon_path = os.path.join(output_dir, 'term_lexicon.json')
+        term_lexicon = safe_load_json(lexicon_path)
+
+        term_lexicon['term2id'] = term_lexicon.get('term2id', {})
+        term_lexicon[term_hist] = term_lexicon.get(term_hist, {})
+
+        for term, count in doc[term_hist].items():
+            if term not in term_lexicon['term2id']:
+                # Assign a new ID to the term
+                term_id = str(len(term_lexicon['term2id']))
+                term_lexicon['term2id'][term] = term_id
+            else:
+                term_id = str(term_lexicon['term2id'][term])
+            # update terms histogram
+            # int_term_id = int(term_id)
+            # str_term_id = str(term_id)
+            # print(str_term_id, int_term_id, term_lexicon)
+
+            # If the term ID is not in the histogram, initialize it
+            if term_id not in term_lexicon[term_hist]:
+                term_lexicon[term_hist][term_id] = 0
+            # term_lexicon[term_hist][term_id] = term_lexicon[term_hist].get(
+            #     term_id, 0)
+            term_lexicon[term_hist][term_id] += int(count)
+
+            if term_id in [2, 3, 4, 5]:
+                print(20*' = ')
+                print(f'Term: {term}, ID: {term_id}, Count: {count}')
+                print(term_lexicon[term_hist].get(term_id, 0))
+                print(20*' = ')
+
+        # Save the updated term lexicon
+        safe_save_json(lexicon_path, term_lexicon)
 
     def append_to_inverted_index(doc, output_dir):
         """ Add inverted index entries for the document
@@ -314,7 +301,7 @@ def append_to_structures(doc, index_path):
         # print(inverted_index_path)
         # Load existing inverted index or create a new one
 
-        inverted_index = load_json_from_path(inverted_index_path)
+        inverted_index = safe_load_json(inverted_index_path)
 
         for term, count in doc['terms_histogram'].items():
             # count = term['terms_histogram'][term]
@@ -324,7 +311,7 @@ def append_to_structures(doc, index_path):
             inverted_index[term].append(posting)
 
         # Save the updated inverted index
-        save_json_to_path(inverted_index, inverted_index_path)
+        safe_save_json(inverted_index_path, inverted_index)
 
     def append_to_document_index(doc, output_dir):
         """ Add document index entries for the document
@@ -332,7 +319,7 @@ def append_to_structures(doc, index_path):
         """
         document_index_path = os.path.join(output_dir, 'document_index.json')
         # Load existing document index or create a new one
-        document_index = load_json_from_path(document_index_path)
+        document_index = safe_load_json(document_index_path)
 
         # Add the document ID and its metadata
         doc_id = int(doc['id'])
@@ -347,39 +334,7 @@ def append_to_structures(doc, index_path):
         }
 
         # Save the updated document index
-        save_json_to_path(document_index, document_index_path)
-
-    def append_to_term_lexicon(doc, output_dir):
-        """ Add term lexicon entries for the document
-            - This is meant to create a mapping of terms to IDs
-            - Also, it updates the terms histogram
-            Code:
-            - loads the existing term lexicon or creates a new one
-            - updates the terms to id mappings
-            - updates the terms histogram
-        """
-
-        lexicon_path = os.path.join(output_dir, 'term_lexicon.json')
-        term_lexicon = load_json_from_path(lexicon_path)
-
-        term_lexicon['term2id'] = term_lexicon.get('term2id', {})
-        term_lexicon['terms_histogram'] = term_lexicon.get(
-            'terms_histogram', {})
-
-        for term, count in doc['terms_histogram'].items():
-            if term not in term_lexicon['term2id']:
-                # Assign a new ID to the term
-                term_id = len(term_lexicon['term2id'])
-                term_lexicon['term2id'][term] = term_id
-            else:
-                term_id = term_lexicon['term2id'][term]
-            # update terms histogram
-            if term_id not in term_lexicon['terms_histogram']:
-                term_lexicon['terms_histogram'][term_id] = 0
-            term_lexicon['terms_histogram'][term_id] += int(count)
-
-        # Save the updated term lexicon
-        save_json_to_path(term_lexicon, lexicon_path)
+        safe_save_json(document_index_path, document_index)
 
     doc['id'] = int(doc['id'])
     doc['all_terms'] = doc['text'] + doc['title'] + sum(doc['keywords'], [])
@@ -393,33 +348,26 @@ def append_to_structures(doc, index_path):
     append_to_document_index(doc, index_path)
 
 
-def doc_processing(doc, mem_limit, index_path):
+def doc_processing(doc, index_path, idx):
     """ Process a single document """
 
+    get_memory_usage(index_path, debug=True, idx=idx)
     doc = json.loads(doc)
     pre_processing(doc)  # tokenizing, stopword removal and stemming
     append_to_structures(doc, index_path)
-    print(mem_limit)
 
 
 def indexer(cmd_args):
     """ Main indexer function """
 
     generate_structures(cmd_args['index'])
-
-    limit = 1
-    idx = 0
-
-    with open(cmd_args['corpus'], 'r', encoding='utf8') as corpus_file:
-        for doc in corpus_file:
-            if idx >= limit:
-                break
-            idx += 1
-            doc_processing(doc, cmd_args['memory'], cmd_args['index'])
+    initialize_nltk_resources()
+    parallel_index(cmd_args, doc_processing, limit=1000, max_threads=32)
+    # parallel_index(cmd_args, doc_processing, limit=None, max_threads=32)
 
 
 def main():
-    """
+    """ indexes the corpus given the arguments
         - Gets the arguments
         - starts perfomance tracking
         - calls the indexer function
@@ -431,10 +379,8 @@ def main():
     print(10*'\n')
     indexer(cmd_args)
 
-    x = 3
-    if 2 > x:
-        statistics = compute_statistics(start_time, cmd_args['index'])
-        print_json(statistics)
+    statistics = compute_statistics(start_time, cmd_args['index'])
+    print_json(statistics)
     # print_json(statistics)
 
 
