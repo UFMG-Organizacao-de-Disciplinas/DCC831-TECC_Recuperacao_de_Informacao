@@ -1,4 +1,4 @@
-from heapq import heappush, heappop, heapify
+# from heapq import heappush, heappop, heapify
 import math
 import numpy as np
 from modules.auxiliar import print_json
@@ -28,6 +28,7 @@ def compute_score(score_info):
         corpus_size = info['corpus_size']
         dl = info['doc_len']
         avg_dl = info['avg_doc_len']
+        query_postings = info['selected_postings']
 
         score = 0.0
         for term in query_terms:
@@ -41,7 +42,7 @@ def compute_score(score_info):
             idf = math.log(idf_div)
 
             # Computing tf (term frequency)
-            term_postings = inv_index.get(term, {})
+            term_postings = query_postings.get(term, {})
             doc_term_freq = term_postings.get(doc_id, 0)
 
             tf_num = doc_term_freq * (k1 + 1)
@@ -51,25 +52,28 @@ def compute_score(score_info):
             # BM25 score for the term
             score += idf * tf
 
+        # print(f"BM25 score for doc {doc_id}: {score}")
+
         return score
 
     def compute_tfidf_score(tfidf_info):
         """ Compute TF-IDF score for a document """
 
-        # inv_index = info['inv_idx']
-        # doc_id = info['doc_id']
-        # avg_dl = info['avg_doc_len']
+        # inv_index = tfidf_info['inv_idx']
+        doc_id = tfidf_info['doc_id']
 
-        # query_terms = tfidf_info['query_terms']
-        # doc_len = tfidf_info['doc_len']
-        # corpus_len = tfidf_info['corpus_size']
+        query_terms = tfidf_info['query_terms']
+        doc_len = tfidf_info['doc_len']
+        corpus_len = tfidf_info['corpus_size']
 
-        # doc_terms = tfidf_info['doc_terms']
-        # term_hist = tfidf_info['term_hist']
+        term_hist = tfidf_info['term_hist']
+        query_postings = tfidf_info['selected_postings']
 
         score = 0.0
         for term in query_terms:
-            doc_term_freq = doc_terms.get(term, 0)
+            postings = query_postings.get(term, [])
+
+            doc_term_freq = postings.get(doc_id, 0)
 
             tf = doc_term_freq / doc_len if doc_len > 0 else 0
 
@@ -122,7 +126,6 @@ def get_conjunctive_postings(query_postings):
         - return the updated query_postings with only the common doc_ids and their tf values
     """
 
-    # gets first term's postings
     first_term = next(iter(query_postings))
     common_docs = set(query_postings[first_term].keys())
 
@@ -162,7 +165,7 @@ def run_daat(query, index_files, postings_to_score, ranker):
             - ranker: 'TFIDF' or 'BM25'
         Logic: run the DAAT algorithm to score documents based on the query terms
     """
-    print_json(postings_to_score)
+    # print_json(postings_to_score)
 
     individual_doc_ids = set()
 
@@ -178,11 +181,17 @@ def run_daat(query, index_files, postings_to_score, ranker):
     corpus_size = len(doc_idx)
 
     # Calculate average document length
-    total_length = sum(doc['unique_terms'] for doc in doc_idx.values())
+    total_length = sum(doc['unique_terms']['length']
+                       for doc in doc_idx.values())
     avg_doc_len = total_length / corpus_size if corpus_size > 0 else 0
 
+    # scores_dict = {}
+    scores_tuples = []
+
     for doc_id in individual_doc_ids:
-        """ Is it daat'ly enough? """
+        # This should be a kind of daat, but i'm not sure if it is.
+        # Id kinda goes a document at a time tho.
+
         doc_dict = doc_idx.get(doc_id, {})
         doc_len = doc_dict.get('unique_terms', 0)
 
@@ -193,12 +202,19 @@ def run_daat(query, index_files, postings_to_score, ranker):
             'corpus_size': corpus_size,
             'doc_len': doc_len,
             'avg_doc_len': avg_doc_len,
-            'ranker': ranker
+            'ranker': ranker,
+            'selected_postings': postings_to_score,
+            'term_hist': index_files['tl']['terms_histogram']
         }
         score = compute_score(scoring_payload)
+        # scores_dict[doc_id] = score
+        scores_tuples.append((doc_id, score))
 
-    score = []
-    return score
+    # Sort the scores in descending order
+    scores_tuples.sort(key=lambda x: x[1], reverse=True)
+    # print(f"Scores for query '{query}': {scores_tuples}")
+
+    return scores_tuples
 
 
 def document_at_a_time(query, index_files, ranker):
@@ -220,11 +236,10 @@ def document_at_a_time(query, index_files, ranker):
 
 
 def score_query(query, index_files, ranker='BM25'):
-    """
-    Score a query using the specified ranker.
-    - query: preprocessed query (list of terms)
-    - index_files: dictionary with inverted index, document index, and lexicon
-    - ranker: 'TFIDF' or 'BM25'
+    """ Score a query using the specified ranker.
+        - query: preprocessed query (list of terms)
+        - index_files: dictionary with inverted index, document index, and lexicon
+        - ranker: 'TFIDF' or 'BM25'
     """
     print(5*'\n')
     scores = document_at_a_time(query, index_files, ranker)

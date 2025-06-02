@@ -74,13 +74,13 @@ from modules.p_rankers import score_query
 
 def load_index(index_path):
     """ Load the index from the specified path """
-    index_files = {'ii': {}, 'di': {}, 'lex': {}}
+    index_files = {'ii': {}, 'di': {}, 'tl': {}}
     with open(index_path + '/inverted_index.json', encoding='utf8') as f:
         index_files['ii'] = json.load(f)
     with open(index_path + '/document_index.json', encoding='utf8') as f:
         index_files['di'] = json.load(f)
     with open(index_path + '/term_lexicon.json', encoding='utf8') as f:
-        index_files['lex'] = json.load(f)
+        index_files['tl'] = json.load(f)
 
     return index_files
 
