@@ -11,6 +11,11 @@ from threading import active_count  # Count the number of active threads
 import psutil
 
 
+def print_json(data):
+    """ Print the data in JSON format """
+    print(json.dumps(data, indent=4))
+
+
 def get_memory_usage(index_path, debug=False, idx=0):
     """ Get the current memory usage of the process in MB """
     def convert_bytes_to_mb(bytes_value):
@@ -71,9 +76,6 @@ def get_indexer_args():
     return args_dict
 
 
-def print_json(data):
-    """ Print the data in JSON format """
-    print(json.dumps(data, indent=4))
 def get_processor_args():
     """
     - `-i <INDEX>`: the path to an index file.
