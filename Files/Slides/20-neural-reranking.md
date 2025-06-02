@@ -118,12 +118,12 @@ Based on the survey:
 - PARADE (Li et al., 2020)
 - [Ranking Survey](https://arxiv.org/abs/2010.06467)
 
-
-----
 ---
+
 ---
 
 [JV] Só comecei a prestar atenção em torno da página 19.
+
 ### Neural Ranking Models (>2016)
 
 - Representation-based
@@ -140,7 +140,7 @@ Based on the survey:
 - [Imagem]
 - Geralmente os modelos são pre-treinados para entender modelos de linguagem
 - O BERT generaliza bem o bastante mesmo no caso de "zero-shot"
-	- Certamente modela a linguagem muito melhor do que antigamente
+  - Certamente modela a linguagem muito melhor do que antigamente
 
 ### Adoption by Commercial Search Engines
 
@@ -162,19 +162,19 @@ Based on the survey:
 
 - Ele não processa símbolos, ele trabalha com números, então inicialmente ele começa tokenizando
 - Cada token então vira um embedding. Um vetor de números que representa esses tokens
-	- Token Embeddings
-		- Vetor que representam o token
-	- Segment Embeddings
-		- Segmentos são categorias diferentes de entradas (?)
-	- Position Embeddings
-		- Vetor que representa a posição do token.
+  - Token Embeddings
+    - Vetor que representam o token
+  - Segment Embeddings
+    - Segmentos são categorias diferentes de entradas (?)
+  - Position Embeddings
+    - Vetor que representa a posição do token.
 
 ---
 
 - Word2Vec não disambiguava por contexto.
 - A saída será os encodings iniciais mas enriquecidas.
 - Softmax:
-	- Converte o embedding em uma distribuição de probabilidades entre as palavras possíveis.
+  - Converte o embedding em uma distribuição de probabilidades entre as palavras possíveis.
 - Entender o BERT dimensionalmente
 
 ### monoBERT: BERT reranker
@@ -184,13 +184,12 @@ Based on the survey:
 - O S_i é um número real
 - O rótulo y é definido por humanos
 
-
 #### Training monoBERT
 
 - Os rótulos positivos são gerados pelos humanos.
 - Os negativos podem ser usados pelo BM25
 
-#### Once monoBERT is trained...
+#### Once monoBERT is trained
 
 - Usa BM25 para gerar os ranques
 - Depois, com os documentos ordenados, usa-se o monoBERT para reranquear em potenciais scores melhores.
@@ -198,13 +197,12 @@ Based on the survey:
 - Por que ao invés de apenas considerar o monoBERT, não considerar também com o BM25
 - Naquele vetor de features de um documento que eram usados para ranquear, poderíamos usar a mesma ideia num vetor de scores que calculasse um score final ainda melhor?
 
-
-## Ranking with ...
-
+## Ranking with
 
 ### BERT's limitations
 
-- ...
+- Transformers têm custo quadrático.
+
 ### From Passages to Documents
 
 #### Handling length Limitation: Training
@@ -212,7 +210,7 @@ Based on the survey:
 - Pode-se passar os labels nos diversos chunks
 - Pelo que entendi os chunks são chamados de passages
 
-#### Inference
+#### Inference (2)
 
 - agregar scores pros documentos
 
@@ -224,7 +222,6 @@ Based on the survey:
 
 #### Over Sentence Scores: Birch
 
-
 #### Over Sentence Scores: Birch - Results
 
 - O melhor resultado foi treinar com MB após treinar com MS MARCO
@@ -232,7 +229,6 @@ Based on the survey:
 #### Aggregation
 
 Usar um tipo de BERT para poder agregar os scores.
-
 
 #### CEDR
 
@@ -243,5 +239,27 @@ One Term Embeddings:
 
 BERT foi melhor que GloVe no relevante, e deu um ranque pior quando não era relevante.
 
-
 ### Over Passage Representations: PARADE
+
+---
+
+## Aula 20 - 02/06/2025
+
+### Why Multi-stage Reranking? (2)
+
+- Técnicas de ranqueamento mais para as extremidades em que há menos documentos são mais caras.
+
+#### Multi-stage with duoBERT
+
+- DuoBERT é um modelo que compara pares de documentos
+- É bem parecido com o monoBERT, mas agora a entrada é um par de documentos e não um único documento.
+- Dúvida: Por que usamos o T[CLS] e não o T[SEP]?
+  - Entende-se que o T[CLS] represente uma atenção maior ao contexto geral do par de documentos, embora não esteja claro como.
+
+##### Training duoBERT
+
+##### Inference with duoBERT
+
+- Ele avalia todas as probabilidades de pares de documentos
+- Depois ele junta as probabilidades de cada um ser melhor que os outros.
+- E esse será o novo score de ranqueamento.

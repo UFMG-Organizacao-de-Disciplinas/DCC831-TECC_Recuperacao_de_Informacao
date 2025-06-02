@@ -8,7 +8,7 @@
 
 - Part 1: Background
   - (text ranking, IR, ML)
-- Part 2: Ranking with relevance classification
+- **Part 2: Ranking with relevance classification**
 - Part 3: Ranking with dense representations
 - Part 4: Conclusion & future directions
 
@@ -234,37 +234,49 @@
   - Fast to compute because $q \cap d$ is usually small.
 - Disadvantage: Terms need to match exactly.
 
+- [JV] Se estou armazenando o mesmo documento em um vetor denso ao invés de um esparso, isso significa que essa célula do vetor representa mais do que uma palavra.
+
 ## Dense Representations
 
-- $q = "fix my air conditioner"$
-- $d = "... AC repair ..."$
+- $q =$ "fix my air conditioner"
+- $d =$ "... AC repair ..."
 - Encoder
   - $\eta(q)$
   - $\eta(d)$
 - $\phi$ is a similarity function (e.g., inner product or cosine similarity)
-  - $\phi(\eta(q), \eta(d)) \rightarrow$ ideally measures how relevant $q$ and $d$ are to each other.
+
+  - $\phi(\eta(q), \eta(d)) \to$ ideally measures how relevant $q$ and $d$ are to each other.
+
+- [JV]
+  - a função de similaridade idealmente precisa conseguir discernir o quão relevante são os documentos pra determinada consulta.
+  - $\eta$ é o que faz o encoding
 
 ## Types of Encoders: Cross-encoder
 
 - [Imagem: Cross-encoder architecture diagram]
+- [JV]
+  - Computa os encodings juntando query e
 
 ## Types of Encoders: Bi-encoder
 
 - [Imagem: Bi-encoder architecture diagram]
+- "Arquitetura de duas torres"
 
-## Nearest Neighbor Search
+- [JV]
+  - Questão da prova: dá pra armazenar esse vetor denso em um índice invertido?
+  - Na prática dá. Se o vetor denso tem 700 posições, seria caro armazenar isso numa lista invertida
 
-- Task: find the top k most relevant texts to a query
-- Query
-- Texts
-  - $\phi(\eta(q), \eta(d_1))$
-  - $\phi(\eta(q), \eta(d_{|C|}))$
-- Top k
+## Nearest Neighbor Search (KNN: K-Nearest Neighbors)
+
+### Task: find the top $k$ most relevant texts to a query
+
+- Query $\to$ Texts: $\phi(\eta(q), \eta(d_1))$ ~ $\phi(\eta(q), \eta(d_{|C|}))$
 - Brute-force search:
   - We often need to search many (e.g.: billions) of texts.
   - Brute-force won't scale.
+- top-$k$
 
-## Approximate Nearest Neighbor Search
+## Approximate Nearest Neighbor Search (ANN)
 
 - Exchange accuracy for speed
   - E.g.: k-means
@@ -279,6 +291,13 @@
 - In practice, ANN implementations are more complicated.
 - We assume a fast dense retrieval library is available (e.g.: Faiss, Annoy, ScaNN).
 
+- [Imagem]
+- [JV]
+  - Primeiro mapeamos a busca pro cluster mais próximo
+  - Um dos mais usados é a clusterização hierárquica
+  - Fazemos uma busca em um tipo de árvore de buscas nesses subgrupos mutidimensionais.
+  - "Essa coisa hierárquica, é um índice, porém com uma estrutura de dados completamente diferente"
+
 ## Distance-based Transformer Representations
 
 - Key characteristic
@@ -288,6 +307,14 @@
 - **Johnson, Douze, Jégou. Billion-scale similarity search with GPUs. arXiv 2017.**
 
 ## Distance-based: SentenceBERT
+
+- [JV]
+
+  - Agora faremos um cálculo dos embeddings dos textos.
+  - Pooling é um método de agrupar os embeddings gerados pelo BERT
+  - $(u, v, |u-v|)$ é um novo vetor que é usado sobre o classificador softmax. Essas seriam nossas features
+  - Não necessariamente queremos minimizar essa diferença absoluta, isso só deve ocorrer quando os documentos forem relevantes.
+  - No caso do cosine, ele não sabe informar direito qual a diferença entre o -1 e 0.
 
 - Softmax classifier
   - (u, v, |u-v|)
@@ -309,7 +336,18 @@
 - Classification
 - **Reimers, Gurevych. Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks. EMNLP 2019.**
 
-## Comparison-based: ColBERT
+## Comparison-based Transformers alguma coisa
+
+### Comparison-based: ColBERT
+
+- [JV]
+
+  - Aqui, gasta-se mais memória pois são armazenados mais vetores.
+  - Não serão usados os Tokens CLS, mas sim os próprios Embeddings.
+  - MaxSim: compara os embeddings U (da query) com os embeddings dos documentos.
+  - Poderíamos usar os embeddings gerados pelo Cross-bert pré-treinado com rótulos humanos para fazer um ajuste fino do ColBERT?
+    - Ele diz que faz sentido, geraria mais casos de teste e ele não sabe se já foi feito.
+  - Ao invés de embeddings de documentos, armazena embeddings de palavras
 
 - Sum
 - M
@@ -333,6 +371,8 @@
 - **Khattab, Zaharia. ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT. SIGIR 2020.**
 
 ---
+
+[Imagem de gráfico comparativo]
 
 - Compatible with ANN?
   - Unclear
@@ -392,18 +432,18 @@
 - DeepCT
 - DeepImpact
 
-## Query reformulation as a translation task
+- [JV] E se não fizermos encodings online?
+
+### Query reformulation as a translation task
 
 - Query Language → Query Reformulator → Document Language
   - Hard: Input has little information
 - Query Language → Document Translator → Document Language
   - Easier: Input has a lot of information
 
-## doc2query
+#### doc2query
 
-- Document
-- seq2seq Transformer
-- Query
+- Document $\to$ seq2seq Transformer $\to$ Query
 - Supervised training:
   - pairs of <query, relevant document>
 - **Nogueira, Yang, Lin, Cho. Document expansion by query prediction. 2019.**
@@ -417,14 +457,18 @@
 - Output: Predicted Query
   - does cinnamon lower blood sugar?
 - Concatenate
-  - -
+  - [JV] Dessa forma temos um documento "enriquecido"
   - Researchers are finding that cinnamon reduces blood sugar levels naturally when taken daily...
   - does cinnamon lower blood sugar?
 - User's Query
   - foods and supplements to lower blood sugar
 - Search Engine
+
   - Index
   - Better Retrieved Docs
+
+- [JV]
+  - A ideia é criar possíveis queries que poderiam ser respondidas para encontrar o documento. E então elas são concateadas ao documento.
 
 ## Results
 
@@ -436,6 +480,12 @@
 - zero-shot: doc2query was trained only on MS MARCO
 
 ## DeepCT
+
+- [JV]
+
+  - De que forma poderíamos armazenar o impacto das palavras?
+  - Treinamos para que palavras alvos sejam rotuladas como 1 para palavras relevantes, e então treina-se o modelo.
+  - Ao invés de scores de 0 a 1, usam Term Frequencies falsos, para poder aumentar a frequência de termos que sejam mais relevantes.
 
 - $\text{loss} = \sum_{t}(\hat{y}_{t,d} - y_{t,d})^2$
 - Target Scores
@@ -470,6 +520,8 @@
 | DeepCT      | 0.243  | 0.913  | 1                       |
 
 ### DeepImpact: combining doc2query with DeepCT
+
+- [JV] afinal, por que não juntarmos as duas ideias?
 
 - Input Document
   - Researchers are finding that cinnamon reduces blood sugar levels naturally when taken daily...
@@ -506,12 +558,15 @@
 - Disadvantages:
   - Have to iterate over the entire collection.
   - Not as effective as rerankers (yet).
+    - [JV] ainda não tão bom quanto os cross-encoders
 
 ## Conclusions
 
 - Pretrained Transformers showed significant improvements in various IR benchmarks.
 - Reproduced and adopted by many in academia and industry.
 - No doubt we are in the age of BERT and Transformers.
+
+- [JV] De que forma decoders serviriam? Poderíamos usar o GPT como busca?
 
 ## Learn more in survey (& upcoming book)
 
