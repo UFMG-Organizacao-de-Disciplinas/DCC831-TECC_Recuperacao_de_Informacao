@@ -74,3 +74,21 @@ def get_indexer_args():
 def print_json(data):
     """ Print the data in JSON format """
     print(json.dumps(data, indent=4))
+def get_processor_args():
+    """
+    - `-i <INDEX>`: the path to an index file.
+    - `-q <QUERIES>`: the path to a file with the list of queries to process.
+    - `-r <RANKER>`: a string informing the ranking function (either "TFIDF" or "BM25") to be used
+    to score documents for each query.
+    """
+    parser = argparse.ArgumentParser(description="Processor arguments")
+    parser.add_argument("-i", "--index", required=True,
+                        help="path to an index file")
+    parser.add_argument("-q", "--queries", required=True,
+                        help="path to queries")
+    parser.add_argument("-r", "--ranker", required=True, help="ranking function to use",
+                        choices=["TFIDF", "BM25"])
+    args = parser.parse_args()
+    args_dict = vars(args)
+
+    return args_dict
