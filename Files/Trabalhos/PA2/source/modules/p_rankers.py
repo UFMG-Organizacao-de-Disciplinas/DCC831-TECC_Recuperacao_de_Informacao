@@ -1,6 +1,7 @@
 from heapq import heappush, heappop, heapify
 import math
 import numpy as np
+from modules.auxiliar import print_json
 
 
 def compute_score(score_info):
@@ -9,143 +10,212 @@ def compute_score(score_info):
     """
 
     def compute_bm25_score(info, b=0.75, k1=1.2):
-        """ Compute BM25 score for a document """
-        term = info['term']
-        tf = info['tf']
+        """ Compute BM25 score for a document
+            - Needed parameters:
+                - Query tokens
+                - N = Corpus Size
+                - Document
+                - df(qi): term frequency in the corpus
+                - tf(qi, d): term frequency in the document
+                - dl(d): document length
+                - avg_dl: average document length in the corpus
+                - b, k1: BM25 parameters
+        """
+
+        query_terms = info['query_terms']
+        inv_index = info['inv_idx']
         doc_id = info['doc_id']
-        document_index = info['document_index']
-        lexicon = info['lexicon']
-        index_size = info['index_size']
+        corpus_size = info['corpus_size']
+        dl = info['doc_len']
+        avg_dl = info['avg_doc_len']
 
-        # Get the document length and average document length
-        doc_length = len(document_index[doc_id]['terms'])
-        avg_doc_length = np.mean([len(doc['terms'])
-                                 for doc in document_index.values()])
+        score = 0.0
+        for term in query_terms:
+            corpus_term_freq = len(inv_index.get(term, []))
 
-        # Get the document frequency of the term
-        doc_freq = lexicon['term_hist'][term]
+            # Computing idf (inverse document frequency)
+            idf_num = corpus_size - corpus_term_freq + 0.5
+            idf_den = corpus_term_freq + 0.5
+            idf_div = idf_num / idf_den
 
-        # Calculate BM25 score
-        idf = math.log((index_size - doc_freq + 0.5) / (doc_freq + 0.5) + 1)
+            idf = math.log(idf_div)
 
-        num = idf * (tf * (k1 + 1))
-        denom = tf + k1 * (1 - b + b * (doc_length / avg_doc_length))
+            # Computing tf (term frequency)
+            term_postings = inv_index.get(term, {})
+            doc_term_freq = term_postings.get(doc_id, 0)
 
-        score = num / denom
+            tf_num = doc_term_freq * (k1 + 1)
+            tf_den = doc_term_freq + (k1 * ((1 - b) + (b * (dl / avg_dl))))
+
+            tf = tf_num / tf_den if tf_den > 0 else 0
+            # BM25 score for the term
+            score += idf * tf
 
         return score
 
-    def compute_tfidf_score(info):
+    def compute_tfidf_score(tfidf_info):
         """ Compute TF-IDF score for a document """
-        term = info['term']
-        tf = info['tf']
+
+        # inv_index = info['inv_idx']
         # doc_id = info['doc_id']
-        document_index = info['document_index']
-        lexicon = info['lexicon']
+        # avg_dl = info['avg_doc_len']
 
-        # Get the document frequency of the term
-        doc_freq = lexicon['term_hist'][term]
-        index_size = len(document_index)
+        # query_terms = tfidf_info['query_terms']
+        # doc_len = tfidf_info['doc_len']
+        # corpus_len = tfidf_info['corpus_size']
 
-        # Calculate TF-IDF score
-        idf = math.log(index_size / (doc_freq + 1))
-        score = tf * idf
+        # doc_terms = tfidf_info['doc_terms']
+        # term_hist = tfidf_info['term_hist']
+
+        score = 0.0
+        for term in query_terms:
+            doc_term_freq = doc_terms.get(term, 0)
+
+            tf = doc_term_freq / doc_len if doc_len > 0 else 0
+
+            idf = math.log(corpus_len / term_hist.get(term, 1))
+
+            score += tf * idf
+
         return score
 
-    if score_info['model'] == 'BM25':
+    if score_info['ranker'] == 'BM25':
         return compute_bm25_score(score_info)
-    if score_info['model'] == 'TFIDF':
+    if score_info['ranker'] == 'TFIDF':
         return compute_tfidf_score(score_info)
 
     return 0.0
 
 
-def get_relevant_postings(query, inverted_index):
+def get_query_related_postings(query, inverted_index):
     """ Get the postings related to the terms in the query """
-    query_postings = []
+    query_postings = {term: {} for term in query}
     for term in query:
         if term in inverted_index:
             term_postings = inverted_index[term]
-            query_postings.append((term, term_postings))
+            posting_dict = {}
+            for doc_id, tf in term_postings:
+                posting_dict[doc_id] = tf
+            # Convert postings to a dictionary for easier access
 
-    query_postings.sort(key=lambda x: len(x[1]))
+            query_postings[term] = posting_dict
+        else:
+            # If the term is not in the index, return an empty list
+            print(f"Oopsie! Term '{term}' not found in the index. 🕵️")
+
+    # if len(query_postings) == len(query):
+    #     print('got all query terms in the index!')
+
+    # query_postings.sort(key=lambda x: len(x[1]))
     # Sort postings by the number of documents they appear in (ascending order)
     return query_postings
 
 
-def slide_daat(query, index, k):
-    """ DAAT algorithm from slides """
-    results = heapify(k)
-    targets = {docid for term in query for docid in index[term]}
-    lists = [index[term] for term in query]
-    for target in targets:
-        score = 0
-        for postings in lists:
-            for (docid, weight) in postings:
-                if docid == target:
-                    score += weight
-        results.add(target, score)
-    return results
+def get_conjunctive_postings(query_postings):
+    """ Get the conjunctive postings for the query terms
+        Pseudocode:
+        - query_postings: dictionary where keys are terms and values are their postings
+            - postings: list of lists [[doc_id, tf], ...]
+        - first: get all doc_ids from the first term's postings
+        - second: for each subsequent term's postings, keep only those doc_ids
+                  that are also in the first term's postings
+        - return the updated query_postings with only the common doc_ids and their tf values
+    """
+
+    # gets first term's postings
+    first_term = next(iter(query_postings))
+    common_docs = set(query_postings[first_term].keys())
+
+    # conjunctively intersect the postings of the other terms
+    for term in query_postings:
+        if term != first_term:
+            doc_ids = set(query_postings[term].keys())
+            common_docs &= doc_ids
+
+    if not common_docs:
+        print('No common documents found for the query terms.')
+        return query_postings
+
+    conjunctive_postings = {term: {} for term in query_postings}
+
+    for term in query_postings:
+        for common_doc in common_docs:
+            tf = query_postings[term].get(common_doc, 0)
+            conjunctive_postings[term][common_doc] = tf
+
+    return conjunctive_postings
 
 
-def get_daat_scores(query_postings):
-    """ Calculate scores for each document based on the query terms """
-    pointers = [0] * len(query_postings)
-    scores = {}
+def run_daat(query, index_files, postings_to_score, ranker):
+    """ Run the Document-at-a-Time (DAAT) algorithm to score documents
+        Args:
+            - query: preprocessed query (list of terms)
+            - index_files: dictionary with inverted index, document index, and lexicon
+                - inverted_index: dictionary with terms as keys and postings as values
+                    - postings: list of lists [[doc_id, tf], ...]
+                - document_index: dictionary with document IDs and their metadata
+                    - id: {text: term list, title: term list, keywords: term list, unique_terms: length: int}
+                - lexicon: dictionary with terms and their metadata
+                    - term_hist: dictionary with term frequencies in the corpus
+                    - term2id: dictionary mapping terms to their IDs
+            - postings_to_score: dictionary with terms from the query and their postings
+            - ranker: 'TFIDF' or 'BM25'
+        Logic: run the DAAT algorithm to score documents based on the query terms
+    """
+    print_json(postings_to_score)
 
-    while True:
-        current_docids = []
-        for i, (term, plist) in enumerate(query_postings):
-            pointer_exceeds_postings_size = pointers[i] >= len(plist)
-            if not pointer_exceeds_postings_size:
-                # Get the current document ID base on the pointer position
-                doc_id = plist[pointers[i]][0]
-                current_docids.append(doc_id)
-            else:
-                # Hard stop if any pointer exceeds the postings size
-                # Could be improved
-                return scores
+    individual_doc_ids = set()
 
-        if len(set(current_docids)) == 1:
-            doc_id = str(current_docids[0])  # converte para string
-            score = 0
+    for _, postings in postings_to_score.items():
+        individual_doc_ids.update(postings.keys())
+    individual_doc_ids = sorted(individual_doc_ids)
 
-            for i, (term, plist) in enumerate(query_postings):
-                _, tf = plist[pointers[i]]
-                score_info = {
-                    'term': term,
-                    'tf': tf,
-                    'doc_id': doc_id,
-                    'document_index': document_index,
-                    'lexicon': lexicon,
-                    'index_size': len(document_index),
-                    'model': model
-                }
-                score += compute_score(score_info)
-                pointers[i] += 1
+    doc_idx = index_files['di']
 
-            scores[doc_id] = score
+    query_terms = list(postings_to_score.keys())
+    inv_idx = index_files['ii']
 
-        else:
-            min_docid = min(current_docids)
-            for i, _ in enumerate(query_postings):
-                first_cond = pointers[i] < len(query_postings[i][1])
-                second_cond = query_postings[i][1][pointers[i]][0] == min_docid
-                if first_cond and second_cond:
-                    pointers[i] += 1
+    corpus_size = len(doc_idx)
+
+    # Calculate average document length
+    total_length = sum(doc['unique_terms'] for doc in doc_idx.values())
+    avg_doc_len = total_length / corpus_size if corpus_size > 0 else 0
+
+    for doc_id in individual_doc_ids:
+        """ Is it daat'ly enough? """
+        doc_dict = doc_idx.get(doc_id, {})
+        doc_len = doc_dict.get('unique_terms', 0)
+
+        scoring_payload = {
+            'query_terms': query_terms,
+            'inv_idx': inv_idx,
+            'doc_id': doc_id,
+            'corpus_size': corpus_size,
+            'doc_len': doc_len,
+            'avg_doc_len': avg_doc_len,
+            'ranker': ranker
+        }
+        score = compute_score(scoring_payload)
+
+    score = []
+    return score
 
 
-def document_at_a_time(query, inverted_index):
+def document_at_a_time(query, index_files, ranker):
     """ Process one document at a time to retrieve its score
         - Keep one pointer for each term in the query
     """
+    inverted_index = index_files['ii']
 
-    query_postings = get_relevant_postings(query, inverted_index)
+    query_postings = get_query_related_postings(query, inverted_index)
     if not query_postings:
-        return {}
+        return []
 
-    scores = get_daat_scores()
+    postings_to_score = get_conjunctive_postings(query_postings)
 
+    # print(f"Postings to score: {postings_to_score}")
+
+    scores = run_daat(query, index_files, postings_to_score, ranker)
     return scores
 
 
@@ -156,14 +226,8 @@ def score_query(query, index_files, ranker='BM25'):
     - index_files: dictionary with inverted index, document index, and lexicon
     - ranker: 'TFIDF' or 'BM25'
     """
-    inverted_index = index_files['ii']
-    document_index = index_files['di']
-    lexicon = index_files['lex']
-
-    term2id = lexicon['term2id']
-    term_hist = lexicon['term_hist']
-    index_size = len(document_index)
-
-    scores = document_at_a_time(query, inverted_index)
+    print(5*'\n')
+    scores = document_at_a_time(query, index_files, ranker)
+    print(5*'\n')
 
     return scores
