@@ -132,6 +132,8 @@ def print_processor_result(queries_results):
 
     for query_results in queries_results:
         msg = json.dumps(query_results, indent=2)
+        # print(query_results)
+        # print()
         print(msg)
 
 

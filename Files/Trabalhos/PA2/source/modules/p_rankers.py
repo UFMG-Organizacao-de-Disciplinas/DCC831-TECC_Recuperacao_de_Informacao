@@ -81,6 +81,18 @@ def compute_score(score_info):
 
             score += tf * idf
 
+            debug = {
+                # 'postings': postings,
+                'term': term,
+                'doc_term_freq': doc_term_freq,
+                'doc_len': doc_len,
+                'tf': tf,
+                'idf': idf,
+                'score': score
+            }
+
+            # print_json(debug)
+        # print(10 * '==')
         return score
 
     if score_info['ranker'] == 'BM25':
@@ -105,7 +117,8 @@ def get_query_related_postings(query, inverted_index):
             query_postings[term] = posting_dict
         else:
             # If the term is not in the index, return an empty list
-            print(f"Oopsie! Term '{term}' not found in the index. 🕵️")
+            # print(f"Oopsie! Term '{term}' not found in the index. 🕵️")
+            pass
 
     # if len(query_postings) == len(query):
     #     print('got all query terms in the index!')
@@ -136,7 +149,7 @@ def get_conjunctive_postings(query_postings):
             common_docs &= doc_ids
 
     if not common_docs:
-        print('No common documents found for the query terms.')
+        # print('No common documents found for the query terms.')
         return query_postings
 
     conjunctive_postings = {term: {} for term in query_postings}
@@ -185,15 +198,20 @@ def run_daat(query, index_files, postings_to_score, ranker):
                        for doc in doc_idx.values())
     avg_doc_len = total_length / corpus_size if corpus_size > 0 else 0
 
-    # scores_dict = {}
     scores_tuples = []
 
     for doc_id in individual_doc_ids:
         # This should be a kind of daat, but i'm not sure if it is.
         # Id kinda goes a document at a time tho.
 
-        doc_dict = doc_idx.get(doc_id, {})
-        doc_len = doc_dict.get('unique_terms', 0)
+        doc_dict = doc_idx.get(str(doc_id), {})
+
+        # For some reason, some doc_idx are missing.
+        # if not doc_dict:
+        #     print(f"Document ID {doc_id} not found in the document index.")
+        #     continue
+        unique_terms = doc_dict.get('unique_terms', {})
+        doc_len = unique_terms.get('length', 0)
 
         scoring_payload = {
             'query_terms': query_terms,
@@ -241,8 +259,8 @@ def score_query(query, index_files, ranker='BM25'):
         - index_files: dictionary with inverted index, document index, and lexicon
         - ranker: 'TFIDF' or 'BM25'
     """
-    print(5*'\n')
+    # print(5*'\n')
     scores = document_at_a_time(query, index_files, ranker)
-    print(5*'\n')
+    # print(5*'\n')
 
     return scores
