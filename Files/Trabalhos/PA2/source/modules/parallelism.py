@@ -38,7 +38,7 @@ def safe_load_json(file_path):
             try:
                 return json.load(f)
             except json.JSONDecodeError:
-                print(f'Invalid path: {file_path}')
+                print(f"Invalid path: {file_path}")
                 return {}
 
 

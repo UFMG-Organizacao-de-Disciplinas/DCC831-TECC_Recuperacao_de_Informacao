@@ -242,7 +242,7 @@ def append_to_structures(doc, index_path):
 
             if term_id in [2, 3, 4, 5]:
                 print(20*' = ')
-                print(f'Term: {term}, ID: {term_id}, Count: {count}')
+                print(f"Term: {term}, ID: {term_id}, Count: {count}")
                 print(term_lexicon[term_hist].get(term_id, 0))
                 print(20*' = ')
 
