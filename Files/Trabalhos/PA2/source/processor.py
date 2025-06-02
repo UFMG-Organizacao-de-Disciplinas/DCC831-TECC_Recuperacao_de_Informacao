@@ -11,7 +11,7 @@ with the following arguments:
 
 - `-i <INDEX>`: the path to an index file.
 - `-q <QUERIES>`: the path to a file with the list of queries to process.
-- `-r <RANKER>`: a string informing the ranking function (either “TFIDF” or “BM25”) to be used to
+- `-r <RANKER>`: a string informing the ranking function (either "TFIDF" or "BM25") to be used to
 score documents for each query.
 
 After processing **each query** (the `-q` argument above), your `processor.py` implementation must
@@ -90,14 +90,12 @@ def query_process(query, index_files, ranker_name):
     processed_query = preprocess_text(query)
 
     scores = score_query(processed_query, index_files, ranker_name)
-    results = scores[:10]  # Get top 10 results
+    top_k_scores = scores[:10]  # Get top 10 results
 
-    query_results = {
-        "Query": query,
-        "Results": [{"ID": str(docid), "Score": round(score, 2)} for docid, score in results]
-    }
+    results = [{"ID": str(docid), "Score": round(score, 2)}
+               for docid, score in top_k_scores]
 
-    return query_results
+    return results
 
 
 def monothread_query_process(parallel_load):
@@ -111,31 +109,30 @@ def monothread_query_process(parallel_load):
     cmd_args = parallel_load['cmd_args']
     ranker_name = cmd_args['ranker']
 
-    query_results = {"Query": "", "Results": []}
+    queries_results = []
 
     with open(cmd_args['queries'], encoding='utf8') as f:
         for line in f:
+            query_results = {"Query": "", "Results": []}
             query = line.strip()
+            # print(f"Processing query: {query}")  # Debugging output
             if not query:
                 continue  # Skip empty lines
 
             query_results["Query"] = query
             results = query_process(query, index_files, ranker_name)
-            query_results["Results"].extend(results)
+            query_results["Results"] = results
+            queries_results.append(query_results)
 
-    return query_results
+    return queries_results
 
 
-def print_processor_result(query_results):
+def print_processor_result(queries_results):
     """ Print the results of processed queries in JSON format """
-    msg = '{\n'
-    msg += f'  "Query": "{query_results["Query"]}",\n'
-    msg += '  "Results": [\n'
-    for result in query_results["Results"]:
-        msg += f'    {{ "ID": "{result["ID"]}", "Score": {result["Score"]} }},\n'
-    # Remove the last comma and newline
-    msg = msg.rstrip(',\n') + '\n}'
-    print(msg)
+
+    for query_results in queries_results:
+        msg = json.dumps(query_results, indent=2)
+        print(msg)
 
 
 def processor(cmd_args):
@@ -162,8 +159,8 @@ def main():
     cmd_args = get_processor_args()
 
     print(10*'\n')
-    query_results = processor(cmd_args)
-    print_processor_result(query_results)
+    queries_results = processor(cmd_args)
+    print_processor_result(queries_results)
 
 
 if __name__ == "__main__":
