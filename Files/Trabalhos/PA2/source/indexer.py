@@ -89,6 +89,7 @@ lower bound, assume your implementation will be tested with `-m 1024`."
 import time  # Time tracking
 import json  # Pretty prints JSON
 import os  # File operations
+
 import nltk  # Natural Language Toolkit for text processing
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -100,11 +101,13 @@ import numpy as np  # Counting repeated terms
 from modules.auxiliar import get_indexer_args, print_json, get_memory_usage
 # paralelism module for thread-safe file operations
 from modules.parallelism import safe_load_json, safe_save_json, parallel_index
+from modules.preprocessing import preprocess_text
 
 FORCE_CREATE = True  # Force creation of index files even if they already exist
 STOP_WORDS = set(stopwords.words('english'))  # Set of stopwords for English
 
 # convert all terms to its id
+# limit amount of threads created to be used later in parallel_index
 
 
 def initialize_nltk_resources():
@@ -192,55 +195,9 @@ def generate_structures(index_path):
 
 def pre_processing(doc):
     """ Pre-process the document (stopword removal and stemming) """
-
-    def tokenize(doc):
-        """ Use NLTK to tokenize the document """
-        # Tokenize the document text
-        doc['text'] = word_tokenize(doc['text'])
-        doc['title'] = word_tokenize(doc['title'])
-        doc['keywords'] = [word_tokenize(keyword)
-                           for keyword in doc['keywords']]
-
-    def remove_stopwords(doc):
-        """ Remove stopwords from the document """
-
-        def remove_stopwords_from_list(word_list):
-            """ Remove stopwords from a list of words """
-            return [word for word in word_list if word.lower() not in STOP_WORDS]
-
-        doc['text'] = remove_stopwords_from_list(doc['text'])
-        doc['title'] = remove_stopwords_from_list(doc['title'])
-        doc['keywords'] = [remove_stopwords_from_list(keywords)
-                           for keywords in doc['keywords']]
-
-        # print(my_stopwords)
-
-    def stem(doc):
-        """ Stem the document using NLTK's english stemmer """
-
-        # Ensure NLTK resources are available
-        nltk.download('punkt', quiet=True)
-
-        stemmer = PorterStemmer()
-
-        def stem_list(word_list):
-            """ Stem a list of words """
-            return [stemmer.stem(word) for word in word_list]
-
-        doc['text'] = stem_list(doc['text'])
-        doc['title'] = stem_list(doc['title'])
-        doc['keywords'] = [stem_list(keywords) for keywords in doc['keywords']]
-
-    # doc = tokenize(doc)
-    tokenize(doc)
-    # print("Tokenized document:")
-    # print(len(doc['text']), len(doc['title']), list(map(len, doc['keywords'])))
-
-    remove_stopwords(doc)
-    # print("Removing stopwords from document:")
-    # print(len(doc['text']), len(doc['title']), list(map(len, doc['keywords'])))
-
-    stem(doc)
+    doc['text'] = preprocess_text(doc['text'])
+    doc['title'] = preprocess_text(doc['title'])
+    doc['keywords'] = [preprocess_text(keyword) for keyword in doc['keywords']]
 
 
 def append_to_structures(doc, index_path):
@@ -362,8 +319,8 @@ def indexer(cmd_args):
 
     generate_structures(cmd_args['index'])
     initialize_nltk_resources()
-    parallel_index(cmd_args, doc_processing, limit=1000, max_threads=32)
-    # parallel_index(cmd_args, doc_processing, limit=None, max_threads=32)
+    # parallel_index(cmd_args, doc_processing, limit=1000, max_threads=32)
+    parallel_index(cmd_args, doc_processing, limit=None, max_threads=32)
 
 
 def main():
