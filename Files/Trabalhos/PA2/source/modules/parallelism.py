@@ -83,3 +83,16 @@ def parallel_index(cmd_args, doc_processing_function, limit, max_threads=8):
                 # print(f"[{i:05d}] ✅ Documento processado.")
             except Exception as e:
                 print(f"[{i:05d}] ❌ Erro: {e}")
+
+
+def new_parallel_index(cmd_args, doc_processing_function, limit, max_threads=8):
+    """ This new version of parallel_index is designed to handle large corpora in a more
+        reasonable way. It divides the corpus into chunks and processes them in parallel,
+        while monitoring memory usage.
+        It will:
+            - Divide the corpus into chunks based on the number of threads.
+            - Process each chunk in a separate thread.
+            - Monitor memory usage and restart threads if they exceed the limit.
+            - A new thread will be created following the last processed document in the
+              previous thread.
+    """
