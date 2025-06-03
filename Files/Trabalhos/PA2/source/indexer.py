@@ -104,12 +104,6 @@ FORCE_CREATE = True  # Force creation of index files even if they already exist
 # limit amount of threads created to be used later in parallel_index
 
 
-def initialize_nltk_resources():
-    """ Ensure NLTK resources are available """
-    nltk.download('punkt', quiet=True)
-    nltk.download('stopwords', quiet=True)
-
-
 def compute_statistics(local_start_time=0.0, index_path="index.json"):
     """ Compute statistics for the indexer """
 
@@ -312,7 +306,6 @@ def indexer(cmd_args):
     """ Main indexer function """
 
     generate_structures(cmd_args['index'])
-    initialize_nltk_resources()
     # parallel_index(cmd_args, doc_processing, limit=1000, max_threads=32)
     parallel_index(cmd_args, doc_processing, limit=None, max_threads=32)
 
