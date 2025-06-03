@@ -89,11 +89,6 @@ lower bound, assume your implementation will be tested with `-m 1024`."
 import time  # Time tracking
 import json  # Pretty prints JSON
 import os  # File operations
-
-import nltk  # Natural Language Toolkit for text processing
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
 import numpy as np  # Counting repeated terms
 
 # My modules
@@ -104,7 +99,6 @@ from modules.parallelism import safe_load_json, safe_save_json, parallel_index
 from modules.preprocessing import preprocess_text
 
 FORCE_CREATE = True  # Force creation of index files even if they already exist
-STOP_WORDS = set(stopwords.words('english'))  # Set of stopwords for English
 
 # convert all terms to its id
 # limit amount of threads created to be used later in parallel_index

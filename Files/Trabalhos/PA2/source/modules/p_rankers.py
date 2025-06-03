@@ -1,4 +1,3 @@
-# from heapq import heappush, heappop, heapify
 """ Module for Processor.py to score queries using ranking models
     - Functions available here:
         - compute_score: computes the score for a document based on the ranking model
@@ -20,8 +19,6 @@
 """
 
 import math
-import numpy as np
-from modules.auxiliar import print_json
 
 
 def compute_score(score_info):
@@ -101,15 +98,15 @@ def compute_score(score_info):
 
             score += tf * idf
 
-            debug = {
-                # 'postings': postings,
-                'term': term,
-                'doc_term_freq': doc_term_freq,
-                'doc_len': doc_len,
-                'tf': tf,
-                'idf': idf,
-                'score': score
-            }
+            # debug = {
+            #     # 'postings': postings,
+            #     'term': term,
+            #     'doc_term_freq': doc_term_freq,
+            #     'doc_len': doc_len,
+            #     'tf': tf,
+            #     'idf': idf,
+            #     'score': score
+            # }
 
             # print_json(debug)
         # print(10 * '==')
@@ -182,7 +179,7 @@ def get_conjunctive_postings(query_postings):
     return conjunctive_postings
 
 
-def run_daat(query, index_files, postings_to_score, ranker):
+def run_daat(index_files, postings_to_score, ranker):
     """ Run the Document-at-a-Time (DAAT) algorithm to score documents
         Args:
             - query: preprocessed query (list of terms)
@@ -269,7 +266,7 @@ def document_at_a_time(query, index_files, ranker):
 
     # print(f"Postings to score: {postings_to_score}")
 
-    scores = run_daat(query, index_files, postings_to_score, ranker)
+    scores = run_daat(index_files, postings_to_score, ranker)
     return scores
 
 
