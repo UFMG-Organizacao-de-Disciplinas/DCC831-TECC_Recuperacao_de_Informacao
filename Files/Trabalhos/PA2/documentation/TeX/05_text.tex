@@ -1,76 +1,114 @@
-% !TEX root = ../clean-sigconf.tex
+% !TEX root = ../JVFD_Doc.tex
 
 % - 5 points for your documentation, assessed based on a short (pdf) report [$^7$][Note_7] describing your implemented data structures and algorithms, their computational complexity, as well as a discussion of their empirical efficiency (e.g. the time elapsed during each step of indexing and query processing, the speedup achieved via parallelization). Your documentation should also include a characterization of your produced inverted index, including (but not limited to) the following statistics: number of documents, number of tokens, number of inverted lists, and a distribution of the number of postings per inverted list. Likewise, you should include a characterization of the results produced for the provided test queries, such as the number of matched documents per query as well as statistics of the score distributions for the two implemented ranking functions (TFIDF and BM25).
 % [Note_7]: https://portalparts.acm.org/hippo/latex_templates/acmart-primary.zip "Your documentation should be no longer than 3 pages and use the ACM LATEX template (sample-sigconf.tex)"
 
 \section{Introduction}
 
-The system consists of two main components implemented in Python 3.13: the \hyperref[subsec:indexer]{\texttt{indexer.py}} for indexing a large corpus of entities from Wikipedia into three index structures (inverted index, document index, and term lexicon) and the \texttt{processor.py} for processing user queries against the indexed data and scoring results using either TFIDF or BM25 ranking functions. The indexing process is designed to handle a large corpus of 4,641,784 documents while adhering to a user-defined memory budget, utilizing parallelization for efficiency.
+The system consists of two main components implemented in Python 3.13: the \hyperref[subsec:indexer]{\texttt{indexer.py}} for indexing a large corpus of entities from Wikipedia into three index structures (inverted index, document index, and term lexicon) and the \hyperref[subsec:processor]{\texttt{processor.py}} for processing user queries against the indexed data and scoring results using either TFIDF or BM25 ranking functions. The indexing process is designed to handle a large corpus of 4,641,784 documents while adhering to a user-defined memory budget, utilizing parallelization for efficiency.
 
 \subsection{Indexer (\texttt{indexer.py})} \label{subsec:indexer}
 
+Processes a JSONL corpus containing 4,641,784 Wikipedia entities. For each document, it creates a thread pool to parallelize the indexing process. Considering the user-defined memory budget, the goal was to keep the least memory usage possible while still being able to index the entire corpus. For that matter, it was decided to always load the previouly created index structures from disk, append the new document to them, and then save them back to disk. The goal was to avoid exploding the memory limit.
+
+The indexer ends up creating three index structures: the inverted index, the document index, and the term lexicon. It's importante to notice that the index structures were created considering only the text content of the documents since it most likely contains the terms present in the title and keywords. Another possible approach would be to merge them all together.
+
+\subsection{Query Processor (\texttt{processor.py})} \label{subsec:processor}
+
+The query processor is designed to handle user queries against the indexed data. It implements a Document-at-a-Time (DAAT) retrieval model, which processes queries by retrieving postings lists for each term in the query and finding common documents that match all terms. The processor supports two ranking functions: TFIDF and BM25, allowing users to choose their preferred method for scoring results. It returns the top-10 results in JSON format, including the processed query, matched document IDs, and their corresponding scores.
+
+No parallelization was implemented in the query processor since it was an optional feature and the query processing time was already low enough to not require it, since it was tested with a small subset of 10,000 documents. The DAAT model was built in such a way that it would only load the postings lists for the terms in the query, which reduces the memory usage and speeds up the query processing time. Also, all the documents that didn't present the terms in the query were filtered out before the scoring step, unless no documents matched the query, in which case all documents were scored. This approach was to ensure the recall of the top-10 results, even if they were not so relevant to the query.
+
+\section{Data Structures} \label{sec:data-structures}
+
+The system uses three main index structures to store the indexed data:
+
 \begin{itemize}
-  \item Processes JSONL corpus with 4,641,784 Wikipedia entities
-  \item Performs stopword removal and Porter stemming
-  \item Builds three index structures:
-        \begin{itemize}
-          \item \texttt{inverted\_index.json}: Term $\rightarrow$ (docID, frequency) mappings
-          \item \texttt{document\_index.json}: Metadata per document (title, text, keywords)
-          \item \texttt{term\_lexicon.json}: Term $\rightarrow$ ID mappings with corpus frequencies
-        \end{itemize}
-  \item Operates within user-specified memory budget using parallelization
+  \item \hyperref[subsec:ii]{\textbf{\texttt{inverted\_index.json}}}: maps each term to a list of postings, where each posting is a list containing the document ID and the term frequency in that document.
+  \item \hyperref[subsec:di]{\textbf{\texttt{document\_index.json}}}: contains metadata for each document, including their tokenized title, text, keywords and number of unique terms.
+  \item \hyperref[subsec:tl]{\textbf{\texttt{term\_lexicon.json}}}: maps each term to a unique ID and includes a histogram of term frequencies across the corpus.
 \end{itemize}
 
-\subsection{Query Processor (\texttt{processor.py})}
-\begin{itemize}
-  \item Processes queries with same preprocessing as documents
-  \item Implements conjunctive Document-at-a-Time (DAAT) retrieval
-  \item Supports both TFIDF and BM25 ranking
-  \item Returns top-10 results in JSON format
-\end{itemize}
+\subsection{Inverted Index} \label{subsec:ii}
 
-\section{Data Structures}
-\begin{table}[htbp]
-  \caption{Index Structures}
-  \label{tab:index-structures}
-  \begin{tabular}{lll}
-    \toprule
-    \textbf{Structure} & \textbf{Format}                                                     & \textbf{Description}            \\
-    \midrule
-    Inverted Index     & \texttt{\{term: [[docID, freq], ...]\}}                             & Postings lists with frequencies \\
-    Document Index     & \texttt{\{docID: \{title: str, text: str, keywords: []\}\}}         & Document metadata               \\
-    Term Lexicon       & \texttt{\{term2id: \{term: id\}, terms\_histogram: \{id: count\}\}} & Term IDs and corpus frequencies \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+Notice that the json conversion converted tuples to lists. This approach seemed later unuseful, since a key-value mapping would be a more direct way of getting the term frequency for a document while scoring in the \hyperref{subsec:processor}{query processor}. So, the postings list were later converted for faster scoring purposes, but they are being converted for each query, which is not the most efficient way of doing it and could be improved in the future.
 
-\section{Algorithms and Complexity}
+Inverted index structure:
 
-\subsection{Indexing Process}
+\begin{verbatim}
+{
+  term_1 (str): [[docID (int), freq (int)], ...],
+}
+\end{verbatim}
+
+\subsection{Document Index} \label{subsec:di}
+
+Although only the text content of the documents was previously indexed, the document index contains all the tokenized information of the documents, including their title, text, and keywords. Each of them is tokenized, stemmed, and had their stopwords removed. Their length were also computed and stored for later use at the scoring step in the \hyperref{subsec:processor}{query processor}, which isn't actually useful since python stores the length of the list as an attribute what certainly is generated when the json content is loaded. Another possible optimization would be to convert all theses therms into their respective term IDs, which could reduce the memory usage.
+
+Document index structure:
+
+\begin{verbatim}
+{
+  docID (str): {
+    "title": {"length": int, "words":[word_1, ...]},
+    "text": {"length": int, "words":[word_1, ...]},
+    "keywords": {"length": int,
+      "words":[[keyword_1, ...], ...]},
+    "unique_terms": {"length": int}
+  }, ...
+}
+\end{verbatim}
+
+\subsection{Term Lexicon} \label{subsec:tl}
+
+The term lexicon is a mapping of each term to a unique ID, which is used to efficiently retrieve postings lists during query processing. It also includes a histogram of term frequencies across the corpus, allowing for quick access to the number of occurrences of each term. For some reason the term ID was stored as a string what was not intended at first but was later kept for consistency.
+
+Term Lexicon structure:
+
+\begin{verbatim}
+{
+"term2id": {term_1 (str): id_1 (str), ... },
+"terms_histogram": {id_1 (str): count_1 (int), ... }
+}
+\end{verbatim}
+
+\section{Algorithms and Complexity} \label{sec:algorithms}
+
+Two main algorithms are implemented in the system: the indexing process and the query processing. Parallelization apart, the overall algorithms are as follows. They both share some common preprocessing steps, such as tokenization, stemming, and stopword removal using the \href{https://www.nltk.org/}{\texttt{nltk}} library that was modularized in the \texttt{auxiliar.py} file. The \href{https://psutil.readthedocs.io/}{\texttt{psutil}} library was used to monitor the memory usage of the process and ensure it stays within the user-defined budget. As for the processor, its core algorithm is based on the Document-At-A-Time (DAAT) and the BM25 and TFIDF ranking functions, those are located at the \texttt{p\_rankers.py} file.
+
+\subsection{Indexing Process} \label{subsec:indexing}
+
 \begin{algorithm}[H]
-  \caption{Parallel Indexing}
+  \caption{Indexing}
   \begin{algorithmic}
-    \STATE Initialize empty index structures
-    \STATE Create ThreadPoolExecutor with max\_threads
+    \STATE Initialize index structures
     \FOR{each document in corpus}
-    \IF{memory usage > budget}
-    \STATE Offload partial indexes to disk
-    \ENDIF
-    \STATE Submit document to thread pool:
-    \begin{enumerate}
-      \item Tokenize, remove stopwords, stem
-      \item Compute term frequencies
-      \item Append to index structures (thread-safe)
-    \end{enumerate}
+    \STATE Loads new line from corpus file as JSON
+    \STATE Tokenize, remove stopwords and stem: document title, text, and keywords
+    \STATE Compute term histogram for all unique terms in the document
+    \STATE \textbf{Compute Term Lexicon:}
+    \STATE \quad Create term ID mapping
+    \STATE \quad Create term frequency histogram
+    \STATE \quad Thread-safe append to term lexicon
+    \STATE \textbf{Compute Inverted Index:}
+    \quad \FOR{each term in the histogram}
+    \STATE \qquad Get term ID from Term Lexicon
+    \STATE \qquad If term not in index, create new entry
+    \STATE \qquad Append posting [docID, term frequency]
+    \STATE \qquad Thread-safe append to inverted index
+    \ENDFOR
+    \STATE \textbf{Compute Document Index:}
+    \STATE \quad Create document entry with ID, title, text, keywords, and unique terms
     \ENDFOR
   \end{algorithmic}
 \end{algorithm}
 
-\textbf{Complexity:}
+\textbf{Indexing complexity:}
+
 \begin{itemize}
-  \item Preprocessing: $O(n)$ per document (n = terms count)
+  \item Preprocessing: $O(t)$ per document ($t$ = terms count)
   \item Index update: $O(1)$ per term with concurrent dictionaries
-  \item Overall: $O(N \times M)$ (N = documents, M = avg terms per doc)
+  \item Overall: $O(d \bar{t})$ ($d$ = |documents|, $\bar{t}$ = avg terms per doc)
 \end{itemize}
 
 \subsection{Query Processing}
