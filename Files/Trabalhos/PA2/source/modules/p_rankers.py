@@ -1,4 +1,24 @@
 # from heapq import heappush, heappop, heapify
+""" Module for Processor.py to score queries using ranking models
+    - Functions available here:
+        - compute_score: computes the score for a document based on the ranking model
+        - get_query_related_postings: retrieves a dict of postings related to the terms in the query
+        - get_conjunctive_postings:
+            - retrieves the conjunctive postings for the query terms
+            - Comments: Should only return the postings for documents that contain all query terms
+              But, for the sake of recall, when no common documents are found,
+              it returns the original query_postings
+        - run_daat: runs the Document-at-a-Time (DAAT) algorithm to score documents
+            - Comments: It does goes through one document at a time, but it does not follows the
+              usual DAAT algorithm.
+        - document_at_a_time: processes one document at a time to retrieve its score
+            - Comments: filters the query postings to only include those documents that contain
+              all query terms
+        - score_query: scores a query using the specified ranker
+            - Comments: Actually quite redundant, since it just calls document_at_a_time, but
+              semantically it makes sense to have it and call score_query instead of a daat one
+"""
+
 import math
 import numpy as np
 from modules.auxiliar import print_json
