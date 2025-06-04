@@ -160,9 +160,9 @@ def main():
     """ PA2 - Query Processor """
     cmd_args = get_processor_args()
 
-    print(10*'\n')
+    # print(10*'\n')
     queries_results = processor(cmd_args)
-    print_processor_result(queries_results)
+    # print_processor_result(queries_results)
 
 
 if __name__ == "__main__":
