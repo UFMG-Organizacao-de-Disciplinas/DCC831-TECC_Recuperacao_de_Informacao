@@ -7,15 +7,15 @@
 
 The system consists of two main components implemented in Python 3.13: the \hyperref[subsec:indexer]{\texttt{indexer.py}} for indexing a large corpus of entities from Wikipedia into three index structures (inverted index, document index, and term lexicon) and the \hyperref[subsec:processor]{\texttt{processor.py}} for processing user queries against the indexed data and scoring results using either TFIDF or BM25 ranking functions. The indexing process is designed to handle a large corpus of 4,641,784 documents while adhering to a user-defined memory budget, utilizing parallelization for efficiency.
 
-\subsection{Indexer (\texttt{indexer.py})} \label{subsec:indexer}
+\subsection{Indexer (\hyperref[subsec:indexing]{\texttt{indexer.py}})} \label{subsec:indexer}
 
 Processes a JSONL corpus containing 4,641,784 Wikipedia entities. For each document, it creates a thread pool to parallelize the indexing process. Considering the user-defined memory budget, the goal was to keep the least memory usage possible while still being able to index the entire corpus. For that matter, it was decided to always load the previouly created index structures from disk, append the new document to them, and then save them back to disk. The goal was to avoid exploding the memory limit.
 
 The indexer ends up creating three index structures: the inverted index, the document index, and the term lexicon. It's importante to notice that the index structures were created considering only the text content of the documents since it most likely contains the terms present in the title and keywords. Another possible approach would be to merge them all together.
 
-\subsection{Query Processor (\texttt{processor.py})} \label{subsec:processor}
+\subsection{Query Processor (\hyperref[subsec:query-processing]{\texttt{processor.py}})} \label{subsec:processor}
 
-The query processor is designed to handle user queries against the indexed data. It implements a Document-at-a-Time (DAAT) retrieval model, which processes queries by retrieving postings lists for each term in the query and finding common documents that match all terms. The processor supports two ranking functions: TFIDF and BM25, allowing users to choose their preferred method for scoring results. It returns the top-10 results in JSON format, including the processed query, matched document IDs, and their corresponding scores.
+The query processor is designed to handle user queries against the indexed data. It implements a Document-at-a-Time (DAAT) retrieval model, which processes queries by retrieving postings lists for each term in the query and finding common documents that match all terms. The processor supports two ranking functions: \hyperref[eq:tfidf]{TFIDF} and \hyperref[eq:bm25]{BM25}, allowing users to choose their preferred method for scoring results. It returns the top-10 results in JSON format, including the processed query, matched document IDs, and their corresponding scores.
 
 No parallelization was implemented in the query processor since it was an optional feature and the query processing time was already low enough to not require it, since it was tested with a small subset of 10,000 documents. The DAAT model was built in such a way that it would only load the postings lists for the terms in the query, which reduces the memory usage and speeds up the query processing time. Also, all the documents that didn't present the terms in the query were filtered out before the scoring step, unless no documents matched the query, in which case all documents were scored. This approach was to ensure the recall of the top-10 results, even if they were not so relevant to the query.
 
@@ -111,7 +111,7 @@ Two main algorithms are implemented in the system: the indexing process and the 
   \item Overall: $O(d \bar{t})$ ($d$ = |documents|, $\bar{t}$ = avg terms per doc)
 \end{itemize}
 
-\subsection{Query Processing}
+\subsection{Query Processing} \label{subsec:query-processing}
 \begin{algorithm}[H]
   \caption{DAAT Query Processing}
   \begin{algorithmic}
@@ -127,8 +127,8 @@ Two main algorithms are implemented in the system: the indexing process and the 
 
 \textbf{Ranking Functions:}
 \begin{itemize}
-  \item \textbf{TFIDF}: $w_{t,d} = \frac{tf_{t,d}}{|d|} \times \log\frac{N}{df_t}$
-  \item \textbf{BM25}: $\sum_{t \in q} \log\frac{N-df_t+0.5}{df_t+0.5} \times \frac{(k_1+1)tf_{t,d}}{tf_{t,d} + k_1(1-b+b\frac{|d|}{avgdl})}$
+  \item $TFIDF(q, d) = \sum_{t \in q} tf_{t,d} \cdot idf_t$ \label{eq:tfidf}
+  \item $BM25(q, d, b=0.75, k1=1.2) = \sum_{t \in q} tf_{t,d} \cdot idf_t$ \label{eq:bm25}
 \end{itemize}
 
 \section{Empirical Evaluation}
@@ -198,6 +198,7 @@ Results for sample queries (BM25 ranking):
   \caption{Score distribution comparison (TFIDF vs BM25)}
   \label{fig:scores}
 \end{figure}
+\subsection{Parallelization Analysis} \label{subsec:parallelization}
 
 \section{Parallelization Analysis}
 Thread scaling tests (10k documents):
