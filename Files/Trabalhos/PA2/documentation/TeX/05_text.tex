@@ -11,7 +11,7 @@ The system consists of two main components implemented in Python 3.13: the \hype
 
 Processes a JSONL corpus containing 4,641,784 Wikipedia entities. For each document, it creates a thread pool to parallelize the indexing process. Considering the user-defined memory budget, the goal was to keep the least memory usage possible while still being able to index the entire corpus. For that matter, it was decided to always load the previouly created index structures from disk, append the new document to them, and then save them back to disk. The goal was to avoid exploding the memory limit.
 
-The indexer ends up creating three index structures: the inverted index, the document index, and the term lexicon. It's importante to notice that the index structures were created considering only the text content of the documents since it most likely contains the terms present in the title and keywords. Another possible approach would be to merge them all together.
+% The indexer ends up creating three index structures: the inverted index, the document index, and the term lexicon. Notice that the index structures were created considering only the text content of the documents since it most likely contains the terms present in the title and keywords. Another possible approach would be to merge them all together.
 
 \subsection{Query Processor (\hyperref[subsec:query-processing]{\texttt{processor.py}})} \label{subsec:processor}
 
@@ -168,14 +168,14 @@ As part of the empirical evaluation, the indexing and query processing were test
 
 \subsection{Indexing Performance}
 
-Even after processing 10k documents distributed into queries, it seems that some kind of overwritting ocurred, since the maximum doc id is 10k but only 1843 entries were found at the document index.
+Even after processing 10k documents distributed into queries, it seems that some kind of overwritting ocurred, since the maximum doc id is 10k but only 1843 entries were found at the document index. The postings were distributed as expected: the terms that are remarkably frequent in the corpus, such as punctuation marks, results in a large number of postings.
 
 \begin{itemize}
   \item All documents: 4,641,784
   \item Number of documents processed: 10,000
   \item Actually stored indexed documents: 1,843
   \item Inverted index terms: 15448
-  \item Lexicon maximum term id: 31101
+  \item Lexicon terms: 31102
   \item Most Frequent Terms: ``,'': 16969; ``.'': 15319, ``('': 7556, ``)'': 7548
 \end{itemize}
 
@@ -183,25 +183,35 @@ Even after processing 10k documents distributed into queries, it seems that some
 
 Results for sample queries against the 10k document subset:
 
-\begin{table}[htbp]
-  \caption{Query Results}
-  \label{tab:query-results}
-  \begin{tabular}{lrrr}
-    \toprule
-    \textbf{Query}           & \shortstack{\textbf{Conj.}       \\\textbf{Matches}} & \textbf{Matches} \\
-    \midrule
-    physics nobel winners    & 0                          & 154 \\
-    christopher nolan movies & 0                          & 23  \\
-    19th female authors      & 0                          & 67  \\
-    german cs universities   & 0                          & 86  \\
-    radiohead albums         & 0                          & 324 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+% \begin{table}[htbp]
+%   \caption{Query Results}
+%   \label{tab:query-results}
+%   \begin{tabular}{lrrr}
+%     \toprule
+%     \textbf{Query}           & \shortstack{\textbf{Conj.}       \\\textbf{Matches}} & \textbf{Matches} \\
+%     \midrule
+%     physics nobel winners    & 0                          & 154 \\
+%     christopher nolan movies & 0                          & 23  \\
+%     19th female authors      & 0                          & 67  \\
+%     german cs universities   & 0                          & 86  \\
+%     radiohead albums         & 0                          & 324 \\
+%     \bottomrule
+%   \end{tabular}
+% \end{table}
+
+\begin{itemize}
+  \item \textbf{physics nobel winners:} \textit{Conj. Matches:} 0, \textit{Matches}: 154, \textit{BM25}: [16.59, 14.41, 13.41, 13.41, 11.11, 11.11, 9.29, 9.08, 8.91, 8.91]; \textit{TFIDF:} [.58, .17, .41, .68, .31, .40, .38, .33, .32, .27]
+  \item \textbf{christopher nolan movies:} \textit{Conj. Matches:} 0, \textit{Matches}: 23, \textit{BM25}: [11.62, 11.12, 9.84, 9.84, 9.18, 8.78, 8.78, 8.78, 8.78, 7.77]; \textit{TFIDF:} [.17, .15, .12, .00, .00, .00, .00, .00, .00, .00]
+  \item \textbf{19th female authors:} \textit{Conj. Matches:} 0, \textit{Matches}: 67, \textit{BM25}: [16.64, 16.64, 10.60, 10.60, 10.18, 10.18, 8.32, 8.32, 8.32, 8.32]; \textit{TFIDF:} [.41, .33, .24, .18, .16, .16, .15, .15, .13, .00]
+  \item \textbf{german cs universities:} \textit{Conj. Matches:} 0, \textit{Matches}: 86, \textit{BM25}: [12.04, 8.88, 8.49, 7.51, 7.51, 7.51, 7.51, 7.51, 7.51, 7.51]; \textit{TFIDF:} [.68, .60, .27, .26, .21, .21, .20, .16, .13, .00]
+  \item \textbf{radiohead albums:} \textit{Conj. Matches:} 0, \textit{Matches}: 324, \textit{BM25}: [3.33, 3.31, 3.31, 3.31, 3.31, 3.30, 3.30, 3.30, 3.30, 3.30]; \textit{TFIDF:} [3.10, 2.89, 2.41, 2.21, 2.01, 1.98, 1.96, 1.61, 1.58, 1.56]
+\end{itemize}
 
 \subsection{Parallelization Analysis} \label{subsec:parallelization}
 
-Thread scaling tests at a corpus size of 1000 documents were conducted to evaluate the impact of parallelization on indexing performance. The \hyperref[tab:threads]{tests} measured total memory usage, time taken, number of lists created, and average list size across different thread counts. The results showed no notable improvements in performance even after parallel processing with 32 threads. The probable cause is the I/O contention due to the disk writes, which limited the benefits of parallelization. Since each thread indexed a document and then wrote it to disk, it was locked to all other threads, which caused a bottleneck. Note that the first entry is the one related to the indexing of the subset of 10k documents, while the others are from the 1000 documents corpus.
+% Thread scaling tests at a corpus size of 1000 documents were conducted to evaluate the impact of parallelization on indexing performance. The \hyperref[tab:threads]{tests} measured total memory usage, time taken, number of lists created, and average list size across different thread counts. The results showed no notable improvements in performance even after parallel processing with 32 threads. The probable cause is the I/O contention due to the disk writes, which limited the benefits of parallelization. Since each thread indexed a document and then wrote it to disk, it was locked to all other threads, which caused a bottleneck.
+
+Thread scaling tests on 1000 documents showed no significant performance gains with parallelization (up to 32 threads). I/O contention from disk writes created a bottleneck, as each thread locked index structures during writes. \textbf{Note:} the \hyperref[tab:threads]{Table 1}'s first row is for 10k documents; others for 1000.
 
 \begin{table}[htbp] \label{tab:threads} \centering
   \caption{Thread Indexing scaling tests}
