@@ -277,6 +277,7 @@ def append_to_structures(doc, index_path):
             'text': {'length': len(doc['text']), 'words': doc['text']},
             'keywords': {'length': len(doc['keywords']), 'words': doc['keywords']},
             'unique_terms': {'length': len(set(doc['text'] + doc['title'] + flat_keywords))},
+            # 'unique_terms': len(doc['terms_histogram']),
         }
 
         # Save the updated document index
