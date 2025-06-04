@@ -298,7 +298,7 @@ def append_to_structures(doc, index_path):
 def doc_processing(corpus_line, index_path, idx):
     """ Process a single document """
 
-    get_memory_usage(index_path, debug=True, idx=idx)
+    get_memory_usage(index_path, debug=DEBUGGING, idx=idx)
     doc = json.loads(corpus_line)
     pre_processing(doc)  # tokenizing, stopword removal and stemming
     append_to_structures(doc, index_path)
@@ -322,7 +322,7 @@ def main():
     cmd_args = get_indexer_args()
     start_time = time.time()  # Start time for statistics
 
-    print(10*'\n')
+    # print(10*'\n')
     indexer(cmd_args)
 
     statistics = compute_statistics(start_time, cmd_args['index'])
