@@ -5,7 +5,7 @@ import os
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from modules.auxiliar import get_memory_usage
+from auxiliar import get_memory_usage
 
 
 # === Locks for Thread Safety ===
