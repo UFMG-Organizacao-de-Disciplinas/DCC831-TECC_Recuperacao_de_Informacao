@@ -33,7 +33,7 @@ The system uses three main index structures to store the indexed data:
 
 Notice that the json conversion converted tuples to lists. This approach seemed later unuseful, since a key-value mapping would be a more direct way of getting the term frequency for a document while scoring in the \hyperref{subsec:processor}{query processor}. So, the postings list were later converted for faster scoring purposes, but they are being converted for each query, which is not the most efficient way of doing it and could be improved in the future.
 
-Inverted index structure:
+\textbf{Inverted index structure:}
 
 \begin{verbatim}
 {
@@ -45,7 +45,7 @@ Inverted index structure:
 
 Although only the text content of the documents was previously indexed, the document index contains all the tokenized information of the documents, including their title, text, and keywords. Each of them is tokenized, stemmed, and had their stopwords removed. Their length were also computed and stored for later use at the scoring step in the \hyperref{subsec:processor}{query processor}, which isn't actually useful since python stores the length of the list as an attribute what certainly is generated when the json content is loaded. Another possible optimization would be to convert all theses therms into their respective term IDs, which could reduce the memory usage.
 
-Document index structure:
+\textbf{Document index structure:}
 
 \begin{verbatim}
 {
@@ -63,7 +63,7 @@ Document index structure:
 
 The term lexicon is a mapping of each term to a unique ID, which is used to efficiently retrieve postings lists during query processing. It also includes a histogram of term frequencies across the corpus, allowing for quick access to the number of occurrences of each term. For some reason the term ID was stored as a string what was not intended at first but was later kept for consistency.
 
-Term Lexicon structure:
+\textbf{Term Lexicon structure:}
 
 \begin{verbatim}
 {
@@ -78,8 +78,10 @@ Two main algorithms are implemented in the system: the indexing process and the 
 
 \subsection{Indexing Process} \label{subsec:indexing}
 
+The indexing process reads the corpus file line by line, tokenizes each document's title, text, and keywords, removes stopwords, stems the terms, and computes a term histogram for each document. It then updates the term lexicon, inverted index, and document index structures in a thread-safe manner while trying to keep the memory usage within the user-defined budget.
+
 \begin{algorithm}[H]
-  \caption{Indexing}
+  \caption{Indexer}
   \begin{algorithmic}
     \STATE Initialize index structures
     \FOR{each document in corpus}
@@ -106,187 +108,124 @@ Two main algorithms are implemented in the system: the indexing process and the 
 \textbf{Indexing complexity:}
 
 \begin{itemize}
-  \item Preprocessing: $O(t)$ per document ($t$ = terms count)
-  \item Index update: $O(1)$ per term with concurrent dictionaries
-  \item Overall: $O(d \bar{t})$ ($d$ = |documents|, $\bar{t}$ = avg terms per doc)
+  \item \textbf{Preprocessing:} $O(t)$ per document ($t$ = terms count)
+  \item \textbf{Index update:} $O(1)$ per term with concurrent dictionaries
+  \item \textbf{Overall:} $O(d \bar{t})$ ($d$ = |documents|, $\bar{t}$ = avg terms per doc)
 \end{itemize}
 
 \subsection{Query Processing} \label{subsec:query-processing}
+
+The query processor retrieves postings lists for each term in the query, performs a conjunctive match to find documents that match all terms, if no documents match, it keeps all postings, and then scores the matching documents using the selected ranking function (TFIDF or BM25). The top-10 results are returned in JSON format.
+
 \begin{algorithm}[H]
-  \caption{DAAT Query Processing}
+  \caption{Query Processor}
   \begin{algorithmic}
+    \STATE Load index structures to memory
+    \FOR{query in \texttt{queries.txt}}
     \STATE Preprocess query (tokenize, stem, remove stopwords)
     \STATE Retrieve postings lists for all query terms
-    \STATE Find common documents (conjunctive match)
-    \FOR{each candidate document}
+    \STATE From query postings select only documents that match all terms (conjunctive match)
+    \IF{no documents match}
+    \STATE Keep all postings
+    \ENDIF
+    \FOR{each DocID in postings}
     \STATE Calculate score using selected ranker (TFIDF/BM25)
     \ENDFOR
-    \STATE Return top-10 scored documents
+    \STATE Append top-10 scored documents for query
+    \ENDFOR
+    \STATE Return queries results
   \end{algorithmic}
 \end{algorithm}
 
+\textbf{Query processing complexity:}
+
+\begin{itemize}
+  \item \textbf{Preprocessing:} $O(q)$ per query ($q$ = query terms count)
+  \item \textbf{Postings retrieval:} $O(q n)$ per term ($n$ = postings list size)
+  \item \textbf{DAAT matching:} $O(m)$ where $m$ = min($|p_1|, |p_2|, ...$) (conjunctive match) and $p_i$ = postings list for term $i$
+  \item \textbf{Scoring:} $O(m)$ per document
+  \item \textbf{Overall:} $O(q + qn + 2m)$
+\end{itemize}
+
 \textbf{Ranking Functions:}
+
 \begin{itemize}
   \item $TFIDF(q, d) = \sum_{t \in q} tf_{t,d} \cdot idf_t$ \label{eq:tfidf}
+        \begin{itemize}
+          \item $tf_{t,d}: \frac{d_t}{|d|}$
+          \item $idf_t = \log{\frac{|Corpus|}{d}}$
+        \end{itemize}
   \item $BM25(q, d, b=0.75, k1=1.2) = \sum_{t \in q} tf_{t,d} \cdot idf_t$ \label{eq:bm25}
+        \begin{itemize}
+          \item $tf_{t,d} = \frac{d_t \cdot (k1+1)}{d_t + k1 \cdot (1-b+b \cdot \frac{|d|}{avgdl})}$
+          \item $idf_t = \log{\frac{|Corpus| - Corpus_{tf} + 0.5}{Corpus_{tf} + 0.5}}$
+        \end{itemize}
 \end{itemize}
 
 \section{Empirical Evaluation}
 
+As part of the empirical evaluation, the indexing and query processing were tested on a subset of 10,000 documents from the full corpus. The tests were meant to evaluate the progression of threading and memory usage during the indexing process.
+
 \subsection{Indexing Performance}
-Indexing results for 10k document subset (1GB memory limit):
 
-\begin{table}[htbp]
-  \caption{Indexing Statistics}
-  \label{tab:index-stats}
-  \begin{tabular}{lcc}
-    \toprule
-    \textbf{Metric}   & \textbf{Value}   \\
-    \midrule
-    Index Size        & 148 MB           \\
-    Elapsed Time      & 325 seconds      \\
-    Number of Lists   & 42,817           \\
-    Average List Size & 8.3              \\
-    Throughput        & 30.7 docs/second \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+Even after processing 10k documents distributed into queries, it seems that some kind of overwritting ocurred, since the maximum doc id is 10k but only 1843 entries were found at the document index.
 
-\begin{figure}[htbp]
-  \centering
-  % \includegraphics[width=0.8\columnwidth]{memory_usage.png}
-  \caption{Memory usage during indexing (1GB limit)}
-  \label{fig:memory}
-\end{figure}
-
-\subsection{Index Characteristics}
-Full corpus index statistics:
 \begin{itemize}
-  \item Documents: 4,641,784
-  \item Unique terms: 2,843,192
-  \item Inverted lists: 2,843,192
-  \item Postings distribution:
-        \begin{itemize}
-          \item 75\% of lists have $\leq$ 15 postings
-          \item Top 1\% cover 25\% of total postings
-          \item Longest list: "unit" (189,452 postings)
-        \end{itemize}
+  \item All documents: 4,641,784
+  \item Number of documents processed: 10,000
+  \item Actually stored indexed documents: 1,843
+  \item Inverted index terms: 15448
+  \item Lexicon maximum term id: 31101
+  \item Most Frequent Terms: ``,'': 16969; ``.'': 15319, ``('': 7556, ``)'': 7548
 \end{itemize}
 
 \subsection{Query Processing}
-Results for sample queries (BM25 ranking):
+
+Results for sample queries against the 10k document subset:
 
 \begin{table}[htbp]
   \caption{Query Results}
   \label{tab:query-results}
-  \begin{tabular}{lcc}
+  \begin{tabular}{lrrr}
     \toprule
-    \textbf{Query}           & \textbf{Matches} & \textbf{Top Score} \\
+    \textbf{Query}           & \shortstack{\textbf{Conj.}       \\\textbf{Matches}} & \textbf{Matches} \\
     \midrule
-    physics nobel winners    & 7,412            & 24.8               \\
-    christopher nolan movies & 183              & 32.6               \\
-    19th female authors      & 9,847            & 18.2               \\
-    german cs universities   & 672              & 27.4               \\
-    radiohead albums         & 94               & 41.3               \\
+    physics nobel winners    & 0                          & 154 \\
+    christopher nolan movies & 0                          & 23  \\
+    19th female authors      & 0                          & 67  \\
+    german cs universities   & 0                          & 86  \\
+    radiohead albums         & 0                          & 324 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
-  \centering
-  % \includegraphics[width=0.8\columnwidth]{score_distribution.png}
-  \caption{Score distribution comparison (TFIDF vs BM25)}
-  \label{fig:scores}
-\end{figure}
 \subsection{Parallelization Analysis} \label{subsec:parallelization}
 
-\section{Parallelization Analysis}
-Thread scaling tests (10k documents):
+Thread scaling tests at a corpus size of 1000 documents were conducted to evaluate the impact of parallelization on indexing performance. The \hyperref[tab:threads]{tests} measured total memory usage, time taken, number of lists created, and average list size across different thread counts. The results showed no notable improvements in performance even after parallel processing with 32 threads. The probable cause is the I/O contention due to the disk writes, which limited the benefits of parallelization. Since each thread indexed a document and then wrote it to disk, it was locked to all other threads, which caused a bottleneck. Note that the first entry is the one related to the indexing of the subset of 10k documents, while the others are from the 1000 documents corpus.
 
-\begin{table}[htbp]
-  \caption{Parallelization Speedup}
-  \label{tab:speedup}
-  \begin{tabular}{ccc}
+\begin{table}[htbp] \label{tab:threads} \centering
+  \caption{Thread Indexing scaling tests}
+  \begin{tabular}{rrrrrr}
     \toprule
-    \textbf{Threads} & \textbf{Time (s)} & \textbf{Speedup} \\
+    \textbf{Threads} & \textbf{Total Memory} & \textbf{Time} & \textbf{Lists} & \textbf{Avg Size} \\
     \midrule
-    1                & 623               & 1.00$\times$     \\
-    4                & 189               & 3.30$\times$     \\
-    8                & 132               & 4.72$\times$     \\
-    16               & 125               & 4.98$\times$     \\
-    32               & 128               & 4.87$\times$     \\
+    32               & 335.31 MB             & 3936 s        & 15448          & 4.8               \\ %10k Corpus
+    32               & 190.87 MB             & 48 s          & 3311           & 2.7               \\
+    16               & 184.58 MB             & 49 s          & 4571           & 2.8               \\
+    16               & X                     & 54 s          & 4982           & 2.9               \\
+    8                & X                     & 65 s          & 6200           & 3.2               \\
+    1                & 184.80 MB             & 42 s          & 3801           & 2.8               \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Optimal thread count: 8-16 (diminishing returns beyond due to I/O contention)
-
-\section{Conclusion}
-The implemented system efficiently indexes large corpora within strict memory constraints using:
-\begin{itemize}
-  \item Thread-based parallelization with optimal 8-16 threads
-  \item Memory monitoring with psutil for budget compliance
-  \item Efficient DAAT query processing with BM25/TFIDF
-\end{itemize}
-
-Future work could include index compression and more advanced ranking features.
-
-\subsection{Empirical Efficiency}
-
-After tweaking a lot with the threads, some notable improvements were made. The \autoref{performance} below shows the performance of the crawler in terms of time taken to crawl a certain number of URLs, as well as the expected time for crawling 100k URLs based on the mean time per URL.
-
-\begin{table}[!ht] \centering
-  \caption{Crawling performance} \label{performance}
-  \begin{tabular}{rrrrrrl}
-    % \textbf{Threads} & \textbf{Scraped} & \textbf{Frontier} & \textbf{Time} & \textbf{Time/URL} & \textbf{Expected Conclusion Duration} & \textbf{Description}                                     \\
-    \textbf{(1)} & \textbf{(2)} & \textbf{(3)} & \textbf{(4)} & \textbf{(5)} & \textbf{(6)}      & \textbf{(7)}             \\
-    % 1            & 100          & 1447         & 60.94        & 0,61         & 16:56:40          &                          \\
-    % 1            & 1000         & 3000         & 859.00       & 0,86         & 23:53:20          &                          \\
-    % 1            & 1000         & 3000         & 859.00       & 0,86         & 23:53:20          &                          \\
-    1            & 1647         & 5767         & 1904.00      & 1,16         & 32:13:20          &                          \\
-    8            & 100          & 1590         & 25.00        & 0,25         & 06:56:40          &                          \\
-    10           & 1002         & 3268         & 584.00       & 0,58         & 16:06:40          & Thread Pool              \\
-    % 16           & 100          & 1191         & 14.00        & 0,14         & 03:53:20          &                          \\
-    % 32           & 100          & 1009         & 10.00        & 0,10         & 02:46:40          &                          \\
-    40           & 537          & 1204         & 47.35        & 0,09         & 02:30:00          & Thread Pool (Fixed)      \\
-    40           & 539          & 598          & 58.98        & 0,11         & 03:03:20          & No WARC Batch            \\
-    % \textbf{40}  & 100          & 417          & 5.95         & 0,06         & \textbf{01:40:00} &                          \\
-    % 48           & 100          & 693          & 16.81        & 0,17         & 04:43:20          & Domain only              \\
-    % \textbf{48}  & 100          & 417          & 5.68         & 0,06         & \textbf{01:40:00} &                          \\
-    \textbf{50}  & 100          & 558          & 6.26         & 0,06         & \textbf{01:40:00} &                          \\
-    % 50           & 100          & 502          & 7.03         & 0,07         & 01:56:40          &                          \\
-    50           & 100          & 848          & 12.97        & 0,13         & 03:36:40          & Domain only              \\
-    50           & 1048         & 3189         & 82.60        & 0,08         & 02:13:20          & Thread Pool              \\
-    50           & 502          & 2048         & 109.63       & 0,22         & 06:06:40          & Thread Pool: broken warc \\
-    50           & 502          & 2092         & 187.36       & 0,37         & 10:16:40          & Thread Pool: batch 100   \\
-    % 50           & 517          & 1948         & 34.66        & 0,07         & 01:56:40          & No WARC Batch            \\
-    % 50           & 520          & 1827         & 47.69        & 0,09         & 02:30:00          & No WARC Batch            \\
-    % 50           & 527          & 1810         & 41.63        & 0,08         & 02:13:20          & No WARC Batch            \\
-    50           & 534          & 2563         & 44.40        & 0,08         & 02:13:20          & No WARC Batch.gz         \\
-    50           & 538          & 2079         & 37.76        & 0,07         & 01:56:40          & Thread Pool              \\
-    % 56           & 100          & 824          & 7.41         & 0,07         & 01:56:40          &                          \\
-    % \textbf{60}  & 543          & 1332         & 31.13        & 0,06         & \textbf{01:40:00} & Thread Pool              \\
-    \textbf{60}  & 559          & 2252         & 32.63        & 0,06         & \textbf{01:40:00} & Thread Pool              \\
-    60           & 1200         & 2113         & 82.67        & 0,07         & 01:56:40          & Converted to py          \\
-    % 64           & 100          & 613          & 7.86         & 0,08         & 02:13:20          &                          \\
-    70           & 547          & 1721         & 51.55        & 0,09         & 02:30:00          & Thread Pool: Worsened    \\
-  \end{tabular}
-\end{table}
-
-\begin{enumerate}
-  \item Number of threads used in the crawling process
-  \item Number of URLs crawled
-  \item Number of URLs in the frontier
-  \item Time taken to crawl the URLs (in seconds)
-  \item Time taken per URL (in seconds)
-  \item Expected time to crawl 100,000 URLs (in hours:minutes:seconds)
-  \item Description of the crawling process
-\end{enumerate}
-
-
 \section{Conclusion}
 
+The implemented system could potentially index large corpora but isn't ideally parallelized due to the I/O contention caused by disk writes. The memory usage was monitored and as an attempt to keep it lower as possible, the index structures were always loaded from disk, updated with the new document, and then saved back to disk. Which indeed kept the memory usage low, but also caused a bottleneck in the indexing process, which proved highly inefficient.
 
+Due to the small number of documents indexed, the conjunctive matching in the query processor was compromised, since no documents matched all the stemmed terms in the queries. However, the processor was able to retrieve documents that matched at least one term in the query in order to be able to score them and return the top-10 results.
+
+% Future work could include index compression and more advanced ranking features.
 
 % ACM's consolidated article template, introduced in 2017, provides a consistent \LaTeX\ style for use across ACM publications, and incorporates accessibility and metadata-extraction functionality necessary for future Digital Library endeavors. Numerous ACM and SIG-specific \LaTeX\ templates have been examined, and their unique features incorporated into this single new template.
 
