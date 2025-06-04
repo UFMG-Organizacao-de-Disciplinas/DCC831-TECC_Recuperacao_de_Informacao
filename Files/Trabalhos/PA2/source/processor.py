@@ -64,6 +64,8 @@ query processing across multiple threads**. You may experiment to find an optima
 to maximize your throughput while minimizing the incurred parallelization overhead.
 """
 
+# Google Drive Link: https://drive.google.com/drive/folders/1MM1WF0Wi-q4CA8zgl6-J2r0md64yfaWK
+
 import json
 
 from modules.auxiliar import get_processor_args
