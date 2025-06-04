@@ -159,15 +159,21 @@ def get_conjunctive_postings(query_postings):
     first_term = next(iter(query_postings))
     common_docs = set(query_postings[first_term].keys())
 
+    # print(f"First term: {first_term} with {len(common_docs)} documents.")
     # conjunctively intersect the postings of the other terms
+    non_conjunctive_doc_ids = common_docs.copy()
     for term in query_postings:
         if term != first_term:
             doc_ids = set(query_postings[term].keys())
             common_docs &= doc_ids
+            non_conjunctive_doc_ids.update(doc_ids)
 
     if not common_docs:
         # print('No common documents found for the query terms.')
+        # print(
+        #     f'using the original {len(non_conjunctive_doc_ids)} query postings instead.')
         return query_postings
+    # print(f"Found {len(common_docs)} common documents for the query terms.")
 
     conjunctive_postings = {term: {} for term in query_postings}
 
@@ -187,7 +193,8 @@ def run_daat(index_files, postings_to_score, ranker):
                 - inverted_index: dictionary with terms as keys and postings as values
                     - postings: list of lists [[doc_id, tf], ...]
                 - document_index: dictionary with document IDs and their metadata
-                    - id: {text: term list, title: term list, keywords: term list, unique_terms: length: int}
+                    - id: {text: term list, title: term list, keywords: term list,
+                      unique_terms: length: int}
                 - lexicon: dictionary with terms and their metadata
                     - term_hist: dictionary with term frequencies in the corpus
                     - term2id: dictionary mapping terms to their IDs

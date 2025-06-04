@@ -130,11 +130,10 @@ def monothread_query_process(parallel_load):
 def print_processor_result(queries_results):
     """ Print the results of processed queries in JSON format """
 
-    for query_results in queries_results:
-        msg = json.dumps(query_results, indent=2)
-        # print(query_results)
-        # print()
-        print(msg)
+    msg = json.dumps(queries_results, indent=2)
+    # print(query_results)
+    # print()
+    print(msg)
 
 
 def processor(cmd_args):
@@ -162,7 +161,7 @@ def main():
 
     # print(10*'\n')
     queries_results = processor(cmd_args)
-    # print_processor_result(queries_results)
+    print_processor_result(queries_results)
 
 
 if __name__ == "__main__":
