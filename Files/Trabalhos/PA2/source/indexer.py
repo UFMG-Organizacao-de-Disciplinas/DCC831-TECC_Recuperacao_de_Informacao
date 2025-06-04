@@ -293,11 +293,11 @@ def append_to_structures(doc, index_path):
     append_to_document_index(doc, index_path)
 
 
-def doc_processing(doc, index_path, idx):
+def doc_processing(corpus_line, index_path, idx):
     """ Process a single document """
 
     get_memory_usage(index_path, debug=True, idx=idx)
-    doc = json.loads(doc)
+    doc = json.loads(corpus_line)
     pre_processing(doc)  # tokenizing, stopword removal and stemming
     append_to_structures(doc, index_path)
 
