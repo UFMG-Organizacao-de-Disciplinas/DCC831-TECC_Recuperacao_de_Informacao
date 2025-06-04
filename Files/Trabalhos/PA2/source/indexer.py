@@ -99,6 +99,7 @@ from modules.parallelism import safe_load_json, safe_save_json, parallel_index
 from modules.preprocessing import preprocess_text
 
 FORCE_CREATE = True  # Force creation of index files even if they already exist
+DEBUGGING = False  # Debugging mode, prints additional information
 
 # convert all terms to its id
 # limit amount of threads created to be used later in parallel_index
@@ -228,7 +229,7 @@ def append_to_structures(doc, index_path):
             #     term_id, 0)
             term_lexicon[term_hist][term_id] += int(count)
 
-            if term_id in [2, 3, 4, 5]:
+            if term_id in [2, 3, 4, 5] and DEBUGGING:
                 print(20*' = ')
                 print(f"Term: {term}, ID: {term_id}, Count: {count}")
                 print(term_lexicon[term_hist].get(term_id, 0))
