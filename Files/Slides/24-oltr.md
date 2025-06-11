@@ -4,7 +4,7 @@
 
 - [Image: Diagram showing query q processed by function f(q,d) to output document d]
 
-## Learning to rank
+### Learning to rank
 
 - [Image: Diagram showing query q processed by function f(x) to output document d]
 
@@ -16,24 +16,30 @@
   - Effective models learned from data
   - Aka machine-learned ranking
 
-## Discriminative learning framework
+#### Discriminative learning framework
 
 - [Image: Training workflow diagram with queries q1-q3 for training, learning function f(·), validation/test on queries q4-qk]
 
-## Drawbacks
+  - Training: Queries $q_1, q_2$ com rótulos $y$
+  - Validation: Query $q_3$ com rótulo $y$
+  - $Validation \to Learning \to f(·) \to Scoring \to Test$
+  - Test: Queries $x$, rótulos $\hat{y} = f(x)$, onde $x$ são as queries $q_4, q_5, ..., q_k$
+
+##### Drawbacks
 
 - Scalability
   - Relevance labels are costly
   - More so if expert labels are needed
 - Realism
   - Hired judges aren't real users
+    - [JV] Eles estão em um contexto diferente dos usuários reais.
   - Real users' preferences are contextualized
 
 ---
 
-[Image: NIST credit logo]
+[Image: Idosos usando computador (representando rotuladores humanos)]
 
-## Contextualized preferences
+###### Contextualized preferences
 
 - Context has a significant influence on search behavior
   - Addressing all possible settings individually through supervised learning is not feasible
@@ -51,19 +57,37 @@
 
 ---
 
-[Image: Diagram of search engine ranking interacting with user assessments and feedback]
+```mermaid
+graph TD
+  A[Search Engine]
+  B[User]
+  C[Assessment]
+
+  A -->|Ranking| B
+  B --- C
+  C -->|Query/Feedback| A
+```
 
 ## Reinforcement learning
 
-- [Image: Reinforcement learning loop: state s_t → agent (action a_t) → environment (reward r_t) → state s_{t+1}]
+```mermaid
+graph TD
+  A[Search Engine (agent)]
+  B[User (environment)]
+  C[Assessment (reward $r_t$)]
+
+  A -->|Ranking (action $a_t$)| B
+  B --- C
+  C -->|Query/Feedback (state $s_t$)| A
+```
 
 ---
 
 - At each discrete time step $t$
-  - Agent observes state $S*t$
+  - Agent observes state $S_t$
   - Agent selects action $a_t$
   - Environment provides reward $r_t$
-  - Environment moves to a new state $S\*{t+1} $
+  - Environment moves to a new state $S\_{t+1} $
 - Goal is to maximize cumulated reward as $t \to \infty $
 
 ---
@@ -82,7 +106,7 @@
 ## Reinforcement learning for ranking
 
 - Online learning to rank as a bandit problem
-  - State ($ s_t $) does not depend on past actions
+  - State ($s_t$) does not depend on past actions
 - Multi-armed bandits (MAB)
   - State is not provided
 
@@ -93,7 +117,7 @@
 ---
 
 - Online learning to rank as a bandit problem
-  - State ($ s_t $) does not depend on past actions
+  - State ($s_t$) does not depend on past actions
 - Multi-armed bandits (MAB)
   - State is not provided
 - Contextual bandits
@@ -104,28 +128,27 @@
 - No state (e.g., query or user profile) is provided
   - Fits well with non-personalized recommendation
 - Example: homepage news recommendation
-  - New user arrives, recommender returns a news story ($ a_t $) to show  
-◦ Observes whether user clicks ($ r_t $)
+  - New user arrives, recommender returns a news story ($a_t$) to show, observes whether user clicks ($r_t$)
   - Goal: maximize clicks in a given period
 
-## Example: ε-greedy
+### Example: $\epsilon$-greedy
 
 - Simple strategy
   - Explore with probability $\epsilon \in [0,1]$
-  - Exploit with probability $1 - \epsilon $
+  - Exploit with probability $1 - \epsilon$
 - Often works well in practice
   - With hyperparameter $\epsilon$ suitably tuned
 
-## Example: UCB
+### Example: UCB
 
 - True reward distribution of an action is unknown
-  - We can only observe samples $r $of it
+  - We can only observe samples $r$ of it
   - Each observed sample increases our confidence
 - Idea: explore actions with large confidence bounds
-  - Try the action $a_x$ that maximizes $\bar{r}\_x + \sqrt{(2 \ln n)/n_x}$
-    for an average reward $\bar{r}\_x$ after $n_x$ observations
+  - Try the action $a_x$ that maximizes $\bar{r_x} + \sqrt{(2 \ln n)/n_x}$
+    for an average reward $\bar{r_x}$ after $n_x$ observations
 
-## Contextual bandits
+### Contextual bandits
 
 - State (context) does not depend on past actions
   - Fits well with independent user searches
@@ -137,18 +160,18 @@
 
 ---
 
-- k-armed contextual bandits
-  - Find the best among $k$ ranking models  
+- $k$-armed contextual bandits
+  - Find the best among $k$ ranking models
     (e.g., $k - 1$ candidate models vs. current best model)
 - Continuous-armed contextual bandits
-  - Find the best among infinite ranking models  
+  - Find the best among infinite ranking models
     (i.e., feature-based ranking models)
 
 ## How to infer ranking quality implicitly?
 
-- Problem: Rewards aren't directly measurable
+- **Problem:** Rewards aren't directly measurable
 
-## Absolute metrics
+### Absolute metrics
 
 - Document-level
   - Click rate, click models
@@ -157,7 +180,7 @@
 - Session-level
   - Queries per session, session length, time to first click
 
-## Relative metrics
+### Relative metrics
 
 - Absolute document-level metrics are biased
   - Position bias: top ranked document favored
@@ -166,7 +189,7 @@
   - Click-skip, fair pairs
 - Better: relative ranking-level metrics!
 
-## Interleaved comparisons [Joachims, KDD 2002]
+#### Interleaved comparisons [Joachims, KDD 2002]
 
 - Blend results from both conditions into a single ranking
 - [Image: Diagram showing ranking A vs. B blended into AB]
@@ -182,13 +205,16 @@
   - e.g., B wins over A
 - [Image: Diagram showing credit assignment to ranking B]
 
-## Dueling bandit gradient descent (DBGD) [Yue et al., ICML 2009]
+#### Dueling bandit gradient descent (DBGD) [Yue et al., ICML 2009]
 
 - [Image: Diagram comparing two rankings with different document orders]
+  - Gráfico $\mathbb{R}^3: PageRank \times BM25 \times #Clicks$
+  - Um vetor vai a um ponto no XY com altura 1, e outro vetor vai a um outro ponto no XY com altura 2 a uma distância do primeiro ponto.
+- [Image: Distribuição dos itens nos dois rankings que são mesclados]
 
 ---
 
-- [Image: Diagram showing ranking exploration with gradient descent]
+- [Image: Mesma imagem que antes com as colunas, mas sem as colunas]
 
 ---
 
@@ -211,7 +237,7 @@
 ---
 
 - DBGD explores one direction at a time
-- Exploring multiple directions could improve efficiency
+  - Exploring multiple directions could improve efficiency
 - Interleaving requires pairwise comparisons
   - Quadratic on the number of candidate models
 - Multileaving to the rescue
@@ -223,30 +249,30 @@
 
 ---
 
-- Winner takes all (MGD-W)
+- **Winner takes all (MGD-W)**
   - Randomly choose one of the winning models
-- Mean winner (MGD-M)
+- **Mean winner (MGD-M)**
   - Use the average of the winning models
-- [Image: PageRank diagram]
+- [Image: PageRank X BM25]
 
 ---
 
 - **ALGORITHM 10:** Multileave Gradient Descent (MGD)
 - **Require:** $n, \alpha, \delta, w^0_t, update(w, \alpha, \{b\}, \{u\})$
-  - **for** $t \to 1...\infty$ **do**
-    - $q_t \to receive\_query(t)$ `// obtain a query from a user`
-    - $l_0 \to generate\_list(w^0_t, q_t)$ `// ranking of current best`
-    - **for** $i \to 1...n$ **do**
-      - $u^i_t \to sample\_unit\_vector()$
-      - $w^i_t \to w^0_t + \delta u^i_t$ `// create a candidate ranker`
-      - $l^i_t \to generate\_list(w^i_t, q_t)$ `// exploratory ranking`
-    - $m_t, t_t \to TDM\_multileave(l_t)$ `// multileaving and teams`
-    - $c_t \to receive\_clicks(m_t)$ `// show multileaving to the user`
-    - $b_t \to TDM\_infer(t_t, c_t)$ `// set of winning candidates`
+  - **for** $t \gets 1..\infty$ **do**
+    - $q_t \gets receive\_query(t)$ `// obtain a query from a user`
+    - $l_0 \gets generate\_list(w^0_t, q_t)$ `// ranking of current best`
+    - **for** $i \gets 1...n$ **do**
+      - $u^i_t \gets sample\_unit\_vecgetsr()$
+      - $w^i_t \gets w^0_t + \delta u^i_t$ `// create a candidate ranker`
+      - $l^i_t \gets generate\_list(w^i_t, q_t)$ `// exploratory ranking`
+    - $m_t, t_t \gets TDM\_multileave(l_t)$ `// multileaving and teams`
+    - $c_t \gets receive\_clicks(m_t)$ `// show multileaving to the user`
+    - $b_t \gets TDM\_infer(t_t, c_t)$ `// set of winning candidates`
   - **if** $w^0_t \in b_t$ **then**
-    - $w^0_{t+1} \to w^0_t$ `// no update if current best wins`
+    - $w^0_{t+1} \gets w^0_t$ `// if current best among winners, no update`
   - **else**
-    - $w^0_{t+1} \to update(w^0_t, \alpha, b_t, u_t)$ `// Algorithm 11 or 12`
+    - $w^0_{t+1} \gets update(w^0_t, \alpha, b_t, u_t)$ `// Algorithm 11 or 12`
 
 ## Summary
 
@@ -269,15 +295,15 @@
 ## References
 
 - Fast and reliable online learning to rank for information retrieval
-  - [Hofmann, PhD thesis 2013](https://khofm.wordpress.com/wp-content/uploads/2013/04/thesis-katja-hofmann-online-learning.pdf)
+  [Hofmann, PhD thesis 2013](https://khofm.wordpress.com/wp-content/uploads/2013/04/thesis-katja-hofmann-online-learning.pdf)
 - Search engines that learn from their users
-  - [Schuth, PhD thesis 2016](https://anneschuth.nl/thesis/)
+  [Schuth, PhD thesis 2016](https://anneschuth.nl/thesis/)
 
 ---
 
 - Online learning to rank for information retrieval
-  - [Grotov and de Rijke, SIGIR 2016](https://doi.org/10.1145/2911451.2914798)
+  [Grotov and de Rijke, SIGIR 2016](https://doi.org/10.1145/2911451.2914798)
 - Interactively optimizing information retrieval systems as a dueling bandits problem
-  - [Yue and Joachims, ICML 2009](https://doi.org/10.1145/1553374.1553527)
+  [Yue and Joachims, ICML 2009](https://doi.org/10.1145/1553374.1553527)
 
 ## Coming next... Seminars
