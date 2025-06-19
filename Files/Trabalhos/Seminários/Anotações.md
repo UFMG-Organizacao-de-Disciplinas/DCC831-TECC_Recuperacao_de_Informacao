@@ -98,6 +98,8 @@ Giovana Machado / Clara Fonseca / Jorge Silva / Vitor Vital
 
 Helio Santos / Henrique Medeiros / João Dias
 
+- [URL](https://docs.google.com/presentation/d/1ORS5Qs6XZHlyaRgTJ3h7ISBFOcLFtE1aKVwc62KHd6o)
+
 ### Towards a Search Engine for Machines: Unified Ranking for Multiple Retrieval-Augmented Large Language Models [(SIGIR 2024)](https://dl.acm.org/doi/pdf/10.1145/3626772.3657733)
 
 Arthur Linhares / Francisco Teixeira / Lorenzo Carneiro / Philipe Dutra
