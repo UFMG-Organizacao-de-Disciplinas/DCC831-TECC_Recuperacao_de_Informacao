@@ -1,4 +1,4 @@
-# Information Retrieval Online Learning to Rank
+# Aula 22 - 04/06/2025 - Online Learning to Rank
 
 ## The ranking problem
 

@@ -1,4 +1,4 @@
-# Slide 23 - Information Retrieval Online Evaluation
+# Aula 21 - 02/06/2025 - Online Evaluation
 
 ## Ranking evaluation
 

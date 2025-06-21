@@ -1,8 +1,8 @@
-# Learning to Rank: Pairwise and Listwise
+# Aula 18 - 21/05/2025 - Learning to Rank: Algorithms; Learning to Rank: Pairwise and Listwise
 
 - [JV]
-	- São áreas atívas há décadas
-	- Ele vai liberar a próxima atividade na quarta feira
+  - São áreas atívas há décadas
+  - Ele vai liberar a próxima atividade na quarta feira
 
 ## The Ranking Problem
 
@@ -13,7 +13,6 @@
 - [Mermaid]
 - f(x)
 - [JV] Aprendizado supervisionado
-
 
 ## Learning to Rank
 
@@ -42,7 +41,7 @@
 
 - Pelo que entendi, basicamente tá definindo uma ranqueamento por "O primeiro é melhor que o segundo? Sim ou não."
 
-#### RankNet (Burges et al., ICML 2005)
+### RankNet (Burges et al., ICML 2005)
 
 - Na entrada são as features de um único documento por vez. Porém essa função é aplicada paralelamente para os documentos $x_u$ e $x_v$
 
@@ -51,12 +50,12 @@
 - $Equação$
 - Os outputs da rede neural são números reais
 - Cross Entropy Loss (Entropia Cruzada)
-	- Busca minimizar a entropia da rede.
-	- Consideremos o label como "1" para $x_u > x_v$ verdadeiro.
-	- Na prática, só uma das parcelas da equação vai ser ativada e calculada, porque o $y$ só será 1 ou 0.
-	- Se acerta, não penaliza nada.
-	- Analisar para $\{0, 1\}^2$
-	- Quando erra, o log de algo próximo a 0 tende a infinito.
+  - Busca minimizar a entropia da rede.
+  - Consideremos o label como "1" para $x_u > x_v$ verdadeiro.
+  - Na prática, só uma das parcelas da equação vai ser ativada e calculada, porque o $y$ só será 1 ou 0.
+  - Se acerta, não penaliza nada.
+  - Analisar para $\{0, 1\}^2$
+  - Quando erra, o log de algo próximo a 0 tende a infinito.
 - A ideia é que use-se o par para treinar a função pairwise, que será o resultado final: uma função de ranqueamento.
 
 #### Ranking SVM (Herbrich et al., ALMC 2000; Joachims, KDD 2002)
@@ -147,7 +146,7 @@ o f(B)/f(B) daria 1, por isso tá omitida.
 
 Em teoria da informação, pode-se comparar a divergência entre distribuições
 
-##### Divergence between...
+##### Divergence between
 
 ##### KL Divergence Loss
 
@@ -172,4 +171,4 @@ PA3: usaremos ferramentas prontas e teremos uma competição no Kaggle
 
 ## Coming Next: Neural Models
 
-- 
+-

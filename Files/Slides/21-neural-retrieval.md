@@ -1,4 +1,6 @@
-# Pretrained Transformers for Text Ranking: BERT and Beyond
+# Aula 20 - 28/05/2025 - Neural Models: Retrieval
+
+Pretrained Transformers for Text Ranking: BERT and Beyond
 
 - Andrew Yates, Rodrigo Nogueira, and Jimmy Lin
 - @andrewyates @rodrigfnogueira @lintool

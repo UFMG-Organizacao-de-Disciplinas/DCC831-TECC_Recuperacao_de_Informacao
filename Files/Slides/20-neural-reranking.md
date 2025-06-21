@@ -1,4 +1,4 @@
-# 20-neural-reranking.md
+# Aula 19 - 26/05/2025 - Neural Models: Reranking
 
 ## Pretrained Transformers for Text Ranking: BERT and Beyond
 

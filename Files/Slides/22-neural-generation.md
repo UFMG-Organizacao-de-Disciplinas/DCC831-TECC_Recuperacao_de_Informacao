@@ -188,7 +188,7 @@
 - Key idea: conduct fine-grained relevance matching between a query and a small set of candidate documents
 - Effectiveness: Heterogeneous ranking components are usually difficult to be optimized in an end-to-end way towards the global objective
 
-## Index-Retrieval-Ranking: Disadvantages
+---
 
 - MS MARCO 300K
 - Big storage: GTR (Dense retrieval) - Memory size 1430MB
@@ -260,13 +260,13 @@
 - Generative retrieval (GR) aims to directly generate the identifiers of information resources (e.g., docids) that are relevant to an information need (e.g., an input query) in an autoregressive fashion
 - "Transformer Memory as a Differentiable Search Index". Tay et al. [2022]; "Autoregressive Entity Retrieval". De Cao et al. [2021]
 
-## Autoregressive formulation
+## Autoregressive formulation (2)
 
 - $P(x_n|x_1, x_2, \ldots, x_{n-1})$
 - Output: x₁, x₂, ⋯, xₙ₋₁, xₙ
 - Input: [bos]
 
-## Two basic operations in GR
+## Two basic operations in GR (2)
 
 - Indexing: To **memorize information about each document**, a GR model should learn to associate the content of each document with its corresponding docid
 - Retrieval: Given an input query, a GR model should **return a ranked list of candidate docids** by autoregressively generating the docid string
@@ -279,7 +279,7 @@
 - Product quantization strings (Zhou et al. 2022)
 - Semantically structured strings (Tay et al. 2022)
 
-## Number-based: Unstructured atomic integers
+## Number-based: Unstructured atomic integers (2)
 
 - An arbitrary (and possibly random) unique integer identifier
 - Corpus: 0, 1, 2, ...
@@ -302,7 +302,7 @@
 - The need for the large softmax output space
 - It is challenging to be used on large corpora!
 
-## Number-based: Naively structured strings
+## Number-based: Naively structured strings (2)
 
 - Treat arbitrary unique integers as tokenizable strings
 - Corpus: 243168, ...
@@ -320,19 +320,19 @@
 - Such a way frees the limitation for the corpus size that comes with unstructured atomic docid
 - Zhou et al. 2022, Zhou et al. 2023, Nguyen and Yates et al. 2023c, Nadeem et al. 2022, Mehta et al. 2022, Zhuang et al. 2023, Nadeem et al. 2022
 
-## Naively structured strings: obvious constraints
+## Naively structured strings: obvious constraints (2)
 
 - Identifiers are assigned in an arbitrary manner
 - The docid space lacks semantic structure
 
-## Number-based: Semantically structured strings
+## Number-based: Semantically structured strings (2)
 
 - Properties:
   - The docid should capture some information about the semantics of its associated document
   - The docid should be structured in a way that the search space is effectively reduced after each decoding step
 - Semantically similar documents share docid prefixes
 
-## Number-based: Semantically structured strings
+## Number-based: Semantically structured strings (2)
 
 - A hierarchical clustering algorithm over document embeddings to induce a decimal tree
 - Source: [Tay et al., 2021]

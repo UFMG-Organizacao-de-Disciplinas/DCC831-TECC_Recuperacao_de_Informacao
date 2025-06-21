@@ -306,9 +306,9 @@ Considerando a qualidade como um valor estático, temos alguns benefícios:
 
 ## References
 
-- [[Link]][2011_Bendersky] Quality-biased ranking of web documents - Bendersky et al., WSDM 2011
-- [[Link]][2002_Kraaij] The importance of prior probabilities for entry page search - Kraaij et al., SIGIR 2002
-- [[Link]][1999_Page] The PageRank citation ranking: bringing order to the Web - Page and Brin, Tech report 1999
+- [[2011_Bendersky]][2011_Bendersky] Quality-biased ranking of web documents - Bendersky et al., WSDM 2011
+- [[2002_Kraaij]][2002_Kraaij] The importance of prior probabilities for entry page search - Kraaij et al., SIGIR 2002
+- [[1999_Page]][1999_Page] The PageRank citation ranking: bringing order to the Web - Page and Brin, Tech report 1999
 
 [2011_Bendersky]: https://doi.org/10.1145/1935826.1935849
 [2002_Kraaij]: https://doi.org/10.1145/564376.564383
@@ -316,9 +316,9 @@ Considerando a qualidade como um valor estático, temos alguns benefícios:
 
 ---
 
-- [[Link]][2005_Craswell] Relevance weighting for query independent evidence - Craswell et al., SIGIR 2005
-- [[Link]][2011_Castillo] Adversarial web search - Castillo and Davison, FnTIR 2011
-- [[Link]][2017_SIGKDD] Fake news detection on social media - Shu et al., SIGKDD Expl. 2017
+- [[2005_Craswell]][2005_Craswell] Relevance weighting for query independent evidence - Craswell et al., SIGIR 2005
+- [[2011_Castillo]][2011_Castillo] Adversarial web search - Castillo and Davison, FnTIR 2011
+- [[2017_SIGKDD]][2017_SIGKDD] Fake news detection on social media - Shu et al., SIGKDD Expl. 2017
 
 [2005_Craswell]: https://doi.org/10.1145/1076034.107610
 [2011_Castillo]: http://dx.doi.org/10.1561/1500000021

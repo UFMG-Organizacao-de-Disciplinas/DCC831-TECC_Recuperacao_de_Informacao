@@ -1,4 +1,4 @@
-# Learning to Rank: Pairwise and Listwise
+# Aula 18 - 21/05/2025 - Learning to Rank: Algorithms; Learning to Rank: Pairwise and Listwise
 
 ## The ranking problem
 

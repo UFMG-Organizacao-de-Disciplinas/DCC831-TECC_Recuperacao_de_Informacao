@@ -1,4 +1,4 @@
-# Slide: Learning to Rank: Fundamentals
+# Aula 17 - 19/05/2025 - Learning to Rank: Fundamentals
 
 ## The Ranking Problem
 

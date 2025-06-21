@@ -1,4 +1,4 @@
-# Diversification Models
+# Aula 16 - 14/05/2025 - Diversification Models
 
 ## The ranking problem
 
@@ -316,15 +316,15 @@
 
 ## References
 
-- [[Link]][1998_SIGIR] The use of MMR, diversity-based reranking for reordering documents and producing summaries - Carbonell and Goldstein, SIGIR 1998
-- [[Link]][2010_Santos] Exploiting query reformulations for Web search result diversification - Santos et al., WWW 2010
+- [[1998_SIGIR]][1998_SIGIR] The use of MMR, diversity-based reranking for reordering documents and producing summaries - Carbonell and Goldstein, SIGIR 1998
+- [[2010_Santos]][2010_Santos] Exploiting query reformulations for Web search result diversification - Santos et al., WWW 2010
 
 [1998_SIGIR]: https://doi.org/10.1145/290941.291025
 [2010_Santos]: http://dx.doi.org/10.1145/1772690.1772780
 
 ---
 
-- [[Link]][2015_Santos] Search result diversification - Santos et al., FnTIR 2015
+- [[2015_Santos]][2015_Santos] Search result diversification - Santos et al., FnTIR 2015
 
 [2015_Santos]: http://dx.doi.org/10.1145/1772690.1772780
 
