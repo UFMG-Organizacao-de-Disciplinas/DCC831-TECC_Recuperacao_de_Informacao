@@ -195,7 +195,7 @@
 - Slow inference speed: GTR (Dense retrieval) - Online latency 1.97s
 - Efficiency: A large document index is needed to search over the corpus, leading to significant memory consumption and computational overhead
 
-## Opinion paper: A single model for IR
+## Opinion paper: A single model for IR (2)
 
 - Query Parser: rewriting, expansion, suggestion, ...
 - Search query
@@ -208,7 +208,7 @@
   - Search query
   - Search results
 
-## Neural IR models: Discriminative vs. Generative
+## Neural IR models: Discriminative vs. Generative (2)
 
 - Discriminative:
   - Document Space: d₁, d₂, d₃, ..., d₊
@@ -219,7 +219,7 @@
   - Document Space: d₁₀ "olympic games", d₂ "olympic symbols", d₊ "2022 Winter Olympics opening ceremony"
   - association
 
-## Two families of generative retrieval
+## Two families of generative retrieval (2)
 
 - Closed-book: The language model is the only source of knowledge leveraged during generation, e.g.:
   - Capturing document ids in the language models
@@ -229,7 +229,7 @@
   - Tool-augmented generation of answers
 - Source: [Najork, 2023]
 
-## Why generative retrieval?
+## Why generative retrieval? (2)
 
 - Heterogeneous objectives:
   - Doc Parser: extractors, anti-spamming, ...
@@ -243,7 +243,7 @@
 - Search query
 - Search results
 
-## Why generative retrieval?
+## Why generative retrieval? (2) (2)
 
 - Memory size (MS MARCO 300K):
   - Dense retrieval: GTR - 1430MB
@@ -332,7 +332,7 @@
   - The docid should be structured in a way that the search space is effectively reduced after each decoding step
 - Semantically similar documents share docid prefixes
 
-## Number-based: Semantically structured strings (2)
+## Number-based: Semantically structured strings (2) (2)
 
 - A hierarchical clustering algorithm over document embeddings to induce a decimal tree
 - Source: [Tay et al., 2021]
@@ -363,7 +363,7 @@
 - Natural Questions 320K
 - Data source: Tay et al. (2022)
 
-## Number-based docids: Summary
+## Number-based docids: Summary (2)
 
 - [x] Docids based on integers are easy to build
 - [x] Unstructured atomic integers and naively/semantically structured strings can maintain uniqueness
@@ -383,12 +383,12 @@
   - Pseudo queries (Tang et al. 2023a)
   - Important terms (Zhang et al. 2023)
 
-## A single docid: Word-based
+## A single docid: Word-based (2)
 
 - The fundamental inspiration:
   - The query is usually keyword-based natural language, which can be challenging to map into a numeric string, while mapping it to words would be more intuitive
 
-## Word-based: Titles
+## Word-based: Titles (2)
 
 - Document titles: be able to summarize the main content
 - Information retrieval | Decoding target
@@ -396,7 +396,7 @@
 - "Autoregressive Entity Retrieval". De Cao et al. [2021]
 - **Chiamaka Nnadozie’s father didn’t want her to play soccer. Nigerian star defied him and rewrote the record books** By Michael Johnston and Amanda Davies, CNN © 5 minute read - Updated 10:06 AM EDIT, Wed November 1, 2023 (CNN) — It wasn’t always plain sailing for Paris FC and Nigerian goalkeeper, Chiamaka Nnadozie, throughout her now-flourishing career. Growing up in a family of boys and men – who had all tried their hand at going professional – Nnadozie’s ambition to follow suit wasn’t greeted with unyielding enthusiasm. Quite the opposite. "It wasn’t very good from my family. They never let me play, especially my dad," the 22-year-old told CNN’s Amanda Davies. "Whenever I went to play soccer, he would always tell me: 'Girls don’t play football. Look at me. I played football, I didn’t make it. Your brother, he played, he didn’t make your cousin played, he didn’t make it. So why do you want to choose this? Why don’t you want to go to school or maybe do some other things?'" Nnadozie recollected.
 
-## Word-based: URLs
+## Word-based: URLs (2)
 
 - The URL of a document contains certain semantic information and can uniquely correspond to this document
 - What is Information Retrieval? Read Discuss Courses Information Retrieval (IR) can be defined as a software program that deals with the organization, storage, retrieval, and evaluation of information from document repositories, particularly textual information. Information Retrieval is the activity of obtaining material that can usually be documented on an unstructured nature i.e. usually text which satisfies an information need from within large collections which is stored on computers. For example, Information Retrieval can be when a user enters a query into the system. Not only librarians, professional searchers, etc engage themselves in the activity of information retrieval but nowadays hundreds of millions of people engage in IR every day when they use web search engines. Information Retrieval is believed to be the dominant form of "TOME: A Two-stage Approach for Model-based Retrieval". Ren et al. [2023]
@@ -406,7 +406,7 @@
 
 - It is necessary to design automatic docid generation techniques
 
-## Word-based: Pseudo queries
+## Word-based: Pseudo queries (2)
 
 - Doc2Query technique: pseudo queries are likely to be representative or related to the contents of documents
 - In fiscal 2015, Disney earned $16,162 billion in revenue from ⋯⋯ Documents
@@ -432,7 +432,7 @@
 - Rely on metadata or labeled data
 - May lead to duplication
 
-## Multiple docids
+## Multiple docids (2)
 
 - A single docid:
   - Number-based docids: Unstructured atomic integers (Tay et al. 2022), Product quantization strings (Zhou et al. 2022), Semantically structured strings (Tay et al. 2022)
@@ -450,7 +450,7 @@
 
 ## Multiple docids: Diverse types (MINDER) [Li et al., 2023]
 
-- Query: Who is the singer of does he love you? ↑Relevant Passage \[ https://en.wikipedia.org/wiki/Does_He_Love_You\] "Does He Love You" is a song written by Sandy Knox and Billy Stritch, and recorded as a duet by American country music artists Reba McEntire and Linda Davis. It was released in August 1993 as the first single from Reba's album "Greatest Hits Volume Two". It is one of country music's several songs about a love triangle. "Does He Love You" was written in 1982 by Billy Stritch. .....
+- Query: Who is the singer of does he love you? ↑Relevant Passage [Does He Love You](https://en.wikipedia.org/wiki/Does_He_Love_You) "Does He Love You" is a song written by Sandy Knox and Billy Stritch, and recorded as a duet by American country music artists Reba McEntire and Linda Davis. It was released in August 1993 as the first single from Reba's album "Greatest Hits Volume Two". It is one of country music's several songs about a love triangle. "Does He Love You" was written in 1982 by Billy Stritch. .....
 - Multiview Identifiers:
   - Title: Does He Love You
   - Substrings: "Does He Love You" is a song ... recorded as a duet by American country music artists Reba McEntire and Linda Davis, ...
@@ -481,7 +481,7 @@
 - GR models with the increased docid numbers demand more memory usage and inference time
 - It is challenging to design discriminative multiple docids for a document
 
-## Performance comparisons
+## Performance comparisons (2)
 
 | Model                        | Recall@1 |
 | ---------------------------- | -------- |
@@ -566,7 +566,7 @@
 - Retrieval loss unchanged:$ \mathcal{L}_{\text{Retrieval}}(Q, I_Q; \theta) = -\sum_{q \in Q} \sum\_{id^q \in I_Q} \log P(id^q \mid q; \theta)$
 - "Bridging the Gap Between Indexing and Retrieval for Differentiable Search Index with Query Generation". Zhuang et al. [2023]
 
-## Comparisons
+## Comparisons (2)
 
 | Model                                 | Hits@1 (MS MARCO 100K) |
 | ------------------------------------- | ---------------------- |
