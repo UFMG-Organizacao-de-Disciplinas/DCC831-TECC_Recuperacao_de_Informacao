@@ -111,9 +111,7 @@ Essas boas práticas servem para indicar de que forma o buscador irá promover c
 #### Coesão
 
 - **Entropia:** uma página com baixa entropia (menos caos), tende a ser mais coesa.
-
   - **Fórmula:** $H(\theta_d) = - \sum_{t \in d} P(t|d) \log P(t|d)$
-
 - **Dúvida:** E afinal, como que seria um texto com baixa entropia?
 - **Comentário:** Ele não pareceu dar muito enfoque à fórmula.
 
@@ -187,9 +185,9 @@ Os valores de partida podem ser definidos aleatoriamente ou uniformemente. Pelo 
 ```mermaid
 graph LR
 
-  A(A)
-  B(B)
-  C(C)
+  A((A))
+  B((B))
+  C((C))
 
   A --> B & C
   B --> C
@@ -204,24 +202,24 @@ graph LR
 
   - [JV] O PageRank de C no tempo $t+1$ é igual ao PageRank de A no tempo $t$ dividido pelo número de saídas de A mais o PageRank de B no tempo $t$ dividido pelo número de saídas de B.
 
-|     X      | $PR^{(t)}(A)$ | $PR^{(t)}(B)$ | $PR^{(t)}(C)$ |
+|  $\times$  | $PR^{(t)}(A)$ | $PR^{(t)}(B)$ | $PR^{(t)}(C)$ |
 | :--------: | ------------: | ------------: | ------------: |
-|   $t=0$    |          0.33 |          0.33 |          0.33 |
-|   $t=1$    |          0.33 |          0.17 |          0.50 |
-|   $t=2$    |          0.50 |          0.17 |          0.33 |
-|   $t=3$    |          0.33 |          0.25 |          0.42 |
+|   $t=0$    |        $0.33$ |        $0.33$ |        $0.33$ |
+|   $t=1$    |        $0.33$ |        $0.17$ |        $0.50$ |
+|   $t=2$    |        $0.50$ |        $0.17$ |        $0.33$ |
+|   $t=3$    |        $0.33$ |        $0.25$ |        $0.42$ |
 |  $\dots$   |               |               |               |
-| $t=\infty$ |          0.40 |          0.20 |          0.40 |
+| $t=\infty$ |        $0.40$ |        $0.20$ |        $0.40$ |
 
 A convergência ocorre em uma distribuição estacionária.
 
-- Dúvida: Talvez utilizar de algum valor residual para o PageRank gerasse uma convergência mais rápida. Talvez dividir pelo número de saídas somado a um, onde essa fração seria o valor residual?
+- **Dúvida:** Talvez utilizar de algum valor residual para o PageRank gerasse uma convergência mais rápida. Talvez dividir pelo número de saídas somado a um, onde essa fração seria o valor residual?
 
 ##### Checagem de Convergência
 
 Usualmente o critério de parada é definido como "a diferença entre o PageRank de dois passos consecutivos é menor que um valor $\epsilon$".
 
-Matematicamente é dado por: $||\overrightarrow{PR}^{(t)} − \overrightarrow{PR}^{(t−1)}|| < \epsilon$
+Matematicamente é dado por: $\|\overrightarrow{PR}^{(t)} − \overrightarrow{PR}^{(t−1)}\| < \epsilon$
 
 Considere também que para um valor $\epsilon$ pequeno, a convergência será mais lenta e acurada, enquanto que para um valor $\epsilon$ grande, a convergência será mais rápida e menos acurada.
 
@@ -236,6 +234,8 @@ Considere também que para um valor $\epsilon$ pequeno, a convergência será ma
     - $R_q$: documentos exibidos para $q$
 
 - **Dúvida:** CTR ainda é critério de Autoridade?
+  - **Resposta GPT:** CTR não é um critério de autoridade tradicional.
+    Ele é um sinal comportamental e implícito, que pode ser usado como feature em sistemas de aprendizado para ranqueamento, mas não substitui métricas de autoridade como PageRank.
 
 ## O que é Spam?
 
@@ -306,9 +306,9 @@ Considerando a qualidade como um valor estático, temos alguns benefícios:
 
 ## References
 
-- [[2011_Bendersky]][2011_Bendersky] Quality-biased ranking of web documents - Bendersky et al., WSDM 2011
-- [[2002_Kraaij]][2002_Kraaij] The importance of prior probabilities for entry page search - Kraaij et al., SIGIR 2002
-- [[1999_Page]][1999_Page] The PageRank citation ranking: bringing order to the Web - Page and Brin, Tech report 1999
+- [2011_Bendersky][2011_Bendersky] Quality-biased ranking of web documents - Bendersky et al., WSDM 2011
+- [2002_Kraaij][2002_Kraaij] The importance of prior probabilities for entry page search - Kraaij et al., SIGIR 2002
+- [1999_Page][1999_Page] The PageRank citation ranking: bringing order to the Web - Page and Brin, Tech report 1999
 
 [2011_Bendersky]: https://doi.org/10.1145/1935826.1935849
 [2002_Kraaij]: https://doi.org/10.1145/564376.564383
@@ -316,9 +316,9 @@ Considerando a qualidade como um valor estático, temos alguns benefícios:
 
 ---
 
-- [[2005_Craswell]][2005_Craswell] Relevance weighting for query independent evidence - Craswell et al., SIGIR 2005
-- [[2011_Castillo]][2011_Castillo] Adversarial web search - Castillo and Davison, FnTIR 2011
-- [[2017_SIGKDD]][2017_SIGKDD] Fake news detection on social media - Shu et al., SIGKDD Expl. 2017
+- [2005_Craswell][2005_Craswell] Relevance weighting for query independent evidence - Craswell et al., SIGIR 2005
+- [2011_Castillo][2011_Castillo] Adversarial web search - Castillo and Davison, FnTIR 2011
+- [2017_SIGKDD][2017_SIGKDD] Fake news detection on social media - Shu et al., SIGKDD Expl. 2017
 
 [2005_Craswell]: https://doi.org/10.1145/1076034.107610
 [2011_Castillo]: http://dx.doi.org/10.1561/1500000021
