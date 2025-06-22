@@ -4,11 +4,7 @@
 
 ```mermaid
 graph LR
-
-  q(q)
-  d(d)
-
-  q .- d
+  q((q)) .- d((d))
 ```
 
 - $f(q, d)$
@@ -26,11 +22,7 @@ graph LR
 
 ```mermaid
 graph LR
-
-  q(q)
-  d(d)
-
-  q .- d
+  q((q)) .- d((d))
 ```
 
 - $f(q, d)$
@@ -39,11 +31,7 @@ graph LR
 
 ```mermaid
 graph LR
-
-  q(q)
-  d(d)
-
-  q .- d
+  q((q)) .- d((d))
 ```
 
 - $f(d)$
