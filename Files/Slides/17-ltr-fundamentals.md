@@ -142,8 +142,7 @@ graph LR
     - $\mathcal{L}$: loss function
     - $\mathcal{O}$: optimizer
     - R: número real
-    - [JV]
-      - Para cada função e exemplos rotulados, a função de perda avalia a função do ranking.
+    - [JV] Para cada função e exemplos rotulados, a função de perda avalia a função do ranking.
 
 ---
 
@@ -280,7 +279,7 @@ $$
   - O Random Forest/Ensemble de árvores, seria rodar essa árvore de regressão simples só que várias e ao mesmo tempo e calcular a média dos resultados.
 
 ```mermaid
-graph TD
+graph LR
   A1(("$$x_7 > 2$$"))
   a1(("$$x_1 > 3$$"))
   a2(("$$x_4 > 0$$"))

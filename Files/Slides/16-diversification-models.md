@@ -28,14 +28,14 @@
 
 [Imagem: maximum relevance]
 
-## Ranking optimality
+### Ranking optimality
 
 - PRP is optimal under certain assumptions
   - (Gordon & Lenk, 1991, 1992)
 - **A1:** The probability of relevance is estimated with certainty, with no measure of risk
 - **A2:** The probability of relevance is estimated independently for every document
 
-## Limiting assumption A1
+#### Limiting assumption A1
 
 - **Assumption**
   - **A1** The probability of relevance is estimated with certainty, with no measure of risk
@@ -64,15 +64,13 @@
 
 - **Ambiguous** query: Multiple **interpretations**
 - **Underspecified** query: Multiple **aspects**
-  - [JV]
-    - Quem tá interessado em um, às vezes está também interessado em outro.
+  - [JV] Quem tá interessado em um, às vezes está também interessado em outro.
 
 ---
 
 - **Ambiguous** query: 16% of web search queries (Song, 2009)
 - **Underspecified** query: every query to some extent (Cronen-Townsend & Croft, 2002)
-  - [JV]
-    - Toda pesquisa tem um quê de underspecified.
+  - [JV] Toda pesquisa tem um quê de underspecified.
 
 ## Limiting assumption A2
 
@@ -81,7 +79,7 @@
 - Limitation: **redundancy**
   - "The relationship between a document and a query is necessary but not sufficient to determine relevance" (Goffman, 1964)
 
----3
+---
 
 [Imagem: Google search results for "glass" with a prompt asking if users need more results about the material]
 
@@ -112,16 +110,16 @@
 ---
 
 - $D \gets \varnothing$
-- $\textbf{while } |D| < \tau \textbf{ do}$
+- **while** $|D| < \tau$ **do**
   - $d^* \gets \argmax_{d \in R} f(q, d, D)$
   - $R \gets R \setminus \{d^*\}$
   - $D \gets D \cup \{d^*\}$
-- $\textbf{end while}$
-- $\textbf{return } D$
+- **end while**
+- **return** $D$
 
 - [JV] O F buscará encontrar o quão relevante ele é dado os itens já existentes
   - No pior caso ainda tá distante do ótimo.
-  - OK, não tá perfeito, mas quando que o pior carro ocorre?
+  - OK, não tá perfeito, mas quando que o pior caso ocorre?
   - Como já é bom o bastante, geralmente nem precisa analisar outros algoritmos.
   - Geralmente o foco está na $f(q, d, D)$.
 
@@ -217,9 +215,9 @@
   - **D**
     - Cinco gatinhos
   - **$R \setminus D$**
-    - $d_1:$ (relevant, not novel) = (+, -)
-    - $d_2:$ (relevant, novel) = (+, +)
-    - $d_3:$ (non-relevant, novel) = (-, +)
+    - $d_1:$ 🐈 (relevant, not novel) = (+, -)
+    - $d_2:$ 🐈‍⬛ (relevant, novel) = (+, +)
+    - $d_3:$ 🐕 (non-relevant, novel) = (-, +)
 
 #### xQuAD (Santos et al., 2010) [JV: doutorado dele]
 
@@ -245,21 +243,23 @@
 
 [Imagem: Sugestões de pesquisa no google]
 
-##### Estimating $P(d, \bar{D}|q)$
+##### Estimating $P(d, \bar{D} \mid q)$
 
-- $f(q, d, D) = (1 - \lambda) P(d|q) + \lambda \sum_{s \in S} P(s|q)P(d|q, s) \prod_{d_j \in D}(1 - P(d_j|q, s))$
+- $f(q, d, D) = (1 - \lambda) P(d \mid q) + \lambda \sum_{s \in S} P(s \mid q)P(d \mid q, s) \prod_{d_j \in D}(1 - P(d_j \mid q, s))$
 
-  - $P(d|q)$: relevance of document $d$ to query $q$
-  - $P(s|q)$: Importância de $s$ dada a query $q$
-  - $P(d|q, s)$: Cobertura de $d$ para $s$ dado a query $q$
+  - $P(d \mid q)$: relevance of document $d$ to query $q$
+  - $P(s \mid q)$: Importância de $s$ dada a query $q$
+  - $P(d \mid q, s)$: Cobertura de $d$ para $s$ dado a query $q$
   - $\prod_{d_j \in D}(1 - P(d_j|q, s))$: Novidade de $\bar{d}_j$ dado $s$ e $q$
+
+---
 
 [Imagem: Grafo com os nós representando os documentos e as arestas representando as relações entre eles]
 
 ##### Example application
 
 - $X^{(i)} = (1 - \lambda) R + \lambda D^{(i-1)} = (1 - \lambda) R + \lambda CN^{(i-1)}$
-- How to estimate $R, C, N,$ and $\lambda$?
+- How to estimate $R, C, N$ and $\lambda$?
   - Advanced topics (see Santos et al., FnTIR 2015, Ch. 6)
 
 ---
@@ -320,12 +320,12 @@
 - [[2010_Santos]][2010_Santos] Exploiting query reformulations for Web search result diversification - Santos et al., WWW 2010
 
 [1998_SIGIR]: https://doi.org/10.1145/290941.291025
-[2010_Santos]: http://dx.doi.org/10.1145/1772690.1772780
+[2010_Santos]: http://doi.org/10.1145/1772690.1772780
 
 ---
 
 - [[2015_Santos]][2015_Santos] Search result diversification - Santos et al., FnTIR 2015
 
-[2015_Santos]: http://dx.doi.org/10.1145/1772690.1772780
+[2015_Santos]: http://doi.org/10.1145/1772690.1772780
 
 ## Coming next: Learning to Rank: Fundamentals
