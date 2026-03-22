@@ -1,4 +1,4 @@
-""" ## Query Processor
+''' Query Processor
 
 Your implementation must include a `processor.py` file, which will be executed in the previously
 described environment, as follows:
@@ -11,7 +11,7 @@ with the following arguments:
 
 - `-i <INDEX>`: the path to an index file.
 - `-q <QUERIES>`: the path to a file with the list of queries to process.
-- `-r <RANKER>`: a string informing the ranking function (either "TFIDF" or "BM25") to be used to
+- `-r <RANKER>`: a string informing the ranking function (either 'TFIDF' or 'BM25') to be used to
 score documents for each query.
 
 After processing **each query** (the `-q` argument above), your `processor.py` implementation must
@@ -30,10 +30,10 @@ The following example illustrates the required output format for a query:
 
 ```json
 {
-  "Query": "information retrieval",
-  "Results": [
-    { "ID": "0512698", "Score": 24.2},
-    { "ID": "0249777", "Score": 12.4},
+  'Query': 'information retrieval',
+  'Results': [
+    { 'ID': '0512698', 'Score': 24.2},
+    { 'ID': '0249777', 'Score': 12.4},
     ...
   ]
 }
@@ -62,7 +62,7 @@ You are free to experiment with different variants of these functions from the l
 4. _Parallelization Policy (extra)_: To ensure maximum efficiency, you **may parallelize the
 query processing across multiple threads**. You may experiment to find an optimal number of threads
 to maximize your throughput while minimizing the incurred parallelization overhead.
-"""
+'''
 
 # Google Drive Link: https://drive.google.com/drive/folders/1MM1WF0Wi-q4CA8zgl6-J2r0md64yfaWK
 
@@ -75,7 +75,7 @@ from modules.p_rankers import score_query
 
 
 def load_index(index_path):
-    """ Load the index from the specified path """
+    ''' Load the index from the specified path '''
     index_files = {'ii': {}, 'di': {}, 'tl': {}}
     with open(index_path + '/inverted_index.json', encoding='utf8') as f:
         index_files['ii'] = json.load(f)
@@ -88,25 +88,26 @@ def load_index(index_path):
 
 
 def query_process(query, index_files, ranker_name):
-    """ Query processing function that preprocesses the query, scores it, and returns results """
+    ''' Query processing function that preprocesses the query, scores it, and returns results '''
     processed_query = preprocess_text(query)
 
     scores = score_query(processed_query, index_files, ranker_name)
     top_k_scores = scores[:10]  # Get top 10 results
 
-    results = [{"ID": str(docid), "Score": round(score, 2)}
-               for docid, score in top_k_scores]
+    results = [
+        {'ID': str(docid), 'Score': round(score, 2)} for docid, score in top_k_scores
+    ]
 
     return results
 
 
 def monothread_query_process(parallel_load):
-    """
+    '''
     Monothread query processing function that processes queries one by one
     - Reads queries from the file specified in cmd_args['queries']
     - Processes each query using the query_process function
     - Groups results by query and returns a dictionary with the results
-    """
+    '''
     index_files = parallel_load['index_files']
     cmd_args = parallel_load['cmd_args']
     ranker_name = cmd_args['ranker']
@@ -115,22 +116,22 @@ def monothread_query_process(parallel_load):
 
     with open(cmd_args['queries'], encoding='utf8') as f:
         for line in f:
-            query_results = {"Query": "", "Results": []}
+            query_results = {'Query': '', 'Results': []}
             query = line.strip()
-            # print(f"Processing query: {query}")  # Debugging output
+            # print(f'Processing query: {query}')  # Debugging output
             if not query:
                 continue  # Skip empty lines
 
-            query_results["Query"] = query
+            query_results['Query'] = query
             results = query_process(query, index_files, ranker_name)
-            query_results["Results"] = results
+            query_results['Results'] = results
             queries_results.append(query_results)
 
     return queries_results
 
 
 def print_processor_result(queries_results):
-    """ Print the results of processed queries in JSON format """
+    ''' Print the results of processed queries in JSON format'''
 
     msg = json.dumps(queries_results, indent=2)
     # print(query_results)
@@ -139,17 +140,14 @@ def print_processor_result(queries_results):
 
 
 def processor(cmd_args):
-    """ Main processor function """
+    ''' Main processor function'''
     index_files = load_index(cmd_args['index'])
 
     parallel_process_load = {
         'index_files': index_files,
         'cmd_args': cmd_args,
         'process': query_process,
-        'hyperparameters': {
-            'limit': 1000,
-            'max_threads': 4
-        }
+        'hyperparameters': {'limit': 1000, 'max_threads': 4},
     }
 
     # query_results = parallel_process_queries(parallel_process_load)
@@ -158,7 +156,7 @@ def processor(cmd_args):
 
 
 def main():
-    """ PA2 - Query Processor """
+    ''' PA2 - Query Processor'''
     cmd_args = get_processor_args()
 
     # print(10*'\n')
@@ -166,5 +164,5 @@ def main():
     print_processor_result(queries_results)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
